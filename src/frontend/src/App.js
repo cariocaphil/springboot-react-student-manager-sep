@@ -4,7 +4,8 @@ import {getAllStudents} from './client.js';
 
 function App() {
   getAllStudents()
-    .then((response) => console.log(response));
+    .then((response) => response.json())
+    .then(console.log);
   return (
     <div className="App">
         <Button type="primary">Hello</Button>
