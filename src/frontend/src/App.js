@@ -1,5 +1,6 @@
 import './App.css';
-import {useState, useEffect} from 'react'
+import {useState, useEffect} from 'react';
+import StudentDrawerForm from "./StudentDrawerForm";
 import {getAllStudents} from "./client";
 import {
     Layout,
@@ -50,6 +51,7 @@ const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
 
 function App() {
     const [students, setStudents] = useState([]);
+    const [showDrawer, setShowDrawer] = useState(false);
     const [collapsed, setCollapsed] = useState(false);
     const [fetching, setFetching] = useState(true);
 
@@ -74,17 +76,23 @@ function App() {
         if (students.length <= 0) {
             return <Empty />;
         }
-        return <Table
+        return <>
+        <StudentDrawerForm
+            showDrawer={showDrawer}
+            setShowDrawer={setShowDrawer}
+        />
+        <Table
             dataSource={students}
             columns={columns}
             bordered
-            title={() => <Button type="primary" shape="round" icon={<PlusOutlined />} size="small">
+            title={() => <Button type="primary" shape="round" icon={<PlusOutlined />} size="small" onClick={() => setShowDrawer(!showDrawer)}>
                              Add New Student
                          </Button>}
             pagination={{ pageSize: 50 }}
             scroll={{ y: 240 }}
             rowKey={(student) => student.id}
-        />;
+        />
+        </>
     }
 
     return <Layout style={{minHeight: '100vh'}}>
