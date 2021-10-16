@@ -1,13 +1,15 @@
 import './App.css';
 import {useState, useEffect} from 'react';
 import StudentDrawerForm from "./StudentDrawerForm";
-import {getAllStudents} from "./client";
+import {deleteStudent, getAllStudents} from "./client";
+import {errorNotification, successNotification} from "./Notification";
 import {
     Layout,
     Menu,
     Breadcrumb,
     Table, Spin, Empty,
-    Button, Badge, Tag, Avatar
+    Button, Badge, Tag, Avatar,
+    Radio, Popconfirm
 } from 'antd';
 import {
     DesktopOutlined,
@@ -38,7 +40,14 @@ const TheAvatar = ({name}) => {
     </Avatar>
 }
 
-const columns = [
+const removeStudent = (studentId, callback) => {
+    deleteStudent(studentId).then(() => {
+        successNotification( "Student deleted", `Student with ${studentId} was deleted`);
+        callback();
+    });
+}
+
+const columns = (fetchStudents) => [
     {
         title: '',
         dataIndex: 'avatar',
@@ -66,6 +75,22 @@ const columns = [
         dataIndex: 'gender',
         key: 'gender',
     },
+    {
+            title: 'Actions',
+            key: 'actions',
+            render: (text, student) =>
+                <Radio.Group>
+                    <Popconfirm
+                        placement='topRight'
+                        title={`Are you sure to delete ${student.name}`}
+                        onConfirm={() => removeStudent(student.id, fetchStudents)}
+                        okText='Yes'
+                        cancelText='No'>
+                        <Radio.Button value="small">Delete</Radio.Button>
+                    </Popconfirm>
+                    <Radio.Button value="small">Edit</Radio.Button>
+                </Radio.Group>
+        }
 ];
 
 const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
@@ -105,7 +130,7 @@ function App() {
         />
         <Table
             dataSource={students}
-            columns={columns}
+            columns={columns(fetchStudents)}
             bordered
             title={() =>
                     <>

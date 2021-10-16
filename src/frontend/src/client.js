@@ -14,6 +14,11 @@ export const getAllStudents = () =>
     fetch("api/v1/students")
         .then(checkStatus);
 
+export const deleteStudent = studentId =>
+    fetch(`api/v1/students/${studentId}`, {
+        method: 'DELETE'
+    }).then(checkStatus);
+
 export const addNewStudent = student =>
     fetch("api/v1/students", {
             headers: {
