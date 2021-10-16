@@ -7,7 +7,7 @@ import {
     Menu,
     Breadcrumb,
     Table, Spin, Empty,
-    Button
+    Button, Badge, Tag, Avatar
 } from 'antd';
 import {
     DesktopOutlined,
@@ -86,13 +86,22 @@ function App() {
             dataSource={students}
             columns={columns}
             bordered
-            title={() => <Button type="primary" shape="round" icon={<PlusOutlined />} size="small" onClick={() => setShowDrawer(!showDrawer)}>
-                             Add New Student
-                         </Button>}
+            title={() =>
+                    <>
+                        <Tag>Number of students</Tag>
+                        <Badge count={students.length} className="site-badge-count-4"/>
+                        <br/><br/>
+                        <Button
+                            onClick={() => setShowDrawer(!showDrawer)}
+                            type="primary" shape="round" icon={<PlusOutlined/>} size="small">
+                            Add New Student
+                        </Button>
+                    </>
+             }
             pagination={{ pageSize: 50 }}
             scroll={{ y: 240 }}
             rowKey={(student) => student.id}
-        />
+        />;
         </>
     }
 
