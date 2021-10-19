@@ -9,7 +9,7 @@ import {
     Breadcrumb,
     Table, Spin, Empty,
     Button, Badge, Tag, Avatar,
-    Radio, Popconfirm
+    Radio, Popconfirm, Divider
 } from 'antd';
 import {
     DesktopOutlined,
@@ -215,6 +215,14 @@ function App() {
                 </div>
             </Content>
             <Footer style={{textAlign: 'center'}}>By Amigoscode</Footer>
+                            <Divider>
+                                <a
+                                    rel="noopener noreferrer"
+                                    target="_blank"
+                                    href="https://amigoscode.com/p/full-stack-spring-boot-react">
+                                    Click here to access Fullstack Spring Boot & React for professionals
+                                </a>
+                            </Divider>
         </Layout>
     </Layout>
 }
