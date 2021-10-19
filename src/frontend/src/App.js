@@ -214,7 +214,7 @@ function App() {
                     {renderStudents()}
                 </div>
             </Content>
-            <Footer style={{textAlign: 'center'}}>By Amigoscode</Footer>
+            <Footer style={{textAlign: 'center'}}>Text Change to Test Deploy Flow</Footer>
                             <Divider>
                                 <a
                                     rel="noopener noreferrer"
