@@ -1,7 +1,7 @@
 version: "3.8"
 services:
   backend:
-    image: "cariocaphil/spring-react-fullstack:23.10.2021.11.18.31"
+    image: "cariocaphil/spring-react-fullstack:23.10.2021.13.19.12"
     ports:
       - "80:8080"
     restart: "always"
