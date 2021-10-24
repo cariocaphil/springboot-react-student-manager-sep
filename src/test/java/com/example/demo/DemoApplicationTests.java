@@ -24,7 +24,7 @@ class DemoApplicationTests {
 		int result = underTest.add(numberOne, numberTwo);
 
 		// then
-		assertThat(result).isEqualTo(51);
+		assertThat(result).isEqualTo(50);
 	}
 
 	class Calculator {
