@@ -108,7 +108,7 @@ Maven profiles:
 | `jib-push-to-dockerhub` | no | On `package`, Jib `build` → Docker Hub (`cariocaphil/spring-react-fullstack`) |
 | `jib-push-to-local` | no | On `package`, Jib `dockerBuild` → local Docker |
 
-Base image: `openjdk:11`. Container exposes `8080`, OCI format.
+Base image: `eclipse-temurin:11-jre`. Container exposes `8080`, OCI format.
 
 ## 5. CI/CD flow (as implemented)
 
@@ -184,7 +184,7 @@ These items are intentional backlog for modernization; this branch does not fix 
 
 - Spring Boot 2.5.x / Java 11 / javax namespace (EOL-era stack)
 - CRA 4 / React 17 / Ant Design 4 / Node 15 via frontend-maven-plugin
-- Jib 2.5.2; `openjdk:11` base (legacy tag practices)
+- Jib 2.5.2 (plugin version still dated; base image updated to Temurin 11 JRE in PR 5)
 - Both `package-lock.json` and `yarn.lock` under `src/frontend`
 - Plugin config lists a stale top-level `nodeVersion` (`v4.6.0`) while the install execution uses `v15.4.0`
 
