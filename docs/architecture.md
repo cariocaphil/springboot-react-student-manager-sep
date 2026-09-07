@@ -131,7 +131,7 @@ Intended sequence:
 4. Docker Hub login (`DOCKER_HUB_USERNAME=cariocaphil` + secret password)
 5. Maven package with `build-frontend` + `jib-push-to-dockerhub` and `-Dapp.image.tag=…`
 6. Slack “pushed … to docker hub” (message text still references historical `amigoscode/…` image names)
-7. `sed` rewrite of image tag inside `elasticbeanstalk/docker-compose.yml`, commit, push as `github-actions`
+7. `sed` rewrite of `cariocaphil/spring-react-fullstack` tag in `elasticbeanstalk/docker-compose.yml` (fails if tag not present after update), commit, push as `github-actions`
 8. `einaregilsson/beanstalk-deploy` with compose file as deployment package
 9. Slack completion (EB URL in message)
 
@@ -176,8 +176,8 @@ These items are intentional backlog for modernization; this branch does not fix 
 ### Configuration & ops drift
 
 - Workflow `AWS_REGION=eu-west-1` vs Slack EB URL and RDS endpoint using **`eu-central-1`**
-- Deploy Slack / `sed` patterns still mention **`amigoscode/springboot-react-fullstack`**, while Jib and compose use **`cariocaphil/spring-react-fullstack`** — tag bump / messaging may not match reality
-- Region / image-name drift and commit-back of compose tags remain on **`deploy.yml`** (Actions majors and `::set-output` addressed in PR 4; invalid leading `YAML` token removed)
+- Deploy Slack text still mentions historical **`amigoscode/springboot-react-fullstack`** (compose tag `sed` fixed to `cariocaphil/…` in PR 7)
+- Region drift and commit-back of compose tags remain on **`deploy.yml`** (Actions majors and `::set-output` addressed in PR 4; invalid leading `YAML` token removed)
 - CICD commits back to the repo from the runner (image tag churn on `main`)
 
 ### Platform age
