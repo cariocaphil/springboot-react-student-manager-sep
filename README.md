@@ -133,6 +133,8 @@ Required secrets (documented as expected by the workflows; not inventing values)
 
 - [Architecture (current state + debt)](docs/architecture.md)
 - [Modernization roadmap (PR build history)](docs/modernization-roadmap.md)
+- [AGENTS.md](AGENTS.md) — shared coding-agent guidance
+- [CLAUDE.md](CLAUDE.md) — Claude-specific entrypoint (defers to AGENTS.md)
 
 ## License / origin
 

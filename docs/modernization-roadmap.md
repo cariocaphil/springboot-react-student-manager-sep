@@ -25,3 +25,4 @@ PR 2 — Project baseline documentation
 - [x] Add root README (stack, local setup, CI/CD, Elastic Beanstalk overview)
 - [x] Add `docs/architecture.md` (as-is architecture + technical debt)
 - [x] Add this roadmap in PR build-history format
+- [x] Add `AGENTS.md` (shared agent guidance) and `CLAUDE.md` (Claude-specific entrypoint)
