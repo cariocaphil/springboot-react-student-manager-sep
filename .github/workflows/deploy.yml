@@ -78,9 +78,16 @@ jobs:
       - name: Update and commit app version in docker-compose.yaml
         run: |
           BUILD_NUMBER=${{steps.build-number.outputs.BUILD_NUMBER}}
-          echo -e "Current elasticbeanstalk/docker-compose.yml\n$(cat elasticbeanstalk/docker-compose.yml)"
-          sed -i -E 's_(amigoscode/springboot-react-fullstack:)([^"]*)_\1'${BUILD_NUMBER}'_' elasticbeanstalk/docker-compose.yml
-          echo -e "Current elasticbeanstalk/docker-compose.yml\n$(cat elasticbeanstalk/docker-compose.yml)"
+          IMAGE_REPO="cariocaphil/spring-react-fullstack"
+          COMPOSE_FILE=elasticbeanstalk/docker-compose.yml
+          echo -e "Current ${COMPOSE_FILE}\n$(cat "${COMPOSE_FILE}")"
+          sed -i -E "s_(${IMAGE_REPO}:)([^\"]*)_\1${BUILD_NUMBER}_" "${COMPOSE_FILE}"
+          echo -e "Updated ${COMPOSE_FILE}\n$(cat "${COMPOSE_FILE}")"
+          if ! grep -Fq "${IMAGE_REPO}:${BUILD_NUMBER}" "${COMPOSE_FILE}"; then
+            echo "::error::Expected ${IMAGE_REPO}:${BUILD_NUMBER} in ${COMPOSE_FILE} after tag update; aborting before commit."
+            cat "${COMPOSE_FILE}"
+            exit 1
+          fi
           git config user.name github-actions
           git config user.email github-actions@github.com
           git add elasticbeanstalk/docker-compose.yml

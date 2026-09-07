@@ -4,12 +4,12 @@ Full-stack student CRUD demo: a Spring Boot API and a Create React App UI packag
 
 ## Status
 
-**Modernization:** PR 6 upgrades Jib to 3.5.2 so it can pull the Temurin 11 OCI base image.
+**Modernization:** PR 7 fixes the deploy compose image-tag `sed` so it updates `cariocaphil/spring-react-fullstack`.
 
 | | |
 | --- | --- |
-| Current | Java 11 / Spring Boot 2.5.4; Jib **3.5.2** + `eclipse-temurin:11-jre` |
-| Next | PR 7 — secrets out of git; later: region/image drift, retire commit-back if desired |
+| Current | Java 11 / Spring Boot 2.5.4; Jib 3.5.2; deploy tag bump matches Hub image name |
+| Next | PR 8 — secrets out of git; later: Slack amigoscode text, region drift, retire commit-back |
 | Full checklist | [docs/modernization-roadmap.md](docs/modernization-roadmap.md) |
 | Architecture | [docs/architecture.md](docs/architecture.md) |
 
