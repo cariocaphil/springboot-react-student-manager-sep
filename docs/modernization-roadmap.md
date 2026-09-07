@@ -2,7 +2,7 @@
 
 Build history for the Student Manager modernization.
 
-PR numbers match merged GitHub pull requests. Future work continues from PR 6.
+PR numbers match merged GitHub pull requests. Future work continues from PR 7.
 
 The README keeps a short Status summary; this file holds the full checklist.
 
@@ -41,7 +41,12 @@ PR 4 — Upgrade CICD GitHub Actions (`deploy.yml`) ✅
 - [x] Keep commit-back of compose image tag, EB deploy, Slack, Docker Hub push, and app stack unchanged
 - [x] Leave secrets, region/image-name drift, and application code for later PRs
 
-PR 5 — Fix Jib Java 11 base image
+PR 5 — Fix Jib Java 11 base image ✅
 - [x] Replace obsolete `openjdk:11` Jib `from` image with `eclipse-temurin:11-jre`
 - [x] Keep Jib 2.5.2, Java 11, Docker Hub target `cariocaphil/spring-react-fullstack`, and EB flow unchanged
 - [x] Do not change credentials, region/image-name drift, or unrelated dependencies
+
+PR 6 — Upgrade Jib for Temurin OCI image indexes
+- [x] Upgrade `jib-maven-plugin` 2.5.2 → 3.5.2 so Jib can resolve `eclipse-temurin:11-jre` OCI indexes
+- [x] Keep `eclipse-temurin:11-jre`, Java 11, Spring Boot 2.5.4, Hub target, and EB behavior unchanged
+- [x] Do not upgrade other dependencies or change credentials / deploy drift
