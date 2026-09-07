@@ -1,0 +1,141 @@
+# Spring Boot + React Student Manager
+
+Full-stack student CRUD demo: a Spring Boot API and a Create React App UI packaged into a single deployable JAR/container and published to AWS Elastic Beanstalk.
+
+## Status
+
+**Modernization:** documenting the as-is baseline (PR 3). Legacy app + CI/CD + Elastic Beanstalk already exist; no runtime upgrades in this docs PR.
+
+| | |
+| --- | --- |
+| Current | Java 11 / Spring Boot 2.5.4 + CRA React 17, image to Docker Hub, deploy via EB Compose |
+| Next | PR 4 — secrets out of git, align region/image/Actions |
+| Full checklist | [docs/modernization-roadmap.md](docs/modernization-roadmap.md) |
+| Architecture | [docs/architecture.md](docs/architecture.md) |
+
+## Current stack (as-is)
+
+| Layer | Technology |
+| --- | --- |
+| Backend | Java 11, Spring Boot **2.5.4**, Spring Web, Spring Data JPA, Bean Validation, Lombok |
+| Database | PostgreSQL (local `localhost:5432`; AWS RDS via `dev` profile) |
+| Frontend | React **17**, Create React App (`react-scripts` 4.0.3), Ant Design 4, `unfetch` |
+| Build | Maven Wrapper, `frontend-maven-plugin` (Node 15.4 / npm 7.3), Jib **2.5.2** |
+| Container | OpenJDK 11 base image; image name `cariocaphil/spring-react-fullstack` |
+| CI/CD | GitHub Actions (`.github/workflows/build.yml`, `deploy.yml`) |
+| Deploy | AWS Elastic Beanstalk (Docker Compose single-service app) |
+
+## Repository layout
+
+```
+.
+├── .github/workflows/     # CI (PR) and CICD (main → Docker Hub → Elastic Beanstalk)
+├── elasticbeanstalk/      # docker-compose.yml deployed to EB
+├── docs/                  # Architecture baseline and modernization roadmap
+├── src/main/java/         # Spring Boot API (student domain)
+├── src/main/resources/    # application.properties (+ application-dev.properties)
+├── src/frontend/          # CRA React app (built into JAR static resources)
+└── pom.xml                # Maven build, frontend packaging, Jib profiles
+```
+
+## Local development
+
+### Prerequisites
+
+- JDK 11+
+- Maven Wrapper (`./mvnw`; no global Maven required)
+- PostgreSQL 13.x listening on `localhost:5432`
+- Node/npm only if you run the frontend separately (Maven installs Node during a full build)
+
+### Database
+
+Create a database matching `src/main/resources/application.properties`:
+
+- Database: `cariocaphil`
+- User: `postgres`
+- Password: `password`
+
+Schema is managed by Hibernate (`spring.jpa.hibernate.ddl-auto=update`).
+
+### Backend + packaged frontend (single process)
+
+From the repo root:
+
+```bash
+./mvnw spring-boot:run
+```
+
+Or build everything (frontend `npm install` / `npm run build`, copy into `target/classes/static`, package JAR):
+
+```bash
+./mvnw clean package -P build-frontend
+java -jar target/demo-0.0.1-SNAPSHOT.jar
+```
+
+The API listens on **http://localhost:8080**. In production-style packaging, the React build is served as static content from the same origin.
+
+### Frontend in watch mode (optional)
+
+```bash
+cd src/frontend
+npm install
+npm start
+```
+
+CRA runs on **http://localhost:3000** and proxies API calls to `http://localhost:8080` (`proxy` in `package.json`).
+
+### Local Docker image (optional)
+
+```bash
+./mvnw clean package -P build-frontend -P jib-push-to-local -Dapp.image.tag=local
+```
+
+Requires Docker. Pushes tags `cariocaphil/spring-react-fullstack:local` and `:latest` to the local daemon.
+
+### Tests
+
+```bash
+./mvnw test
+```
+
+Today this effectively runs the Spring context smoke test (`DemoApplicationTests`). CI also spins up Postgres before `./mvnw clean package`.
+
+## API surface (current)
+
+Base path: `/api/v1/students`
+
+| Method | Path | Behavior |
+| --- | --- | --- |
+| `GET` | `/api/v1/students` | List all students |
+| `POST` | `/api/v1/students` | Create student (validated; rejects duplicate email) |
+| `DELETE` | `/api/v1/students/{studentId}` | Delete by id (404 if missing) |
+
+There is **no** update/PUT endpoint. The UI shows an Edit control that is not wired to the API.
+
+## CI/CD overview
+
+| Workflow | Trigger | Purpose |
+| --- | --- | --- |
+| [`.github/workflows/build.yml`](.github/workflows/build.yml) (`CI`) | PRs to `main`, manual | Checkout, Java 11, Postgres 13.1 service, `./mvnw clean package -P build-frontend` |
+| [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml) (`CICD`) | Push to `main`, manual | Build + Jib push to Docker Hub, bump image tag in `elasticbeanstalk/docker-compose.yml`, deploy that compose file to Elastic Beanstalk; Slack notifications |
+
+Required secrets (documented as expected by the workflows; not inventing values): `DOCKER_HUB_PASSWORD`, `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `SLACK_WEBHOOK_URL`.
+
+## AWS Elastic Beanstalk (current)
+
+- Application: `springboot-react-fullstack`
+- Environment: `Springbootreactfullstack-env`
+- Region in workflow env: `eu-west-1` (note: Slack URL / RDS host references suggest `eu-central-1` — see debt in architecture doc)
+- Package: `elasticbeanstalk/docker-compose.yml` (maps host `80` → container `8080`, sets `SPRING_PROFILES_ACTIVE=dev`)
+- Runtime DB for `dev`: AWS RDS Postgres URL in `application-dev.properties`
+
+## Documentation
+
+- [Architecture (current state + debt)](docs/architecture.md)
+- [Modernization roadmap (PR build history)](docs/modernization-roadmap.md)
+- [AGENTS.md](AGENTS.md) — shared coding-agent guidance
+- [CLAUDE.md](CLAUDE.md) — Claude-specific entrypoint (defers to AGENTS.md)
+
+## License / origin
+
+Tutorial-style fullstack sample (Amigoscode footer/links in the UI). Treat credentials and environment names in-repo as **legacy baseline artifacts**, not as a recommended security posture.
