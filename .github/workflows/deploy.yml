@@ -18,7 +18,7 @@ env:
   DOCKER_HUB_USERNAME: cariocaphil
   # AWS & Elastic Bean Stalk
   AWS_REGION: eu-central-1
-  EB_ENVIRONMENT_NAME: Springbootreactfullstack-env
+  EB_ENVIRONMENT_NAME: springboot-react-fullstack-env
   EB_APPLICATION_NAME: springboot-react-fullstack
   EB_DEPLOYMENT_PACKAGE: elasticbeanstalk/docker-compose.yml
 
