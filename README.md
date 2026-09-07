@@ -4,12 +4,12 @@ Full-stack student CRUD demo: a Spring Boot API and a Create React App UI packag
 
 ## Status
 
-**Modernization:** PR 3 upgrades outdated Actions on CI `build.yml` only. App stack and `deploy.yml` unchanged.
+**Modernization:** PR 4 upgrades outdated Actions on CICD `deploy.yml` (Java 11 / Temurin). Commit-back and EB flow kept; secrets and image/region drift still open.
 
 | | |
 | --- | --- |
-| Current | Java 11 / Spring Boot 2.5.4 + CRA React 17; CI uses `checkout@v4` + `setup-java@v5` (Temurin) |
-| Next | PR 4 — secrets out of git; later: align `deploy.yml` Actions / region / image drift |
+| Current | Java 11 / Spring Boot 2.5.4 + CRA React 17; CI + CICD use `checkout@v4` + `setup-java@v5` (Temurin) |
+| Next | PR 5 — secrets out of git; later: region/image drift, retire commit-back if desired |
 | Full checklist | [docs/modernization-roadmap.md](docs/modernization-roadmap.md) |
 | Architecture | [docs/architecture.md](docs/architecture.md) |
 

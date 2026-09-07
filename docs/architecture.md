@@ -119,15 +119,15 @@ Base image: `openjdk:11`. Container exposes `8080`, OCI format.
 3. Java 11 (Temurin) via `actions/setup-java@v5`
 4. `./mvnw clean package -P build-frontend`
 
-(`actions/checkout@v4` is used for checkout. `deploy.yml` still uses older Actions versions — see debt below.)
+(`actions/checkout@v4` is used for checkout. `deploy.yml` uses the same checkout / setup-java majors as of PR 4.)
 
 ### 5.2 Main / CICD — `deploy.yml`
 
 Intended sequence:
 
 1. Slack “CICD ongoing”
-2. Checkout + Java 11 + Postgres service
-3. Compute build number timestamp `d.m.Y.H.M.S`
+2. Checkout (`actions/checkout@v4`) + Java 11 Temurin (`actions/setup-java@v5`) + Postgres service
+3. Compute build number timestamp `d.m.Y.H.M.S` via `$GITHUB_OUTPUT`
 4. Docker Hub login (`DOCKER_HUB_USERNAME=cariocaphil` + secret password)
 5. Maven package with `build-frontend` + `jib-push-to-dockerhub` and `-Dapp.image.tag=…`
 6. Slack “pushed … to docker hub” (message text still references historical `amigoscode/…` image names)
@@ -177,8 +177,7 @@ These items are intentional backlog for modernization; this branch does not fix 
 
 - Workflow `AWS_REGION=eu-west-1` vs Slack EB URL and RDS endpoint using **`eu-central-1`**
 - Deploy Slack / `sed` patterns still mention **`amigoscode/springboot-react-fullstack`**, while Jib and compose use **`cariocaphil/spring-react-fullstack`** — tag bump / messaging may not match reality
-- `deploy.yml` begins with a literal `YAML` token above `name:` (invalid / fragile workflow document shape)
-- Deprecated Actions patterns remain on **`deploy.yml`**: `actions/checkout@v2`, `setup-java@v1`, `::set-output` (`build.yml` upgraded in PR 3)
+- Region / image-name drift and commit-back of compose tags remain on **`deploy.yml`** (Actions majors and `::set-output` addressed in PR 4; invalid leading `YAML` token removed)
 - CICD commits back to the repo from the runner (image tag churn on `main`)
 
 ### Platform age
