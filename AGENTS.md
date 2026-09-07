@@ -49,7 +49,7 @@ Before changing runtime behavior, read:
 - Image: Jib → `cariocaphil/spring-react-fullstack`; compose may pin a numeric tag
 - Deploy profile: `SPRING_PROFILES_ACTIVE=dev` on EB
 
-Known inconsistencies (debt — fix only in the dedicated PR): region/image-name drift in `deploy.yml` vs compose/Slack; invalid `YAML` preamble on `deploy.yml`; aging Actions versions on **`deploy.yml`** (`build.yml` CI actions upgraded in PR 3).
+Known inconsistencies (debt — fix only in the dedicated PR): region/image-name drift in `deploy.yml` vs compose/Slack; CI commit-back of compose image tags; committed DB credentials (`build.yml` / `deploy.yml` Actions majors upgraded in PRs 3–4).
 
 ## After finishing a modernization PR
 
