@@ -4,12 +4,12 @@ Full-stack student CRUD demo: a Spring Boot API and a Create React App UI packag
 
 ## Status
 
-**Modernization:** PR 4 upgrades outdated Actions on CICD `deploy.yml` (Java 11 / Temurin). Commit-back and EB flow kept; secrets and image/region drift still open.
+**Modernization:** PR 5 restores the Jib container build by using a maintained Temurin 11 JRE base image.
 
 | | |
 | --- | --- |
-| Current | Java 11 / Spring Boot 2.5.4 + CRA React 17; CI + CICD use `checkout@v4` + `setup-java@v5` (Temurin) |
-| Next | PR 5 — secrets out of git; later: region/image drift, retire commit-back if desired |
+| Current | Java 11 / Spring Boot 2.5.4 + CRA React 17; Jib `from` = `eclipse-temurin:11-jre` |
+| Next | PR 6 — secrets out of git; later: region/image drift, retire commit-back if desired |
 | Full checklist | [docs/modernization-roadmap.md](docs/modernization-roadmap.md) |
 | Architecture | [docs/architecture.md](docs/architecture.md) |
 
@@ -21,7 +21,7 @@ Full-stack student CRUD demo: a Spring Boot API and a Create React App UI packag
 | Database | PostgreSQL (local `localhost:5432`; AWS RDS via `dev` profile) |
 | Frontend | React **17**, Create React App (`react-scripts` 4.0.3), Ant Design 4, `unfetch` |
 | Build | Maven Wrapper, `frontend-maven-plugin` (Node 15.4 / npm 7.3), Jib **2.5.2** |
-| Container | OpenJDK 11 base image; image name `cariocaphil/spring-react-fullstack` |
+| Container | Eclipse Temurin 11 JRE base (`eclipse-temurin:11-jre`); image name `cariocaphil/spring-react-fullstack` |
 | CI/CD | GitHub Actions (`.github/workflows/build.yml`, `deploy.yml`) |
 | Deploy | AWS Elastic Beanstalk (Docker Compose single-service app) |
 
