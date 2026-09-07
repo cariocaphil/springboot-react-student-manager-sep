@@ -2,7 +2,7 @@
 
 Build history for the Student Manager modernization.
 
-PR numbers match merged GitHub pull requests. Future work continues from PR 3.
+PR numbers match merged GitHub pull requests. Future work continues from PR 4.
 
 The README keeps a short Status summary; this file holds the full checklist.
 
@@ -21,8 +21,14 @@ PR 1 — UI Footer ✅
 - [x] Add footer / course link on the UI
 - [x] Add `rel="noreferrer"` on the external link
 
-PR 2 — Project baseline documentation
+PR 2 — Project baseline documentation ✅
 - [x] Add root README (stack, local setup, CI/CD, Elastic Beanstalk overview)
 - [x] Add `docs/architecture.md` (as-is architecture + technical debt)
 - [x] Add this roadmap in PR build-history format
 - [x] Add `AGENTS.md` (shared agent guidance) and `CLAUDE.md` (Claude-specific entrypoint)
+
+PR 3 — Upgrade CI GitHub Actions (`build.yml`)
+- [x] Upgrade `actions/checkout` v2 → v4
+- [x] Upgrade `actions/setup-java` v1.4.3 → v5 (Temurin, Java 11)
+- [x] Keep Maven/frontend package step and Postgres 13.1 service unchanged
+- [x] Leave `deploy.yml`, secrets, EB, and application stack untouched

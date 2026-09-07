@@ -4,12 +4,12 @@ Full-stack student CRUD demo: a Spring Boot API and a Create React App UI packag
 
 ## Status
 
-**Modernization:** documenting the as-is baseline (PR 3). Legacy app + CI/CD + Elastic Beanstalk already exist; no runtime upgrades in this docs PR.
+**Modernization:** PR 3 upgrades outdated Actions on CI `build.yml` only. App stack and `deploy.yml` unchanged.
 
 | | |
 | --- | --- |
-| Current | Java 11 / Spring Boot 2.5.4 + CRA React 17, image to Docker Hub, deploy via EB Compose |
-| Next | PR 4 — secrets out of git, align region/image/Actions |
+| Current | Java 11 / Spring Boot 2.5.4 + CRA React 17; CI uses `checkout@v4` + `setup-java@v5` (Temurin) |
+| Next | PR 4 — secrets out of git; later: align `deploy.yml` Actions / region / image drift |
 | Full checklist | [docs/modernization-roadmap.md](docs/modernization-roadmap.md) |
 | Architecture | [docs/architecture.md](docs/architecture.md) |
 

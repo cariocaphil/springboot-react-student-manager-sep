@@ -116,8 +116,10 @@ Base image: `openjdk:11`. Container exposes `8080`, OCI format.
 
 1. Trigger: `pull_request` → `main`, or `workflow_dispatch`
 2. Service container: Postgres 13.1 (`cariocaphil` / `postgres` / `password`)
-3. Java 11 via `actions/setup-java@v1.4.3`
+3. Java 11 (Temurin) via `actions/setup-java@v5`
 4. `./mvnw clean package -P build-frontend`
+
+(`actions/checkout@v4` is used for checkout. `deploy.yml` still uses older Actions versions — see debt below.)
 
 ### 5.2 Main / CICD — `deploy.yml`
 
@@ -176,7 +178,7 @@ These items are intentional backlog for modernization; this branch does not fix 
 - Workflow `AWS_REGION=eu-west-1` vs Slack EB URL and RDS endpoint using **`eu-central-1`**
 - Deploy Slack / `sed` patterns still mention **`amigoscode/springboot-react-fullstack`**, while Jib and compose use **`cariocaphil/spring-react-fullstack`** — tag bump / messaging may not match reality
 - `deploy.yml` begins with a literal `YAML` token above `name:` (invalid / fragile workflow document shape)
-- Deprecated Actions patterns: `actions/checkout@v2`, `setup-java@v1`, `::set-output`
+- Deprecated Actions patterns remain on **`deploy.yml`**: `actions/checkout@v2`, `setup-java@v1`, `::set-output` (`build.yml` upgraded in PR 3)
 - CICD commits back to the repo from the runner (image tag churn on `main`)
 
 ### Platform age
