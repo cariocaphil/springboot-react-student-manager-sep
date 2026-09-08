@@ -66,10 +66,10 @@ Production: relative API URLs work because UI and API share origin. Dev: CRA `pr
 
 | File | When used | Notable settings |
 | --- | --- | --- |
-| `application.properties` | Default / local | Local Postgres JDBC; `ddl-auto=update`; SQL logging on; error messages included in responses |
-| `application-dev.properties` | `SPRING_PROFILES_ACTIVE=dev` (EB compose) | AWS RDS JDBC URL; hardcoded DB username/password in source |
+| `application.properties` | Default / local / CI | Local Postgres JDBC defaults via `${SPRING_DATASOURCE_*:…}` placeholders; `ddl-auto=update`; SQL logging on; error messages included in responses |
+| `application-dev.properties` | `SPRING_PROFILES_ACTIVE=dev` (EB compose) | Datasource **required** from env: `SPRING_DATASOURCE_URL` / `_USERNAME` / `_PASSWORD` (no secrets in git) |
 
-Elastic Beanstalk compose sets `SPRING_PROFILES_ACTIVE: dev` for the backend service.
+Elastic Beanstalk compose sets `SPRING_PROFILES_ACTIVE: dev` and passes through `SPRING_DATASOURCE_*` from the host/EB environment.
 
 ## 3. Data model
 
@@ -150,7 +150,7 @@ Intended sequence:
 - Image tag currently pinned in-repo (example: `cariocaphil/spring-react-fullstack:40`)
 - Port map `80:8080`
 - `restart: always`
-- Profile `dev` → RDS-backed config
+- Profile `dev` → datasource from `SPRING_DATASOURCE_*` environment variables (passed through compose)
 
 ## 6. Testing (current)
 
@@ -168,14 +168,14 @@ These items are intentional backlog for modernization; this branch does not fix 
 
 ### Security & secrets
 
-- RDS hostname, username, and password committed in `application-dev.properties`
-- Local DB password in plaintext properties
+- ~~RDS credentials committed in `application-dev.properties`~~ — removed in PR 12; `dev` requires env vars
+- Previously leaked RDS password may still exist in git history — **rotate** and consider history scrub as follow-up
+- Local/CI still use default `postgres`/`password` placeholders (acceptable for local only)
 - No Spring Security / authentication / authorization
 - API and error payloads expose binding/message details (`server.error.include-message=always`)
 
 ### Configuration & ops drift
 
-- Workflow `AWS_REGION=eu-west-1` vs Slack EB URL and RDS endpoint using **`eu-central-1`**
 - Deploy Slack Hub text aligned to `cariocaphil/spring-react-fullstack` in PR 11; final Slack URL remains `http://springbootreactfullstack-env.eba-qtwuxhgp.eu-central-1.elasticbeanstalk.com/`
 - Commit-back of compose tags remains on **`deploy.yml`** (Actions majors and `::set-output` addressed in PR 4; invalid leading `YAML` token removed)
 - CICD commits back to the repo from the runner (image tag churn on `main`)
