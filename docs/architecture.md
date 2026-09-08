@@ -108,7 +108,7 @@ Maven profiles:
 | `jib-push-to-dockerhub` | no | On `package`, Jib `build` → Docker Hub (`cariocaphil/spring-react-fullstack`) |
 | `jib-push-to-local` | no | On `package`, Jib `dockerBuild` → local Docker |
 
-Base image: `eclipse-temurin:11-jre`. Container exposes `8080`, OCI format.
+Base image: `eclipse-temurin:17-jre`. Container exposes `8080`, OCI format.
 
 ## 5. CI/CD flow (as implemented)
 
@@ -116,7 +116,7 @@ Base image: `eclipse-temurin:11-jre`. Container exposes `8080`, OCI format.
 
 1. Trigger: `pull_request` → `main`, or `workflow_dispatch`
 2. Service container: Postgres 13.1 (`cariocaphil` / `postgres` / `password`)
-3. Java 11 (Temurin) via `actions/setup-java@v5`
+3. Java 17 (Temurin) via `actions/setup-java@v5`
 4. `./mvnw clean package -P build-frontend`
 
 (`actions/checkout@v4` is used for checkout. `deploy.yml` uses the same checkout / setup-java majors as of PR 4.)
@@ -126,7 +126,7 @@ Base image: `eclipse-temurin:11-jre`. Container exposes `8080`, OCI format.
 Intended sequence:
 
 1. Slack “CICD ongoing”
-2. Checkout (`actions/checkout@v4`) + Java 11 Temurin (`actions/setup-java@v5`) + Postgres service
+2. Checkout (`actions/checkout@v4`) + Java 17 Temurin (`actions/setup-java@v5`) + Postgres service
 3. Compute build number timestamp `d.m.Y.H.M.S` via `$GITHUB_OUTPUT`
 4. Docker Hub login (`DOCKER_HUB_USERNAME=cariocaphil` + secret password)
 5. Maven package with `build-frontend` + `jib-push-to-dockerhub` and `-Dapp.image.tag=…`
@@ -181,9 +181,9 @@ These items are intentional backlog for modernization; this branch does not fix 
 
 ### Platform age
 
-- Spring Boot 2.5.x / Java 11 / javax namespace (EOL-era stack)
+- Spring Boot **2.7.18** / Java **17** / still `javax.*` (Boot 3 + jakarta deferred to PR 16)
 - CRA 4 / React 17 / Ant Design 4 / Node 15 via frontend-maven-plugin
-- Jib **3.5.2** with `eclipse-temurin:11-jre` (OCI index support; upgraded in PR 6)
+- Jib **3.5.2** with `eclipse-temurin:17-jre` (Java 17 runtime as of PR 15)
 - Both `package-lock.json` and `yarn.lock` under `src/frontend`
 - Plugin config lists a stale top-level `nodeVersion` (`v4.6.0`) while the install execution uses `v15.4.0`
 
