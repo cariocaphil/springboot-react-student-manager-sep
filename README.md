@@ -4,12 +4,12 @@ Full-stack student CRUD demo: a Spring Boot API and a Create React App UI packag
 
 ## Status
 
-**Modernization:** PR 7 fixes the deploy compose image-tag `sed` so it updates `cariocaphil/spring-react-fullstack`.
+**Modernization:** PR 11 aligns Slack deploy notifications with the real Docker Hub image; EB URL already `eu-central-1`.
 
 | | |
 | --- | --- |
-| Current | Java 11 / Spring Boot 2.5.4; Jib 3.5.2; deploy tag bump matches Hub image name |
-| Next | PR 8 — secrets out of git; later: Slack amigoscode text, region drift, retire commit-back |
+| Current | Java 11 / Spring Boot 2.5.4; Jib 3.5.2; Slack Hub text = `cariocaphil/spring-react-fullstack` |
+| Next | PR 12 — secrets out of git; later: retire commit-back if desired |
 | Full checklist | [docs/modernization-roadmap.md](docs/modernization-roadmap.md) |
 | Architecture | [docs/architecture.md](docs/architecture.md) |
 
