@@ -2,7 +2,7 @@
 
 Build history for the Student Manager modernization.
 
-PR numbers match merged GitHub pull requests. Future work continues from PR 8.
+PR numbers match merged GitHub pull requests. Future work continues from PR 12.
 
 The README keeps a short Status summary; this file holds the full checklist.
 
@@ -51,7 +51,21 @@ PR 6 — Upgrade Jib for Temurin OCI image indexes ✅
 - [x] Keep `eclipse-temurin:11-jre`, Java 11, Spring Boot 2.5.4, Hub target, and EB behavior unchanged
 - [x] Do not upgrade other dependencies or change credentials / deploy drift
 
-PR 7 — Fix deploy compose image-tag update
+PR 7 — Fix deploy compose image-tag update ✅
 - [x] Point `deploy.yml` tag `sed` at `cariocaphil/spring-react-fullstack` (was stale `amigoscode/springboot-react-fullstack`)
 - [x] Fail the job if the compose file does not contain the new `BUILD_NUMBER` tag before commit-back
 - [x] Keep commit-back, Hub repo name, credentials, region, EB, and app/Jib versions unchanged
+
+PR 8 — Align deploy AWS region ✅
+- [x] Set `AWS_REGION` to `eu-central-1` for Elastic Beanstalk deploy
+
+PR 9 — Align Elastic Beanstalk environment name ✅
+- [x] Set `EB_ENVIRONMENT_NAME` to `springboot-react-fullstack-env`
+
+PR 10 — Update restored RDS endpoint ✅
+- [x] Point `application-dev.properties` at the restored RDS endpoint
+
+PR 11 — Fix Slack deploy notifications
+- [x] Docker Hub Slack text/link use `cariocaphil/spring-react-fullstack` (not legacy `amigoscode/…`)
+- [x] Confirm final EB Slack URL remains `springbootreactfullstack-env` in `eu-central-1`
+- [x] Keep `8398a7/action-slack@v3`, webhook secret, and deploy/commit-back logic unchanged
