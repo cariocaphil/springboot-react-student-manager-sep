@@ -4,12 +4,12 @@ Full-stack student CRUD demo: a Spring Boot API and a Create React App UI packag
 
 ## Status
 
-**Modernization:** PR 14 adds backend unit and API integration tests for the student domain.
+**Modernization:** PR 15 moves the backend toolchain to Java 17 and Spring Boot 2.7.18 (javax retained).
 
 | | |
 | --- | --- |
-| Current | Java 11 / Spring Boot 2.5.4; service/repo/API tests green against Postgres in CI |
-| Next | PR 15 — Java/Spring Boot upgrade when ready |
+| Current | **Java 17** / Spring Boot **2.7.18**; Jib `eclipse-temurin:17-jre` |
+| Next | PR 16 — Spring Boot 3 + `jakarta.*` |
 | Full checklist | [docs/modernization-roadmap.md](docs/modernization-roadmap.md) |
 | Architecture | [docs/architecture.md](docs/architecture.md) |
 
@@ -17,11 +17,11 @@ Full-stack student CRUD demo: a Spring Boot API and a Create React App UI packag
 
 | Layer | Technology |
 | --- | --- |
-| Backend | Java 11, Spring Boot **2.5.4**, Spring Web, Spring Data JPA, Bean Validation, Lombok |
+| Backend | Java **17**, Spring Boot **2.7.18**, Spring Web, Spring Data JPA, Bean Validation, Lombok |
 | Database | PostgreSQL (local `localhost:5432`; AWS RDS via `dev` profile) |
 | Frontend | React **17**, Create React App (`react-scripts` 4.0.3), Ant Design 4, `unfetch` |
 | Build | Maven Wrapper, `frontend-maven-plugin` (Node 15.4 / npm 7.3), Jib **3.5.2** |
-| Container | Eclipse Temurin 11 JRE base (`eclipse-temurin:11-jre`); image name `cariocaphil/spring-react-fullstack` |
+| Container | Eclipse Temurin **17** JRE base (`eclipse-temurin:17-jre`); image name `cariocaphil/spring-react-fullstack` |
 | CI/CD | GitHub Actions (`.github/workflows/build.yml`, `deploy.yml`) |
 | Deploy | AWS Elastic Beanstalk (Docker Compose single-service app) |
 
@@ -42,7 +42,7 @@ Full-stack student CRUD demo: a Spring Boot API and a Create React App UI packag
 
 ### Prerequisites
 
-- JDK 11+
+- JDK 17+
 - Maven Wrapper (`./mvnw`; no global Maven required)
 - PostgreSQL 13.x listening on `localhost:5432`
 - Node/npm only if you run the frontend separately (Maven installs Node during a full build)
@@ -149,7 +149,7 @@ There is **no** update/PUT endpoint. The UI shows an Edit control that is not wi
 
 | Workflow | Trigger | Purpose |
 | --- | --- | --- |
-| [`.github/workflows/build.yml`](.github/workflows/build.yml) (`CI`) | PRs to `main`, manual | Checkout, Java 11, Postgres 13.1 service, `./mvnw clean package -P build-frontend` |
+| [`.github/workflows/build.yml`](.github/workflows/build.yml) (`CI`) | PRs to `main`, manual | Checkout, Java 17, Postgres 13.1 service, `./mvnw clean package -P build-frontend` |
 | [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml) (`CICD`) | Push to `main`, manual | Build + Jib push to Docker Hub, pin compose image tag **in the job** (no commit-back), deploy that compose file to Elastic Beanstalk; Slack notifications |
 
 Required secrets (documented as expected by the workflows; not inventing values): `DOCKER_HUB_PASSWORD`, `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `SLACK_WEBHOOK_URL`.

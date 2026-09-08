@@ -2,7 +2,7 @@
 
 Build history for the Student Manager modernization.
 
-PR numbers match merged GitHub pull requests. Future work continues from PR 15.
+PR numbers match merged GitHub pull requests. Future work continues from PR 16.
 
 The README keeps a short Status summary; this file holds the full checklist.
 
@@ -82,9 +82,16 @@ PR 13 — Stop CI commit-back of compose image tags ✅
 - [x] Remove `git commit` / `git push` of `elasticbeanstalk/docker-compose.yml` from `deploy.yml`
 - [x] Leave Hub push, EB deploy, Slack, secrets, and app stack unchanged
 
-PR 14 — Backend unit and integration tests
+PR 14 — Backend unit and integration tests ✅
 - [x] Add `StudentServiceTest` (email taken, delete missing, happy paths) with Mockito
 - [x] Add `StudentRepositoryTest` for `selectExistsEmail` against Postgres
 - [x] Add `StudentIntegrationTest` (MockMvc GET/POST/DELETE, duplicate email, 404)
 - [x] Add `src/test/resources/application.properties` for test DB settings
 - [x] Keep Boot/Java/Jib and deploy behavior unchanged
+
+PR 15 — Java 17 toolchain (Boot 3 prep)
+- [x] Raise Maven `java.version` and CI/CICD `JAVA_VERSION` to **17**
+- [x] Move Spring Boot parent **2.5.4 → 2.7.18** (supported on Java 17; still `javax.*`)
+- [x] Jib base image `eclipse-temurin:11-jre` → `eclipse-temurin:17-jre`
+- [x] Keep React/CRA, Hub image name, EB flow, and datasource env config unchanged
+- [x] Leave Spring Boot 3 / `jakarta.*` for PR 16
