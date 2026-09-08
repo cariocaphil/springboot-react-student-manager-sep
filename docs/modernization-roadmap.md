@@ -2,7 +2,7 @@
 
 Build history for the Student Manager modernization.
 
-PR numbers match merged GitHub pull requests. Future work continues from PR 16.
+PR numbers match merged GitHub pull requests. Future work continues from PR 17.
 
 The README keeps a short Status summary; this file holds the full checklist.
 
@@ -89,9 +89,15 @@ PR 14 — Backend unit and integration tests ✅
 - [x] Add `src/test/resources/application.properties` for test DB settings
 - [x] Keep Boot/Java/Jib and deploy behavior unchanged
 
-PR 15 — Java 17 toolchain (Boot 3 prep)
+PR 15 — Java 17 toolchain (Boot 3 prep) ✅
 - [x] Raise Maven `java.version` and CI/CICD `JAVA_VERSION` to **17**
 - [x] Move Spring Boot parent **2.5.4 → 2.7.18** (supported on Java 17; still `javax.*`)
 - [x] Jib base image `eclipse-temurin:11-jre` → `eclipse-temurin:17-jre`
 - [x] Keep React/CRA, Hub image name, EB flow, and datasource env config unchanged
 - [x] Leave Spring Boot 3 / `jakarta.*` for PR 16
+
+PR 16 — Spring Boot 3
+- [x] Upgrade Spring Boot parent **2.7.18 → 3.4.5**
+- [x] Migrate persistence/validation imports `javax.*` → `jakarta.*`
+- [x] Keep Java 17, Temurin 17 Jib base, Hub/EB/deploy, and React stack unchanged
+- [x] Verify backend tests against Postgres
