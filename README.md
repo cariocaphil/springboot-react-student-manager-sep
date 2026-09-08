@@ -4,12 +4,12 @@ Full-stack student CRUD demo: a Spring Boot API and a Create React App UI packag
 
 ## Status
 
-**Modernization:** PR 12 removes committed RDS credentials; datasource settings come from the environment for `dev`.
+**Modernization:** PR 13 stops CICD from committing compose image tags back to `main`.
 
 | | |
 | --- | --- |
-| Current | Java 11 / Spring Boot 2.5.4; `dev` profile requires `SPRING_DATASOURCE_*` env vars |
-| Next | PR 13 — retire CI commit-back of compose tags; rotate any previously leaked DB password |
+| Current | Java 11 / Spring Boot 2.5.4; deploy pins compose tag in-job only (no git push) |
+| Next | PR 14 — rotate previously leaked DB password / history scrub if desired |
 | Full checklist | [docs/modernization-roadmap.md](docs/modernization-roadmap.md) |
 | Architecture | [docs/architecture.md](docs/architecture.md) |
 
@@ -123,7 +123,7 @@ There is **no** update/PUT endpoint. The UI shows an Edit control that is not wi
 | Workflow | Trigger | Purpose |
 | --- | --- | --- |
 | [`.github/workflows/build.yml`](.github/workflows/build.yml) (`CI`) | PRs to `main`, manual | Checkout, Java 11, Postgres 13.1 service, `./mvnw clean package -P build-frontend` |
-| [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml) (`CICD`) | Push to `main`, manual | Build + Jib push to Docker Hub, bump image tag in `elasticbeanstalk/docker-compose.yml`, deploy that compose file to Elastic Beanstalk; Slack notifications |
+| [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml) (`CICD`) | Push to `main`, manual | Build + Jib push to Docker Hub, pin compose image tag **in the job** (no commit-back), deploy that compose file to Elastic Beanstalk; Slack notifications |
 
 Required secrets (documented as expected by the workflows; not inventing values): `DOCKER_HUB_PASSWORD`, `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `SLACK_WEBHOOK_URL`.
 
