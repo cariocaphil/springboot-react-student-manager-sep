@@ -4,12 +4,12 @@ Full-stack student CRUD demo: a Spring Boot API and a Create React App UI packag
 
 ## Status
 
-**Modernization:** PR 15 moves the backend toolchain to Java 17 and Spring Boot 2.7.18 (javax retained).
+**Modernization:** PR 16 upgrades to Spring Boot 3.4.5 with `jakarta.*`.
 
 | | |
 | --- | --- |
-| Current | **Java 17** / Spring Boot **2.7.18**; Jib `eclipse-temurin:17-jre` |
-| Next | PR 16 — Spring Boot 3 + `jakarta.*` |
+| Current | **Java 17** / Spring Boot **3.4.5** (`jakarta.*`); Jib `eclipse-temurin:17-jre` |
+| Next | PR 17 — frontend tests in CI, or CRA → Vite when ready |
 | Full checklist | [docs/modernization-roadmap.md](docs/modernization-roadmap.md) |
 | Architecture | [docs/architecture.md](docs/architecture.md) |
 
@@ -17,7 +17,7 @@ Full-stack student CRUD demo: a Spring Boot API and a Create React App UI packag
 
 | Layer | Technology |
 | --- | --- |
-| Backend | Java **17**, Spring Boot **2.7.18**, Spring Web, Spring Data JPA, Bean Validation, Lombok |
+| Backend | Java **17**, Spring Boot **3.4.5**, Spring Web, Spring Data JPA, Bean Validation, Lombok |
 | Database | PostgreSQL (local `localhost:5432`; AWS RDS via `dev` profile) |
 | Frontend | React **17**, Create React App (`react-scripts` 4.0.3), Ant Design 4, `unfetch` |
 | Build | Maven Wrapper, `frontend-maven-plugin` (Node 15.4 / npm 7.3), Jib **3.5.2** |

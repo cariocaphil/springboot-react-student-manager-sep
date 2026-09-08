@@ -181,7 +181,7 @@ These items are intentional backlog for modernization; this branch does not fix 
 
 ### Platform age
 
-- Spring Boot **2.7.18** / Java **17** / still `javax.*` (Boot 3 + jakarta deferred to PR 16)
+- Spring Boot **3.4.5** / Java **17** / `jakarta.*` (migrated in PR 16)
 - CRA 4 / React 17 / Ant Design 4 / Node 15 via frontend-maven-plugin
 - Jib **3.5.2** with `eclipse-temurin:17-jre` (Java 17 runtime as of PR 15)
 - Both `package-lock.json` and `yarn.lock` under `src/frontend`
