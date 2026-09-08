@@ -131,7 +131,7 @@ Intended sequence:
 4. Docker Hub login (`DOCKER_HUB_USERNAME=cariocaphil` + secret password)
 5. Maven package with `build-frontend` + `jib-push-to-dockerhub` and `-Dapp.image.tag=…`
 6. Slack “pushed … to docker hub” for `cariocaphil/spring-react-fullstack` (Hub link aligned in PR 11)
-7. `sed` rewrite of `cariocaphil/spring-react-fullstack` tag in `elasticbeanstalk/docker-compose.yml` (fails if tag not present after update), commit, push as `github-actions`
+7. `sed` rewrite of `cariocaphil/spring-react-fullstack` tag in `elasticbeanstalk/docker-compose.yml` for this job’s EB package only (fails if tag missing; **not** committed back to the repo as of PR 13)
 8. `einaregilsson/beanstalk-deploy` with compose file as deployment package
 9. Slack completion (EB URL in message)
 
@@ -177,8 +177,7 @@ These items are intentional backlog for modernization; this branch does not fix 
 ### Configuration & ops drift
 
 - Deploy Slack Hub text aligned to `cariocaphil/spring-react-fullstack` in PR 11; final Slack URL remains `http://springbootreactfullstack-env.eba-qtwuxhgp.eu-central-1.elasticbeanstalk.com/`
-- Commit-back of compose tags remains on **`deploy.yml`** (Actions majors and `::set-output` addressed in PR 4; invalid leading `YAML` token removed)
-- CICD commits back to the repo from the runner (image tag churn on `main`)
+- Compose image tag is pinned in the deploy job workspace for EB (PR 13); the checked-in compose file may lag the latest Hub tag until someone updates it deliberately
 
 ### Platform age
 

@@ -49,9 +49,9 @@ Before changing runtime behavior, read:
 - Image: Jib → `cariocaphil/spring-react-fullstack` from `eclipse-temurin:11-jre`; compose may pin a numeric tag
 - Deploy profile: `SPRING_PROFILES_ACTIVE=dev` on EB
 
-Known inconsistencies (open debt): CI commit-back of compose image tags on `main`; previously leaked DB password may remain in git history (rotate).
+Known inconsistencies (open debt): previously leaked DB password may remain in git history (rotate); checked-in compose image tag may lag the latest deploy (updated only in the CI workspace as of PR 13).
 
-Already addressed: compose tag `sed` (PR 7); AWS region + EB env name (PRs 8–9); Slack Hub text/link (PR 11); committed RDS credentials removed from properties (PR 12).
+Already addressed: compose tag `sed` (PR 7); AWS region + EB env name (PRs 8–9); Slack Hub text/link (PR 11); committed RDS credentials removed (PR 12); CI commit-back of compose tags removed (PR 13).
 
 ## After finishing a modernization PR
 

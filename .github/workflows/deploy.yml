@@ -75,7 +75,7 @@ jobs:
           text: ':white_check_mark: pushed cariocaphil/spring-react-fullstack:${{steps.build-number.outputs.BUILD_NUMBER}} to docker hub... https://hub.docker.com/repository/docker/cariocaphil/spring-react-fullstack'
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-      - name: Update and commit app version in docker-compose.yaml
+      - name: Pin compose image tag for this deployment
         run: |
           BUILD_NUMBER=${{steps.build-number.outputs.BUILD_NUMBER}}
           IMAGE_REPO="cariocaphil/spring-react-fullstack"
@@ -84,15 +84,11 @@ jobs:
           sed -i -E "s_(${IMAGE_REPO}:)([^\"]*)_\1${BUILD_NUMBER}_" "${COMPOSE_FILE}"
           echo -e "Updated ${COMPOSE_FILE}\n$(cat "${COMPOSE_FILE}")"
           if ! grep -Fq "${IMAGE_REPO}:${BUILD_NUMBER}" "${COMPOSE_FILE}"; then
-            echo "::error::Expected ${IMAGE_REPO}:${BUILD_NUMBER} in ${COMPOSE_FILE} after tag update; aborting before commit."
+            echo "::error::Expected ${IMAGE_REPO}:${BUILD_NUMBER} in ${COMPOSE_FILE} after tag update; aborting before deploy."
             cat "${COMPOSE_FILE}"
             exit 1
           fi
-          git config user.name github-actions
-          git config user.email github-actions@github.com
-          git add elasticbeanstalk/docker-compose.yml
-          git commit -m "new app version: ${BUILD_NUMBER}"
-          git push
+          echo "Compose tag updated for this job only (not committed back to the repository)."
 
       - uses: 8398a7/action-slack@v3
         with:
