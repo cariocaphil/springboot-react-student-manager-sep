@@ -156,9 +156,9 @@ Intended sequence:
 
 | Area | Present today |
 | --- | --- |
-| Backend | `DemoApplicationTests` — `@SpringBootTest` context load only |
+| Backend | `DemoApplicationTests`; `StudentServiceTest` (Mockito); `StudentRepositoryTest` (`@DataJpaTest`); `StudentIntegrationTest` (MockMvc API) |
 | Frontend | CRA scaffold `App.test.js` (not part of Maven CI package step beyond whatever CRA may run locally) |
-| Integration / repository / service tests | **Not present** in the tracked tree |
+| Integration / repository / service tests | Present for student create/list/delete and email uniqueness (PR 14) |
 
 CI validates that the project **packages** against a live Postgres; it does not exercise a rich automated test suite.
 
@@ -169,7 +169,7 @@ These items are intentional backlog for modernization; this branch does not fix 
 ### Security & secrets
 
 - ~~RDS credentials committed in `application-dev.properties`~~ — removed in PR 12; `dev` requires env vars
-- Previously leaked RDS password may still exist in git history — **rotate** and consider history scrub as follow-up
+- ~~Rotate previously leaked RDS password~~ — done in AWS/EB (ops); old values may still exist in git history — optional history scrub if policy requires it
 - Local/CI still use default `postgres`/`password` placeholders (acceptable for local only)
 - No Spring Security / authentication / authorization
 - API and error payloads expose binding/message details (`server.error.include-message=always`)
