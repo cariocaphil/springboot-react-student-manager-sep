@@ -156,9 +156,9 @@ Intended sequence:
 
 | Area | Present today |
 | --- | --- |
-| Backend | `DemoApplicationTests` — `@SpringBootTest` context load only |
+| Backend | `DemoApplicationTests`; `StudentServiceTest` (Mockito); `StudentRepositoryTest` (`@DataJpaTest`); `StudentIntegrationTest` (MockMvc API) |
 | Frontend | CRA scaffold `App.test.js` (not part of Maven CI package step beyond whatever CRA may run locally) |
-| Integration / repository / service tests | **Not present** in the tracked tree |
+| Integration / repository / service tests | Present for student create/list/delete and email uniqueness (PR 14) |
 
 CI validates that the project **packages** against a live Postgres; it does not exercise a rich automated test suite.
 

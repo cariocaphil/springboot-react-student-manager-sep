@@ -2,7 +2,7 @@
 
 Build history for the Student Manager modernization.
 
-PR numbers match merged GitHub pull requests. Future work continues from PR 14.
+PR numbers match merged GitHub pull requests. Future work continues from PR 15.
 
 The README keeps a short Status summary; this file holds the full checklist.
 
@@ -77,7 +77,14 @@ PR 12 — Move DB credentials to environment variables ✅
 - [x] Document required env vars; note credential rotation / history scrub as follow-up
 - [x] Do not change Boot/Java/Jib, Hub image names, commit-back, or region/EB deploy logic
 
-PR 13 — Stop CI commit-back of compose image tags
+PR 13 — Stop CI commit-back of compose image tags ✅
 - [x] Update compose image tag in the deploy job for the EB package only (keep `sed` + guard)
 - [x] Remove `git commit` / `git push` of `elasticbeanstalk/docker-compose.yml` from `deploy.yml`
 - [x] Leave Hub push, EB deploy, Slack, secrets, and app stack unchanged
+
+PR 14 — Backend unit and integration tests
+- [x] Add `StudentServiceTest` (email taken, delete missing, happy paths) with Mockito
+- [x] Add `StudentRepositoryTest` for `selectExistsEmail` against Postgres
+- [x] Add `StudentIntegrationTest` (MockMvc GET/POST/DELETE, duplicate email, 404)
+- [x] Add `src/test/resources/application.properties` for test DB settings
+- [x] Keep Boot/Java/Jib and deploy behavior unchanged

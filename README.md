@@ -4,12 +4,12 @@ Full-stack student CRUD demo: a Spring Boot API and a Create React App UI packag
 
 ## Status
 
-**Modernization:** PR 13 stops CICD from committing compose image tags back to `main`.
+**Modernization:** PR 14 adds backend unit and API integration tests for the student domain.
 
 | | |
 | --- | --- |
-| Current | Java 11 / Spring Boot 2.5.4; deploy pins compose tag in-job only (no git push) |
-| Next | PR 14 — rotate previously leaked DB password / history scrub if desired |
+| Current | Java 11 / Spring Boot 2.5.4; service/repo/API tests green against Postgres in CI |
+| Next | PR 15 — Java/Spring Boot upgrade when ready; rotate leaked DB password (ops) |
 | Full checklist | [docs/modernization-roadmap.md](docs/modernization-roadmap.md) |
 | Architecture | [docs/architecture.md](docs/architecture.md) |
 
@@ -104,7 +104,7 @@ Requires Docker. Pushes tags `cariocaphil/spring-react-fullstack:local` and `:la
 ./mvnw test
 ```
 
-Today this effectively runs the Spring context smoke test (`DemoApplicationTests`). CI also spins up Postgres before `./mvnw clean package`.
+Runs `StudentServiceTest` (no DB), plus Postgres-backed `StudentRepositoryTest`, `StudentIntegrationTest`, and `DemoApplicationTests`. Local Postgres on `localhost:5432` (same defaults as CI) is required for the DB tests. CI starts Postgres 13.1 before `./mvnw clean package`.
 
 ## API surface (current)
 
