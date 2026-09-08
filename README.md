@@ -1,15 +1,15 @@
 # Spring Boot + React Student Manager
 
-Full-stack student CRUD demo: a Spring Boot API and a Create React App UI packaged into a single deployable JAR/container and published to AWS Elastic Beanstalk.
+Full-stack student CRUD demo: a Spring Boot API and a Vite React UI packaged into a single deployable JAR/container and published to AWS Elastic Beanstalk.
 
 ## Status
 
-**Modernization:** PR 16 upgrades to Spring Boot 3.4.5 with `jakarta.*`.
+**Modernization:** PR 17 migrates the frontend from CRA to Vite 5 + Vitest.
 
 | | |
 | --- | --- |
-| Current | **Java 17** / Spring Boot **3.4.5** (`jakarta.*`); Jib `eclipse-temurin:17-jre` |
-| Next | PR 17 — frontend tests in CI, or CRA → Vite when ready |
+| Current | **Java 17** / Spring Boot **3.4.5**; Vite React 17 UI; Jib `eclipse-temurin:17-jre` |
+| Next | PR 18 — Ant Design / React upgrades, or further platform work per roadmap |
 | Full checklist | [docs/modernization-roadmap.md](docs/modernization-roadmap.md) |
 | Architecture | [docs/architecture.md](docs/architecture.md) |
 
@@ -19,8 +19,8 @@ Full-stack student CRUD demo: a Spring Boot API and a Create React App UI packag
 | --- | --- |
 | Backend | Java **17**, Spring Boot **3.4.5**, Spring Web, Spring Data JPA, Bean Validation, Lombok |
 | Database | PostgreSQL (local `localhost:5432`; AWS RDS via `dev` profile) |
-| Frontend | React **17**, Create React App (`react-scripts` 4.0.3), Ant Design 4, `unfetch` |
-| Build | Maven Wrapper, `frontend-maven-plugin` (Node 15.4 / npm 7.3), Jib **3.5.2** |
+| Frontend | React **17**, **Vite 5**, Ant Design 4, `unfetch`, Vitest |
+| Build | Maven Wrapper, `frontend-maven-plugin` (Node **20** / npm **10**), Jib **3.5.2** |
 | Container | Eclipse Temurin **17** JRE base (`eclipse-temurin:17-jre`); image name `cariocaphil/spring-react-fullstack` |
 | CI/CD | GitHub Actions (`.github/workflows/build.yml`, `deploy.yml`) |
 | Deploy | AWS Elastic Beanstalk (Docker Compose single-service app) |
@@ -34,7 +34,7 @@ Full-stack student CRUD demo: a Spring Boot API and a Create React App UI packag
 ├── docs/                  # Architecture baseline and modernization roadmap
 ├── src/main/java/         # Spring Boot API (student domain)
 ├── src/main/resources/    # application.properties (+ application-dev.properties)
-├── src/frontend/          # CRA React app (built into JAR static resources)
+├── src/frontend/          # Vite React app (built into JAR static resources)
 └── pom.xml                # Maven build, frontend packaging, Jib profiles
 ```
 
@@ -115,7 +115,7 @@ npm install
 npm start
 ```
 
-CRA runs on **http://localhost:3000** and proxies API calls to `http://localhost:8080` (`proxy` in `package.json`).
+Vite runs on **http://localhost:3000** and proxies `/api` to `http://localhost:8080` (`server.proxy` in `vite.config.js`).
 
 ### Local Docker image (optional)
 
@@ -132,6 +132,12 @@ Requires Docker. Pushes tags `cariocaphil/spring-react-fullstack:local` and `:la
 ```
 
 Runs `StudentServiceTest` (no DB), plus Postgres-backed `StudentRepositoryTest`, `StudentIntegrationTest`, and `DemoApplicationTests`. Start local Postgres first (see [Database](#database)). CI starts Postgres 13.1 before `./mvnw clean package`.
+
+Frontend Vitest (also run by Maven’s `build-frontend` profile before `vite build`):
+
+```bash
+cd src/frontend && npm test
+```
 
 ## API surface (current)
 

@@ -26,8 +26,8 @@ This document describes the **as-is** architecture of the student manager applic
 ### 2.1 Packaging model
 
 - **Monolith / modular-monolith style:** frontend source lives under `src/frontend` but is compiled and copied into `target/classes/static` during Maven’s `build-frontend` profile (active by default).
-- Spring Boot serves both JSON API and the CRA production build from one process.
-- Local CRA dev mode is the exception: separate Node process with HTTP proxy to the API.
+- Spring Boot serves both JSON API and the Vite production build from one process.
+- Local Vite dev mode is the exception: separate Node process with HTTP proxy to the API.
 
 ### 2.2 Backend layers
 
@@ -54,13 +54,13 @@ Package root: `com.example.demo`
 
 | Concern | Implementation |
 | --- | --- |
-| Framework | React 17 function components + hooks |
+| Framework | React 17 function components + hooks (Vite 5) |
 | UI kit | Ant Design 4 (Layout, Table, Drawer, Form, notifications) |
 | HTTP | `unfetch` wrappers in `client.js` against relative `api/v1/students` |
 | Features | List students, add via drawer form, delete with confirm; empty-state CTA |
 | Incomplete UX | Edit button rendered but not connected to any API |
 
-Production: relative API URLs work because UI and API share origin. Dev: CRA `proxy` → `localhost:8080`.
+Production: relative API URLs work because UI and API share origin. Dev: Vite `server.proxy` `/api` → `localhost:8080`.
 
 ### 2.4 Configuration profiles
 
@@ -104,7 +104,7 @@ Maven profiles:
 
 | Profile | Default | Purpose |
 | --- | --- | --- |
-| `build-frontend` | **yes** | Install Node/npm via plugin, `npm install`, `npm run build`, copy to classpath static |
+| `build-frontend` | **yes** | Install Node/npm via plugin, `npm install`, `npm test` (Vitest), `vite build`, copy to classpath static |
 | `jib-push-to-dockerhub` | no | On `package`, Jib `build` → Docker Hub (`cariocaphil/spring-react-fullstack`) |
 | `jib-push-to-local` | no | On `package`, Jib `dockerBuild` → local Docker |
 
@@ -157,7 +157,7 @@ Intended sequence:
 | Area | Present today |
 | --- | --- |
 | Backend | `DemoApplicationTests`; `StudentServiceTest` (Mockito); `StudentRepositoryTest` (`@DataJpaTest`); `StudentIntegrationTest` (MockMvc API) |
-| Frontend | CRA scaffold `App.test.js` (not part of Maven CI package step beyond whatever CRA may run locally) |
+| Frontend | Vitest smoke test (`App.test.jsx`); run by Maven `build-frontend` via `npm test` before `vite build` |
 | Integration / repository / service tests | Present for student create/list/delete and email uniqueness (PR 14) |
 
 CI validates that the project **packages** against a live Postgres; it does not exercise a rich automated test suite.
@@ -182,10 +182,8 @@ These items are intentional backlog for modernization; this branch does not fix 
 ### Platform age
 
 - Spring Boot **3.4.5** / Java **17** / `jakarta.*` (migrated in PR 16)
-- CRA 4 / React 17 / Ant Design 4 / Node 15 via frontend-maven-plugin
+- React 17 / Ant Design 4 / Vite 5 / Node 20 via frontend-maven-plugin (CRA removed in PR 17)
 - Jib **3.5.2** with `eclipse-temurin:17-jre` (Java 17 runtime as of PR 15)
-- Both `package-lock.json` and `yarn.lock` under `src/frontend`
-- Plugin config lists a stale top-level `nodeVersion` (`v4.6.0`) while the install execution uses `v15.4.0`
 
 ### Product / design
 

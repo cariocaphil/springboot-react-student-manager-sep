@@ -2,7 +2,7 @@
 
 Build history for the Student Manager modernization.
 
-PR numbers match merged GitHub pull requests. Future work continues from PR 17.
+PR numbers match merged GitHub pull requests. Future work continues from PR 18.
 
 The README keeps a short Status summary; this file holds the full checklist.
 
@@ -101,3 +101,10 @@ PR 16 — Spring Boot 3
 - [x] Migrate persistence/validation imports `javax.*` → `jakarta.*`
 - [x] Keep Java 17, Temurin 17 Jib base, Hub/EB/deploy, and React stack unchanged
 - [x] Verify backend tests against Postgres
+
+PR 17 — CRA → Vite
+- [x] Replace `react-scripts` with Vite 5 + `@vitejs/plugin-react`
+- [x] Keep React 17 / Ant Design 4; Maven still copies `src/frontend/build` → `target/classes/static`
+- [x] Bump `frontend-maven-plugin` Node to **20** (Vite requirement)
+- [x] Dev proxy `/api` → `localhost:8080` via `vite.config.js`
+- [x] Add Vitest smoke test for empty student list; run via Maven `npm test`; drop unused `yarn.lock`
