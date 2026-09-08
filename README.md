@@ -51,11 +51,38 @@ Full-stack student CRUD demo: a Spring Boot API and a Create React App UI packag
 
 Create a local database matching the **defaults** in `application.properties` (overridable via `SPRING_DATASOURCE_*`):
 
+- Host/port: `localhost:5432`
 - Database: `cariocaphil`
 - User: `postgres`
 - Password: `password`
 
-Schema is managed by Hibernate (`spring.jpa.hibernate.ddl-auto=update`).
+Schema is managed by Hibernate (`spring.jpa.hibernate.ddl-auto=update` for the app; tests use `create-drop`).
+
+**Start Postgres with Podman** (preferred on this machine) or Docker — same settings as CI:
+
+```bash
+podman run -d --name student-pg \
+  -e POSTGRES_DB=cariocaphil \
+  -e POSTGRES_USER=postgres \
+  -e POSTGRES_PASSWORD=password \
+  -p 5432:5432 \
+  postgres:13.1
+```
+
+(Use `docker run …` instead of `podman run …` if you use Docker.)
+
+**Connect and run a query:**
+
+```bash
+podman exec -it student-pg psql -U postgres -d cariocaphil
+```
+
+```sql
+\dt
+SELECT id, name, email, gender FROM student;
+```
+
+Stop/remove the container when finished: `podman stop student-pg && podman rm student-pg`.
 
 For the `dev` profile (Elastic Beanstalk), set these in the environment (EB console / host) — **not** in git:
 
@@ -104,7 +131,7 @@ Requires Docker. Pushes tags `cariocaphil/spring-react-fullstack:local` and `:la
 ./mvnw test
 ```
 
-Runs `StudentServiceTest` (no DB), plus Postgres-backed `StudentRepositoryTest`, `StudentIntegrationTest`, and `DemoApplicationTests`. Local Postgres on `localhost:5432` (same defaults as CI) is required for the DB tests. CI starts Postgres 13.1 before `./mvnw clean package`.
+Runs `StudentServiceTest` (no DB), plus Postgres-backed `StudentRepositoryTest`, `StudentIntegrationTest`, and `DemoApplicationTests`. Start local Postgres first (see [Database](#database)). CI starts Postgres 13.1 before `./mvnw clean package`.
 
 ## API surface (current)
 
