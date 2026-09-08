@@ -2,7 +2,7 @@
 
 Build history for the Student Manager modernization.
 
-PR numbers match merged GitHub pull requests. Future work continues from PR 12.
+PR numbers match merged GitHub pull requests. Future work continues from PR 13.
 
 The README keeps a short Status summary; this file holds the full checklist.
 
@@ -65,7 +65,14 @@ PR 9 — Align Elastic Beanstalk environment name ✅
 PR 10 — Update restored RDS endpoint ✅
 - [x] Point `application-dev.properties` at the restored RDS endpoint
 
-PR 11 — Fix Slack deploy notifications
+PR 11 — Fix Slack deploy notifications ✅
 - [x] Docker Hub Slack text/link use `cariocaphil/spring-react-fullstack` (not legacy `amigoscode/…`)
 - [x] Confirm final EB Slack URL remains `springbootreactfullstack-env` in `eu-central-1`
 - [x] Keep `8398a7/action-slack@v3`, webhook secret, and deploy/commit-back logic unchanged
+
+PR 12 — Move DB credentials to environment variables
+- [x] Replace committed RDS URL/user/password in `application-dev.properties` with required `SPRING_DATASOURCE_*` placeholders
+- [x] Keep local/CI defaults via placeholders in `application.properties`
+- [x] Pass datasource env vars through `elasticbeanstalk/docker-compose.yml` (values set on EB / host — not in git)
+- [x] Document required env vars; note credential rotation / history scrub as follow-up
+- [x] Do not change Boot/Java/Jib, Hub image names, commit-back, or region/EB deploy logic

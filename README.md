@@ -4,12 +4,12 @@ Full-stack student CRUD demo: a Spring Boot API and a Create React App UI packag
 
 ## Status
 
-**Modernization:** PR 11 aligns Slack deploy notifications with the real Docker Hub image; EB URL already `eu-central-1`.
+**Modernization:** PR 12 removes committed RDS credentials; datasource settings come from the environment for `dev`.
 
 | | |
 | --- | --- |
-| Current | Java 11 / Spring Boot 2.5.4; Jib 3.5.2; Slack Hub text = `cariocaphil/spring-react-fullstack` |
-| Next | PR 12 — secrets out of git; later: retire commit-back if desired |
+| Current | Java 11 / Spring Boot 2.5.4; `dev` profile requires `SPRING_DATASOURCE_*` env vars |
+| Next | PR 13 — retire CI commit-back of compose tags; rotate any previously leaked DB password |
 | Full checklist | [docs/modernization-roadmap.md](docs/modernization-roadmap.md) |
 | Architecture | [docs/architecture.md](docs/architecture.md) |
 
@@ -49,13 +49,19 @@ Full-stack student CRUD demo: a Spring Boot API and a Create React App UI packag
 
 ### Database
 
-Create a database matching `src/main/resources/application.properties`:
+Create a local database matching the **defaults** in `application.properties` (overridable via `SPRING_DATASOURCE_*`):
 
 - Database: `cariocaphil`
 - User: `postgres`
 - Password: `password`
 
 Schema is managed by Hibernate (`spring.jpa.hibernate.ddl-auto=update`).
+
+For the `dev` profile (Elastic Beanstalk), set these in the environment (EB console / host) — **not** in git:
+
+- `SPRING_DATASOURCE_URL`
+- `SPRING_DATASOURCE_USERNAME`
+- `SPRING_DATASOURCE_PASSWORD`
 
 ### Backend + packaged frontend (single process)
 
@@ -124,10 +130,10 @@ Required secrets (documented as expected by the workflows; not inventing values)
 ## AWS Elastic Beanstalk (current)
 
 - Application: `springboot-react-fullstack`
-- Environment: `Springbootreactfullstack-env`
-- Region in workflow env: `eu-west-1` (note: Slack URL / RDS host references suggest `eu-central-1` — see debt in architecture doc)
-- Package: `elasticbeanstalk/docker-compose.yml` (maps host `80` → container `8080`, sets `SPRING_PROFILES_ACTIVE=dev`)
-- Runtime DB for `dev`: AWS RDS Postgres URL in `application-dev.properties`
+- Environment: `springboot-react-fullstack-env`
+- Region: `eu-central-1`
+- Package: `elasticbeanstalk/docker-compose.yml` (maps host `80` → container `8080`, sets `SPRING_PROFILES_ACTIVE=dev`, passes through `SPRING_DATASOURCE_*`)
+- Runtime DB for `dev`: configure `SPRING_DATASOURCE_URL` / `_USERNAME` / `_PASSWORD` on the EB environment (compose does not embed secrets)
 
 ## Documentation
 
@@ -138,4 +144,4 @@ Required secrets (documented as expected by the workflows; not inventing values)
 
 ## License / origin
 
-Tutorial-style fullstack sample (Amigoscode footer/links in the UI). Treat credentials and environment names in-repo as **legacy baseline artifacts**, not as a recommended security posture.
+Tutorial-style fullstack sample (Amigoscode footer/links in the UI). Do not commit database passwords; configure `dev` via environment variables.

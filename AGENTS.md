@@ -25,7 +25,7 @@ Before changing runtime behavior, read:
 3. **Current vs target.** Keep as-is behavior in `architecture.md` / README Status. Put planned work only in the roadmap checklist. When a PR merges, mark items `[x]` / add `✅` and bump “Future work continues from PR N”.
 4. **Small PRs.** One theme per PR (secrets, tests, Boot upgrade, frontend, etc.). Leave the app deployable unless a cutover is explicit.
 5. **No drive-by cleanup.** Match existing style; don’t rename packages, rewrite UI, or tidy unrelated files.
-6. **Secrets.** Credentials in `application-dev.properties` are known debt. Do not print, commit new secrets, or “fix” them by hardcoding replacements. Prefer env / EB / Secrets Manager when that PR is in scope.
+6. **Secrets.** Do not print, commit, or hardcode DB credentials. For `dev` / EB use `SPRING_DATASOURCE_URL`, `SPRING_DATASOURCE_USERNAME`, `SPRING_DATASOURCE_PASSWORD`. Local/CI may use the defaults in `application.properties`.
 7. **Commands.** Use `./mvnw` (not a global Maven). Frontend lives under `src/frontend`. Full package: `./mvnw clean package -P build-frontend`.
 8. **Git.** Never commit (or push / open a PR) unless the user explicitly asks. Default end state for finished work: **stage** relevant files only (`git add`), leave the commit uncreated, and **propose** a commit message (and PR title when useful) in the reply. If the user later asks to commit, use that proposal via HEREDOC. Don’t amend pushed commits or force-push `main`.
 
@@ -49,9 +49,9 @@ Before changing runtime behavior, read:
 - Image: Jib → `cariocaphil/spring-react-fullstack` from `eclipse-temurin:11-jre`; compose may pin a numeric tag
 - Deploy profile: `SPRING_PROFILES_ACTIVE=dev` on EB
 
-Known inconsistencies (open debt): CI commit-back of compose image tags on `main`; committed DB credentials in `application-dev.properties`.
+Known inconsistencies (open debt): CI commit-back of compose image tags on `main`; previously leaked DB password may remain in git history (rotate).
 
-Already addressed: compose tag `sed` (PR 7); AWS region + EB env name (PRs 8–9); Slack Hub text/link (PR 11).
+Already addressed: compose tag `sed` (PR 7); AWS region + EB env name (PRs 8–9); Slack Hub text/link (PR 11); committed RDS credentials removed from properties (PR 12).
 
 ## After finishing a modernization PR
 
