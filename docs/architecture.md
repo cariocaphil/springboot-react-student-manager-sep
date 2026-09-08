@@ -169,7 +169,7 @@ These items are intentional backlog for modernization; this branch does not fix 
 ### Security & secrets
 
 - ~~RDS credentials committed in `application-dev.properties`~~ — removed in PR 12; `dev` requires env vars
-- Previously leaked RDS password may still exist in git history — **rotate** and consider history scrub as follow-up
+- ~~Rotate previously leaked RDS password~~ — done in AWS/EB (ops); old values may still exist in git history — optional history scrub if policy requires it
 - Local/CI still use default `postgres`/`password` placeholders (acceptable for local only)
 - No Spring Security / authentication / authorization
 - API and error payloads expose binding/message details (`server.error.include-message=always`)

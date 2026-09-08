@@ -9,7 +9,7 @@ Full-stack student CRUD demo: a Spring Boot API and a Create React App UI packag
 | | |
 | --- | --- |
 | Current | Java 11 / Spring Boot 2.5.4; service/repo/API tests green against Postgres in CI |
-| Next | PR 15 — Java/Spring Boot upgrade when ready; rotate leaked DB password (ops) |
+| Next | PR 15 — Java/Spring Boot upgrade when ready |
 | Full checklist | [docs/modernization-roadmap.md](docs/modernization-roadmap.md) |
 | Architecture | [docs/architecture.md](docs/architecture.md) |
 

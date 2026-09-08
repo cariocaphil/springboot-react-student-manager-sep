@@ -74,7 +74,7 @@ PR 12 — Move DB credentials to environment variables ✅
 - [x] Replace committed RDS URL/user/password in `application-dev.properties` with required `SPRING_DATASOURCE_*` placeholders
 - [x] Keep local/CI defaults via placeholders in `application.properties`
 - [x] Pass datasource env vars through `elasticbeanstalk/docker-compose.yml` (values set on EB / host — not in git)
-- [x] Document required env vars; note credential rotation / history scrub as follow-up
+- [x] Document required env vars; credential rotation completed in AWS/EB (ops); history scrub remains optional
 - [x] Do not change Boot/Java/Jib, Hub image names, commit-back, or region/EB deploy logic
 
 PR 13 — Stop CI commit-back of compose image tags ✅
