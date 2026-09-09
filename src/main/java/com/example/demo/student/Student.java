@@ -1,6 +1,5 @@
 package com.example.demo.student;
 
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -23,7 +22,6 @@ import jakarta.validation.constraints.NotNull;
 @Getter
 @Setter
 @NoArgsConstructor
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Entity
 @Table
 public class Student {
@@ -38,7 +36,6 @@ public class Student {
             generator = "student_sequence",
             strategy = GenerationType.SEQUENCE
     )
-    @EqualsAndHashCode.Include
     private Long id;
 
     @NotBlank
