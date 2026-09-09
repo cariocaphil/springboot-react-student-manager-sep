@@ -2,7 +2,7 @@ import { Drawer, Input, Col, Select, Form, Row, Button, Spin } from 'antd';
 import type { ValidateErrorEntity } from 'rc-field-form/es/interface';
 import { LoadingOutlined } from '@ant-design/icons';
 import { useState } from 'react';
-import type { NewStudent } from '../types';
+import type { NewStudent } from '../../types';
 import StudentDrawerFooter from './StudentDrawerFooter';
 
 const { Option } = Select;

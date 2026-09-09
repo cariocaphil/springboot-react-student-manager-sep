@@ -57,7 +57,7 @@ Package root: `com.example.demo`
 | Framework | React 18 + TypeScript function components + hooks (Vite 5) |
 | UI kit | Ant Design 4 (Layout, Table, Drawer, Form, notifications) |
 | HTTP | Typed `client` helpers against relative `api/v1/students` (`unfetch`) |
-| Structure | `AppLayout` (shell) + `StudentsView` / `useStudents` (list/create/delete) + `StudentDrawerForm` |
+| Structure | `components/layout` (`AppLayout`) + `components/students` (`StudentsView`, drawer/table) + `useStudents` |
 | Features | List students, add via drawer form, delete with confirm; empty-state CTA |
 | Incomplete UX | Edit button rendered but not connected to any API |
 

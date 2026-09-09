@@ -1,7 +1,7 @@
 import type { ColumnsType } from 'antd/es/table';
 import StudentActions from './StudentActions';
 import StudentAvatar from './StudentAvatar';
-import type { Student } from '../types';
+import type { Student } from '../../types';
 
 export function buildColumns(
   onDelete: (studentId: number) => void,

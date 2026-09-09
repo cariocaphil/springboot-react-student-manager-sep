@@ -1,6 +1,6 @@
 import './App.css';
-import AppLayout from './components/AppLayout';
-import StudentsView from './components/StudentsView';
+import AppLayout from './components/layout/AppLayout';
+import StudentsView from './components/students/StudentsView';
 
 function App() {
   return (

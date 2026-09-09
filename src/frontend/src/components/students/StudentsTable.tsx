@@ -1,8 +1,7 @@
 import { Badge, Table, Tag } from 'antd';
-import type { Student } from '../types';
-import { buildColumns } from './students/studentColumns';
-import AddStudentButton from './students/AddStudentButton';
-
+import type { Student } from '../../types';
+import AddStudentButton from './AddStudentButton';
+import { buildColumns } from './studentColumns';
 
 interface StudentsTableProps {
   students: Student[];
