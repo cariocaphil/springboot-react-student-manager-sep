@@ -127,8 +127,10 @@ PR 20 — React 18 upgrade
 - [x] Align related deps: `@types/react` 18, `@testing-library/react` 14, Ant Design **4.24.16** (React 18 fixes)
 - [x] Keep Vite/TS/Maven packaging and app behavior unchanged
 
-PR 21 — React architecture refactor
+PR 21 — React architecture refactor ✅
 - [x] Separate shell (`AppLayout`) from students feature (`StudentsView` + `useStudents`)
-- [x] Make `client` return typed domain data; centralize HTTP error → notification formatting
-- [x] Single drawer instance; clearer drawer props (`open` / `onClose` / `onCreated`)
-- [x] Preserve UI/behavior; extend Vitest for `apiError` + `StudentAvatar`
+- [x] Make `client` return typed domain data; centralize HTTP error → notification formatting (`apiError`, `notifyUnexpectedError` fallback)
+- [x] Single drawer instance; clearer drawer props (`open` / `onClose` / `onCreate`); move create into `useStudents`
+- [x] Extract presentational leaves (table/columns/actions/avatar/empty/add button/drawer footer; layout sidebar/footer)
+- [x] Group UI under `components/layout` and `components/students`; split `types` into student / api / notification; extract `apiRoutes`
+- [x] Preserve UI/behavior; extend Vitest for apiError, hooks, student/layout leaves, and App flows

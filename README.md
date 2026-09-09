@@ -4,11 +4,11 @@ Full-stack student CRUD demo: a Spring Boot API and a Vite React UI packaged int
 
 ## Status
 
-**Modernization:** PR 21 refactors the React UI structure without changing behavior.
+**Modernization:** PR 21 React architecture refactor is complete; future work continues from PR 22.
 
 | | |
 | --- | --- |
-| Current | **Java 17** / Spring Boot **3.4.5**; Vite + TypeScript **React 18.3** with split layout/students modules |
+| Current | **Java 17** / Spring Boot **3.4.5**; Vite + TypeScript **React 18.3** with `layout`/`students` modules, `useStudents`, typed client/`apiRoutes` |
 | Next | PR 22 — Ant Design 5 / React 19, or further platform work per roadmap |
 | Full checklist | [docs/modernization-roadmap.md](docs/modernization-roadmap.md) |
 | Architecture | [docs/architecture.md](docs/architecture.md) |
