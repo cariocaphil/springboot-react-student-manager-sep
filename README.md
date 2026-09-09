@@ -4,12 +4,12 @@ Full-stack student CRUD demo: a Spring Boot API and a Vite React UI packaged int
 
 ## Status
 
-**Modernization:** PR 19 migrates the Vite React UI to TypeScript.
+**Modernization:** PR 20 upgrades the UI to React 18 (compatible with Ant Design 4).
 
 | | |
 | --- | --- |
-| Current | **Java 17** / Spring Boot **3.4.5**; Vite + **TypeScript** React 17 UI; Vitest suite |
-| Next | PR 20 — Ant Design / React upgrades, or further platform work per roadmap |
+| Current | **Java 17** / Spring Boot **3.4.5**; Vite + TypeScript **React 18.3** / Ant Design **4.24** |
+| Next | PR 21 — Ant Design 5 / React 19, or further platform work per roadmap |
 | Full checklist | [docs/modernization-roadmap.md](docs/modernization-roadmap.md) |
 | Architecture | [docs/architecture.md](docs/architecture.md) |
 
@@ -19,7 +19,7 @@ Full-stack student CRUD demo: a Spring Boot API and a Vite React UI packaged int
 | --- | --- |
 | Backend | Java **17**, Spring Boot **3.4.5**, Spring Web, Spring Data JPA, Bean Validation, Lombok |
 | Database | PostgreSQL (local `localhost:5432`; AWS RDS via `dev` profile) |
-| Frontend | React **17** + **TypeScript**, **Vite 5**, Ant Design 4, `unfetch`, Vitest |
+| Frontend | React **18.3** + **TypeScript**, **Vite 5**, Ant Design **4.24**, `unfetch`, Vitest |
 | Build | Maven Wrapper, `frontend-maven-plugin` (Node **20** / npm **10**), Jib **3.5.2** |
 | Container | Eclipse Temurin **17** JRE base (`eclipse-temurin:17-jre`); image name `cariocaphil/spring-react-fullstack` |
 | CI/CD | GitHub Actions (`.github/workflows/build.yml`, `deploy.yml`) |
