@@ -48,7 +48,9 @@ Student feature packages under `com.example.demo.student`:
 
 1. `POST /api/v1/students` with JSON body → controller `@Valid StudentRequest`  
 2. Map to `Student` entity → service checks email via repository → `DuplicateEmailException` if taken  
-3. `save` via JPA  
+3. `save` via JPA → **201 Created** (empty body)
+
+**Other success statuses:** `GET` → **200 OK**; `DELETE` → **204 No Content**.
 
 **Gaps vs a full CRUD product (recorded, not fixed):** no update endpoint; no authn/authz; no Flyway/Liquibase (DDL via Hibernate `update`).
 

@@ -57,7 +57,7 @@ class StudentIntegrationTest {
         mockMvc.perform(post(STUDENTS_URI)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(payload)))
-                .andExpect(status().isOk());
+                .andExpect(status().isCreated());
 
         assertThat(studentRepository.existsByEmail("jamila@example.com")).isTrue();
 
@@ -105,7 +105,7 @@ class StudentIntegrationTest {
                 Student.createNew("Alex", "alex@example.com", Gender.MALE));
 
         mockMvc.perform(delete(STUDENT_BY_ID_URI, saved.getId()))
-                .andExpect(status().isOk());
+                .andExpect(status().isNoContent());
 
         assertThat(studentRepository.existsById(saved.getId())).isFalse();
     }
