@@ -56,9 +56,21 @@ Package root: `com.example.demo`
 | --- | --- |
 | Framework | React 18 + TypeScript function components + hooks (Vite 5) |
 | UI kit | Ant Design 4 (Layout, Table, Drawer, Form, notifications) |
-| HTTP | `unfetch` wrappers in `client.js` against relative `api/v1/students` |
+| HTTP | Typed `client` helpers + `apiRoutes` (`studentsApi`) against relative `api/v1/students` (`unfetch`) |
+| Errors | `apiError` maps HTTP / unexpected failures → notifications (`notifyHttpError`, `notifyUnexpectedError`) |
+| Domain types | `types/student`, `types/api`, `types/notification` |
+| Structure | `components/layout` (shell) + `components/students` (view/table/drawer leaves) + `hooks/useStudents` (list/create/delete + toasts) |
 | Features | List students, add via drawer form, delete with confirm; empty-state CTA |
-| Incomplete UX | Edit button rendered but not connected to any API |
+| Incomplete UX | Edit button rendered but not connected to any API; placeholder sidebar menu |
+
+```text
+App
+└── AppLayout (layout/)
+    └── StudentsView (students/)
+        ├── useStudents → client / apiRoutes / apiError / Notification
+        ├── EmptyStudents | StudentsTable (+ studentColumns, StudentActions, …)
+        └── StudentDrawerForm (onCreate)
+```
 
 Production: relative API URLs work because UI and API share origin. Dev: Vite `server.proxy` `/api` → `localhost:8080`.
 
@@ -157,7 +169,7 @@ Intended sequence:
 | Area | Present today |
 | --- | --- |
 | Backend | `DemoApplicationTests`; `StudentServiceTest` (Mockito); `StudentRepositoryTest` (`@DataJpaTest`); `StudentIntegrationTest` (MockMvc API) |
-| Frontend | Vitest suite (`client`, `Notification`, `StudentDrawerForm`, `App` in `.ts`/`.tsx`); run by Maven `build-frontend` via `npm test` before `vite build` |
+| Frontend | Vitest for `client`, `apiRoutes`, `apiError`, notifications, `useStudents`, student/layout leaves, drawer, and App flows; Maven `build-frontend` runs `npm test` before `vite build` |
 | Integration / repository / service tests | Present for student create/list/delete and email uniqueness (PR 14) |
 
 CI validates that the project **packages** against a live Postgres and runs the Vitest frontend suite during `build-frontend`.
@@ -195,7 +207,7 @@ These items are intentional backlog for modernization; this branch does not fix 
 
 ### Quality
 
-- Minimal automated tests
+- Frontend Vitest coverage expanded in PRs 18–21; backend service/repo/API tests from PR 14 — still no broad E2E
 - Unused imports in `StudentService` (HttpStatus / ResponseStatus)
 - Manual getters/setters alongside Lombok annotations on `Student`
 

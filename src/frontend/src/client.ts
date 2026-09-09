@@ -1,5 +1,7 @@
 import fetch from 'unfetch';
-import type { ApiResponse, HttpError, NewStudent } from './types';
+import { studentsApi } from './apiRoutes';
+import type { ApiResponse, HttpError } from './types/api';
+import type { NewStudent, Student } from './types/student';
 
 const checkStatus = (response: ApiResponse): ApiResponse => {
   if (response.ok) {
@@ -10,19 +12,25 @@ const checkStatus = (response: ApiResponse): ApiResponse => {
   throw error;
 };
 
-export const getAllStudents = (): Promise<ApiResponse> =>
-  fetch('api/v1/students').then(checkStatus);
+export const getAllStudents = (): Promise<Student[]> =>
+  fetch(studentsApi.collection)
+    .then(checkStatus)
+    .then((response) => response.json<Student[]>());
 
-export const deleteStudent = (studentId: number): Promise<ApiResponse> =>
-  fetch(`api/v1/students/${studentId}`, {
+export const deleteStudent = (studentId: number): Promise<void> =>
+  fetch(studentsApi.byId(studentId), {
     method: 'DELETE',
-  }).then(checkStatus);
+  })
+    .then(checkStatus)
+    .then(() => undefined);
 
-export const addNewStudent = (student: NewStudent): Promise<ApiResponse> =>
-  fetch('api/v1/students', {
+export const addNewStudent = (student: NewStudent): Promise<void> =>
+  fetch(studentsApi.collection, {
     headers: {
       'Content-Type': 'application/json',
     },
     method: 'POST',
     body: JSON.stringify(student),
-  }).then(checkStatus);
+  })
+    .then(checkStatus)
+    .then(() => undefined);

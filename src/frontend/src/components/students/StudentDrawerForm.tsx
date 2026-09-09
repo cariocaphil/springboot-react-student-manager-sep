@@ -1,57 +1,30 @@
 import { Drawer, Input, Col, Select, Form, Row, Button, Spin } from 'antd';
 import type { ValidateErrorEntity } from 'rc-field-form/es/interface';
 import { LoadingOutlined } from '@ant-design/icons';
-import { addNewStudent } from './client';
 import { useState } from 'react';
-import { successNotification, errorNotification } from './Notification';
-import type { ApiErrorBody, NewStudent } from './types';
-import { isHttpError } from './types';
+import { GENDERS, type NewStudent } from '../../types/student';
+import StudentDrawerFooter from './StudentDrawerFooter';
 
 const { Option } = Select;
 
 const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
 
 interface StudentDrawerFormProps {
-  showDrawer: boolean;
-  setShowDrawer: (open: boolean) => void;
-  fetchStudents: () => void;
+  open: boolean;
+  onClose: () => void;
+  onCreate: (student: NewStudent) => Promise<boolean>;
 }
 
-function StudentDrawerForm({
-  showDrawer,
-  setShowDrawer,
-  fetchStudents,
-}: StudentDrawerFormProps) {
+function StudentDrawerForm({ open, onClose, onCreate }: StudentDrawerFormProps) {
   const [submitting, setSubmitting] = useState(false);
-
-  const onCLose = () => setShowDrawer(false);
 
   const onFinish = (student: NewStudent) => {
     setSubmitting(true);
-    console.log(JSON.stringify(student, null, 2));
-    addNewStudent(student)
-      .then(() => {
-        console.log('student added');
-        onCLose();
-        successNotification(
-          'Student successfully added',
-          `${student.name} was added to the system`
-        );
-        fetchStudents();
-      })
-      .catch((err: unknown) => {
-        console.log(err);
-        if (!isHttpError(err)) {
-          return;
+    void onCreate(student)
+      .then((created) => {
+        if (created) {
+          onClose();
         }
-        err.response.json<ApiErrorBody>().then((res) => {
-          console.log(res);
-          errorNotification(
-            'There was an issue',
-            `${res.message} [${res.status}] [${res.error}]`,
-            'bottomLeft'
-          );
-        });
       })
       .finally(() => {
         setSubmitting(false);
@@ -66,20 +39,10 @@ function StudentDrawerForm({
     <Drawer
       title="Create new student"
       width={720}
-      onClose={onCLose}
-      visible={showDrawer}
+      onClose={onClose}
+      visible={open}
       bodyStyle={{ paddingBottom: 80 }}
-      footer={
-        <div
-          style={{
-            textAlign: 'right',
-          }}
-        >
-          <Button onClick={onCLose} style={{ marginRight: 8 }}>
-            Cancel
-          </Button>
-        </div>
-      }
+      footer={<StudentDrawerFooter onClose={onClose} />}
     >
       <Form
         layout="vertical"
@@ -115,9 +78,11 @@ function StudentDrawerForm({
               rules={[{ required: true, message: 'Please select a gender' }]}
             >
               <Select placeholder="Please select a gender">
-                <Option value="MALE">MALE</Option>
-                <Option value="FEMALE">FEMALE</Option>
-                <Option value="OTHER">OTHER</Option>
+                {GENDERS.map((gender) => (
+                  <Option key={gender} value={gender}>
+                    {gender}
+                  </Option>
+                ))}
               </Select>
             </Form.Item>
           </Col>

@@ -1,20 +1,3 @@
-export type Gender = 'MALE' | 'FEMALE' | 'OTHER';
-
-export interface Student {
-  id: number;
-  name: string;
-  email: string;
-  gender: Gender;
-}
-
-export type NewStudent = Omit<Student, 'id'>;
-
-export interface ApiErrorBody {
-  message: string;
-  status: number;
-  error: string;
-}
-
 /** Minimal response shape returned by `unfetch`. */
 export type ApiResponse = {
   ok: boolean;
@@ -22,6 +5,12 @@ export type ApiResponse = {
   statusText: string;
   json: <T = unknown>() => Promise<T>;
 };
+
+export interface ApiErrorBody {
+  message: string;
+  status: number;
+  error: string;
+}
 
 export type HttpError = Error & { response: ApiResponse };
 

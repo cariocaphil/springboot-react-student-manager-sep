@@ -1,14 +1,11 @@
 import { notification } from 'antd';
-import type { ArgsProps } from 'antd/es/notification';
-
-type NotificationType = 'success' | 'error' | 'info' | 'warning';
-type Placement = ArgsProps['placement'];
+import type { NotificationPlacement, NotificationType } from './types/notification';
 
 const openNotificationWithIcon = (
   type: NotificationType,
   message: string,
   description: string,
-  placement: Placement = 'topRight'
+  placement: NotificationPlacement = 'topRight'
 ): void => {
   notification[type]({ message, description, placement });
 };
@@ -16,23 +13,23 @@ const openNotificationWithIcon = (
 export const successNotification = (
   message: string,
   description: string,
-  placement?: Placement
+  placement?: NotificationPlacement
 ): void => openNotificationWithIcon('success', message, description, placement);
 
 export const errorNotification = (
   message: string,
   description: string,
-  placement?: Placement
+  placement?: NotificationPlacement
 ): void => openNotificationWithIcon('error', message, description, placement);
 
 export const infoNotification = (
   message: string,
   description: string,
-  placement?: Placement
+  placement?: NotificationPlacement
 ): void => openNotificationWithIcon('info', message, description, placement);
 
 export const warningNotification = (
   message: string,
   description: string,
-  placement?: Placement
+  placement?: NotificationPlacement
 ): void => openNotificationWithIcon('warning', message, description, placement);
