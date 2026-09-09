@@ -40,7 +40,7 @@ Student feature packages under `com.example.demo.student`:
 | Bootstrap | `com.example.demo` | `DemoApplication` | Spring Boot entrypoint |
 | API | `student.api` | `StudentController`, DTOs, `StudentMapper`, `StudentApiPaths`, `ApiExceptionHandler` | HTTP boundary + stable error JSON |
 | Domain | `student.domain` | `Student` (`@Entity`), `Gender` | Persistence model |
-| Application | `student.application` | `StudentService` | List, add (email uniqueness), delete |
+| Application | `student.application` | `StudentService` | List, add (email uniqueness), delete; class `@Transactional(readOnly = true)`, writes override with `@Transactional` |
 | Persistence | `student.persistence` | `StudentRepository` | CRUD + derived `existsByEmail` |
 | Exceptions | `student.exception` | `DuplicateEmailException`, `StudentNotFoundException`, `BadRequestException` (generic fallback) | Domain/API failure types |
 
