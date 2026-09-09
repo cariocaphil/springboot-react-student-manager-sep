@@ -74,7 +74,25 @@ class StudentIntegrationTest {
         mockMvc.perform(post("/api/v1/students")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(duplicate)))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value(400))
+                .andExpect(jsonPath("$.error").value("Bad Request"))
+                .andExpect(jsonPath("$.message").value("Email jamila@example.com taken"));
+    }
+
+    @Test
+    void addStudent_rejectsInvalidPayload() throws Exception {
+        String invalidJson = """
+                {"name":"","email":"not-an-email","gender":null}
+                """;
+
+        mockMvc.perform(post("/api/v1/students")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(invalidJson))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value(400))
+                .andExpect(jsonPath("$.error").value("Bad Request"))
+                .andExpect(jsonPath("$.message").isNotEmpty());
     }
 
     @Test
@@ -91,6 +109,9 @@ class StudentIntegrationTest {
     @Test
     void deleteStudent_returnsNotFoundWhenMissing() throws Exception {
         mockMvc.perform(delete("/api/v1/students/{id}", 12345L))
-                .andExpect(status().isNotFound());
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.status").value(404))
+                .andExpect(jsonPath("$.error").value("Not Found"))
+                .andExpect(jsonPath("$.message").value("Student with id 12345 does not exists"));
     }
 }
