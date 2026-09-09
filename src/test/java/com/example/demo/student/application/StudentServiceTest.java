@@ -2,7 +2,7 @@ package com.example.demo.student.application;
 
 import com.example.demo.student.domain.Gender;
 import com.example.demo.student.domain.Student;
-import com.example.demo.student.exception.BadRequestException;
+import com.example.demo.student.exception.DuplicateEmailException;
 import com.example.demo.student.exception.StudentNotFoundException;
 import com.example.demo.student.persistence.StudentRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -66,7 +66,7 @@ class StudentServiceTest {
         given(studentRepository.existsByEmail(student.getEmail())).willReturn(true);
 
         assertThatThrownBy(() -> underTest.addStudent(student))
-                .isInstanceOf(BadRequestException.class)
+                .isInstanceOf(DuplicateEmailException.class)
                 .hasMessageContaining(student.getEmail())
                 .hasMessageContaining("taken");
 

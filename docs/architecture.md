@@ -42,12 +42,12 @@ Student feature packages under `com.example.demo.student`:
 | Domain | `student.domain` | `Student` (`@Entity`), `Gender` | Persistence model |
 | Application | `student.application` | `StudentService` | List, add (email uniqueness), delete |
 | Persistence | `student.persistence` | `StudentRepository` | CRUD + derived `existsByEmail` |
-| Exceptions | `student.exception` | `BadRequestException`, `StudentNotFoundException` | Domain/API failure types |
+| Exceptions | `student.exception` | `DuplicateEmailException`, `StudentNotFoundException`, `BadRequestException` (generic fallback) | Domain/API failure types |
 
 **Request flow (create):**
 
 1. `POST /api/v1/students` with JSON body → controller `@Valid StudentRequest`  
-2. Map to `Student` entity → service checks email via repository → `BadRequestException` if taken  
+2. Map to `Student` entity → service checks email via repository → `DuplicateEmailException` if taken  
 3. `save` via JPA  
 
 **Gaps vs a full CRUD product (recorded, not fixed):** no update endpoint; no authn/authz; no Flyway/Liquibase (DDL via Hibernate `update`).

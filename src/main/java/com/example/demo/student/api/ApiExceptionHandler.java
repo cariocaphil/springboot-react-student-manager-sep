@@ -1,6 +1,7 @@
 package com.example.demo.student.api;
 
 import com.example.demo.student.exception.BadRequestException;
+import com.example.demo.student.exception.DuplicateEmailException;
 import com.example.demo.student.exception.StudentNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,8 +15,11 @@ import java.util.stream.Collectors;
 @RestControllerAdvice
 public class ApiExceptionHandler {
 
-    @ExceptionHandler(BadRequestException.class)
-    public ResponseEntity<ApiErrorResponse> handleBadRequest(BadRequestException ex) {
+    @ExceptionHandler({
+            BadRequestException.class,
+            DuplicateEmailException.class
+    })
+    public ResponseEntity<ApiErrorResponse> handleBadRequest(RuntimeException ex) {
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
                 .body(new ApiErrorResponse(ex.getMessage(), HttpStatus.BAD_REQUEST.value(), "Bad Request"));

@@ -1,7 +1,7 @@
 package com.example.demo.student.application;
 
 import com.example.demo.student.domain.Student;
-import com.example.demo.student.exception.BadRequestException;
+import com.example.demo.student.exception.DuplicateEmailException;
 import com.example.demo.student.exception.StudentNotFoundException;
 import com.example.demo.student.persistence.StudentRepository;
 import lombok.AllArgsConstructor;
@@ -21,8 +21,7 @@ public class StudentService {
 
     public void addStudent(Student student) {
         if (studentRepository.existsByEmail(student.getEmail())) {
-            throw new BadRequestException(
-                    "Email " + student.getEmail() + " taken");
+            throw new DuplicateEmailException(student.getEmail());
         }
         studentRepository.save(student);
     }

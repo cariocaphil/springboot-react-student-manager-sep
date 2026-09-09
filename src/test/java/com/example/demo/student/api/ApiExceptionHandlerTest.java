@@ -1,6 +1,7 @@
 package com.example.demo.student.api;
 
 import com.example.demo.student.exception.BadRequestException;
+import com.example.demo.student.exception.DuplicateEmailException;
 import com.example.demo.student.exception.StudentNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -18,7 +19,17 @@ class ApiExceptionHandlerTest {
     @Test
     void handleBadRequest_returnsStableErrorBody() {
         ResponseEntity<ApiErrorResponse> response =
-                handler.handleBadRequest(new BadRequestException("Email jamila@example.com taken"));
+                handler.handleBadRequest(new BadRequestException("Invalid input"));
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(response.getBody()).isEqualTo(
+                new ApiErrorResponse("Invalid input", 400, "Bad Request"));
+    }
+
+    @Test
+    void handleDuplicateEmail_returnsStableErrorBody() {
+        ResponseEntity<ApiErrorResponse> response =
+                handler.handleBadRequest(new DuplicateEmailException("jamila@example.com"));
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
         assertThat(response.getBody()).isEqualTo(
