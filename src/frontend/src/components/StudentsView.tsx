@@ -1,9 +1,10 @@
 import { useState } from 'react';
-import { Empty, Spin } from 'antd';
+import { Spin } from 'antd';
 import { LoadingOutlined } from '@ant-design/icons';
 import StudentDrawerForm from '../StudentDrawerForm';
 import { useStudents } from '../hooks/useStudents';
-import StudentsTable, { AddStudentButton } from './StudentsTable';
+import EmptyStudents from './EmptyStudents';
+import StudentsTable from './StudentsTable';
 
 const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
 
@@ -18,12 +19,7 @@ function StudentsView() {
   if (fetching) {
     body = <Spin indicator={antIcon} />;
   } else if (students.length <= 0) {
-    body = (
-      <>
-        <AddStudentButton onClick={openDrawer} />
-        <Empty />
-      </>
-    );
+    body = <EmptyStudents onAddClick={openDrawer} />;
   } else {
     body = (
       <StudentsTable
