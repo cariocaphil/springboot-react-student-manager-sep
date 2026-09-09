@@ -3,6 +3,7 @@ package com.example.demo.integration;
 import com.example.demo.student.Gender;
 import com.example.demo.student.Student;
 import com.example.demo.student.StudentRepository;
+import com.example.demo.student.StudentRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -47,7 +48,7 @@ class StudentIntegrationTest {
 
     @Test
     void addStudent_createsStudent() throws Exception {
-        Student payload = new Student(null, "Jamila", "jamila@example.com", Gender.FEMALE);
+        StudentRequest payload = new StudentRequest("Jamila", "jamila@example.com", Gender.FEMALE);
 
         mockMvc.perform(post("/api/v1/students")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -59,13 +60,16 @@ class StudentIntegrationTest {
         mockMvc.perform(get("/api/v1/students"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(1)))
-                .andExpect(jsonPath("$[0].email").value("jamila@example.com"));
+                .andExpect(jsonPath("$[0].id").isNumber())
+                .andExpect(jsonPath("$[0].name").value("Jamila"))
+                .andExpect(jsonPath("$[0].email").value("jamila@example.com"))
+                .andExpect(jsonPath("$[0].gender").value("FEMALE"));
     }
 
     @Test
     void addStudent_rejectsDuplicateEmail() throws Exception {
         studentRepository.save(new Student(null, "Jamila", "jamila@example.com", Gender.FEMALE));
-        Student duplicate = new Student(null, "Other", "jamila@example.com", Gender.OTHER);
+        StudentRequest duplicate = new StudentRequest("Other", "jamila@example.com", Gender.OTHER);
 
         mockMvc.perform(post("/api/v1/students")
                         .contentType(MediaType.APPLICATION_JSON)

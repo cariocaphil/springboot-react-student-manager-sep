@@ -36,19 +36,20 @@ Package root: `com.example.demo`
 | Layer | Types | Role |
 | --- | --- | --- |
 | Bootstrap | `DemoApplication` | Spring Boot entrypoint |
-| API | `StudentController` | `@RestController` at `api/v1/students` |
-| Domain / persistence model | `Student` (`@Entity`), `Gender` enum | JPA entity with Bean Validation (`@NotBlank`, `@Email`, `@NotNull`) |
+| API | `StudentController` | `@RestController` at `api/v1/students`; exposes `StudentRequest` / `StudentResponse` |
+| Domain / persistence model | `Student` (`@Entity`), `Gender` enum | JPA entity (column constraints; API validation lives on DTOs) |
+| Mapping | `StudentMapper` | Request → entity; entity → response |
 | Application service | `StudentService` | List, add (email uniqueness), delete (existence check) |
 | Persistence | `StudentRepository` (`JpaRepository`) | CRUD + JPQL `selectExistsEmail` |
 | Errors | `BadRequestException` (400), `StudentNotFoundException` (404) | `@ResponseStatus` runtime exceptions |
 
 **Request flow (create):**
 
-1. `POST /api/v1/students` with JSON body → controller `@Valid` Student  
-2. Service checks email via repository → `BadRequestException` if taken  
+1. `POST /api/v1/students` with JSON body → controller `@Valid StudentRequest`  
+2. Map to `Student` entity → service checks email via repository → `BadRequestException` if taken  
 3. `save` via JPA  
 
-**Gaps vs a full CRUD product (recorded, not fixed):** no update endpoint; no authn/authz; no DTO boundary (entity exposed over the wire); no global exception advice beyond `@ResponseStatus`; no Flyway/Liquibase (DDL via Hibernate `update`).
+**Gaps vs a full CRUD product (recorded, not fixed):** no update endpoint; no authn/authz; no global exception advice beyond `@ResponseStatus`; no Flyway/Liquibase (DDL via Hibernate `update`).
 
 ### 2.3 Frontend
 
@@ -202,7 +203,6 @@ These items are intentional backlog for modernization; this branch does not fix 
 - Edit UI without backend update API
 - Placeholder Ant Design sidebar/menu content unrelated to students
 - Hibernate `ddl-auto=update` used for deployed `dev` profile (no migration history)
-- Entity used as API contract
 - Dual lockfiles and tutorial footer/marketing link in production UI
 
 ### Quality
