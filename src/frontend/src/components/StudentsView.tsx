@@ -1,32 +1,11 @@
 import { useState } from 'react';
-import {
-  Badge,
-  Button,
-  Empty,
-  Spin,
-  Table,
-  Tag,
-} from 'antd';
-import { LoadingOutlined, PlusOutlined } from '@ant-design/icons';
+import { Empty, Spin } from 'antd';
+import { LoadingOutlined } from '@ant-design/icons';
 import StudentDrawerForm from '../StudentDrawerForm';
 import { useStudents } from '../hooks/useStudents';
-import { buildColumns } from './studentColumns';
+import StudentsTable, { AddStudentButton } from './StudentsTable';
 
 const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
-
-function AddStudentButton({ onClick }: { onClick: () => void }) {
-  return (
-    <Button
-      onClick={onClick}
-      type="primary"
-      shape="round"
-      icon={<PlusOutlined />}
-      size="small"
-    >
-      Add New Student
-    </Button>
-  );
-}
 
 function StudentsView() {
   const { students, fetching, refreshStudents, removeStudentById } = useStudents();
@@ -47,22 +26,10 @@ function StudentsView() {
     );
   } else {
     body = (
-      <Table
-        dataSource={students}
-        columns={buildColumns(removeStudentById)}
-        bordered
-        title={() => (
-          <>
-            <Tag>Number of students</Tag>
-            <Badge count={students.length} className="site-badge-count-4" />
-            <br />
-            <br />
-            <AddStudentButton onClick={openDrawer} />
-          </>
-        )}
-        pagination={{ pageSize: 50 }}
-        scroll={{ y: 240 }}
-        rowKey={(student) => student.id}
+      <StudentsTable
+        students={students}
+        onDelete={removeStudentById}
+        onAddClick={openDrawer}
       />
     );
   }
