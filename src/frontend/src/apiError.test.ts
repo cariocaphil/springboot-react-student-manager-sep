@@ -1,5 +1,9 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { formatApiErrorDescription, notifyHttpError } from './apiError';
+import {
+  formatApiErrorDescription,
+  notifyHttpError,
+  notifyUnexpectedError,
+} from './apiError';
 import * as notify from './Notification';
 import type { ApiErrorBody, HttpError } from './types';
 
@@ -25,9 +29,29 @@ describe('apiError', () => {
     );
   });
 
-  it('notifyHttpError ignores non-HTTP errors', async () => {
+  it('notifyUnexpectedError uses Error.message', () => {
+    notifyUnexpectedError(new Error('boom'));
+    expect(notify.errorNotification).toHaveBeenCalledWith(
+      'There was an issue',
+      'boom'
+    );
+  });
+
+  it('notifyUnexpectedError falls back for non-Error values', () => {
+    notifyUnexpectedError('nope', { placement: 'bottomLeft' });
+    expect(notify.errorNotification).toHaveBeenCalledWith(
+      'There was an issue',
+      'Unexpected error',
+      'bottomLeft'
+    );
+  });
+
+  it('notifyHttpError falls back to notifyUnexpectedError for non-HTTP errors', async () => {
     await notifyHttpError(new Error('boom'));
-    expect(notify.errorNotification).not.toHaveBeenCalled();
+    expect(notify.errorNotification).toHaveBeenCalledWith(
+      'There was an issue',
+      'boom'
+    );
   });
 
   it('notifyHttpError surfaces API body with optional placement', async () => {

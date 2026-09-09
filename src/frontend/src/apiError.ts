@@ -18,6 +18,24 @@ export function formatApiErrorDescription(
   return `${body.message} [${body.status}] [${body.error}]`;
 }
 
+function notifyIssue(description: string, placement?: Placement): void {
+  if (placement !== undefined) {
+    errorNotification('There was an issue', description, placement);
+    return;
+  }
+  errorNotification('There was an issue', description);
+}
+
+/** Map an unknown failure to a user-facing error toast. */
+export function notifyUnexpectedError(
+  error: unknown,
+  options: { placement?: Placement } = {}
+): void {
+  const description =
+    error instanceof Error ? error.message : 'Unexpected error';
+  notifyIssue(description, options.placement);
+}
+
 export async function notifyHttpError(
   error: unknown,
   options: {
@@ -26,6 +44,7 @@ export async function notifyHttpError(
   } = {}
 ): Promise<void> {
   if (!isHttpError(error)) {
+    notifyUnexpectedError(error, { placement: options.placement });
     return;
   }
 
@@ -34,11 +53,5 @@ export async function notifyHttpError(
     body,
     options.descriptionStyle ?? 'spaced'
   );
-
-  if (options.placement !== undefined) {
-    errorNotification('There was an issue', description, options.placement);
-    return;
-  }
-
-  errorNotification('There was an issue', description);
+  notifyIssue(description, options.placement);
 }
