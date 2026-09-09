@@ -1,0 +1,22 @@
+package com.example.demo.student.api;
+
+import com.example.demo.student.domain.Student;
+
+final class StudentMapper {
+
+    private StudentMapper() {
+    }
+
+    static Student toEntity(StudentRequest request) {
+        return Student.createNew(request.name(), request.email(), request.gender());
+    }
+
+    static StudentResponse toResponse(Student student) {
+        return new StudentResponse(
+                student.getId(),
+                student.getName(),
+                student.getEmail(),
+                student.getGender()
+        );
+    }
+}

@@ -1,7 +1,10 @@
-package com.example.demo.student;
+package com.example.demo.student.application;
 
-import com.example.demo.student.exception.BadRequestException;
+import com.example.demo.student.domain.Gender;
+import com.example.demo.student.domain.Student;
+import com.example.demo.student.exception.DuplicateEmailException;
 import com.example.demo.student.exception.StudentNotFoundException;
+import com.example.demo.student.persistence.StudentRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -44,23 +47,26 @@ class StudentServiceTest {
 
     @Test
     void addStudent_savesWhenEmailIsFree() {
-        Student student = new Student(null, "Jamila", "jamila@gmail.com", Gender.FEMALE);
-        given(studentRepository.selectExistsEmail(student.getEmail())).willReturn(false);
+        Student student = Student.createNew("Jamila", "jamila@gmail.com", Gender.FEMALE);
+        given(studentRepository.existsByEmail(student.getEmail())).willReturn(false);
 
         underTest.addStudent(student);
 
         ArgumentCaptor<Student> captor = ArgumentCaptor.forClass(Student.class);
         verify(studentRepository).save(captor.capture());
-        assertThat(captor.getValue()).isEqualTo(student);
+        Student saved = captor.getValue();
+        assertThat(saved.getName()).isEqualTo(student.getName());
+        assertThat(saved.getEmail()).isEqualTo(student.getEmail());
+        assertThat(saved.getGender()).isEqualTo(student.getGender());
     }
 
     @Test
     void addStudent_throwsWhenEmailTaken() {
-        Student student = new Student(null, "Jamila", "jamila@gmail.com", Gender.FEMALE);
-        given(studentRepository.selectExistsEmail(student.getEmail())).willReturn(true);
+        Student student = Student.createNew("Jamila", "jamila@gmail.com", Gender.FEMALE);
+        given(studentRepository.existsByEmail(student.getEmail())).willReturn(true);
 
         assertThatThrownBy(() -> underTest.addStudent(student))
-                .isInstanceOf(BadRequestException.class)
+                .isInstanceOf(DuplicateEmailException.class)
                 .hasMessageContaining(student.getEmail())
                 .hasMessageContaining("taken");
 

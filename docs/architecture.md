@@ -33,22 +33,24 @@ This document describes the **as-is** architecture of the student manager applic
 
 Package root: `com.example.demo`
 
-| Layer | Types | Role |
-| --- | --- | --- |
-| Bootstrap | `DemoApplication` | Spring Boot entrypoint |
-| API | `StudentController` | `@RestController` at `api/v1/students` |
-| Domain / persistence model | `Student` (`@Entity`), `Gender` enum | JPA entity with Bean Validation (`@NotBlank`, `@Email`, `@NotNull`) |
-| Application service | `StudentService` | List, add (email uniqueness), delete (existence check) |
-| Persistence | `StudentRepository` (`JpaRepository`) | CRUD + JPQL `selectExistsEmail` |
-| Errors | `BadRequestException` (400), `StudentNotFoundException` (404) | `@ResponseStatus` runtime exceptions |
+Student feature packages under `com.example.demo.student`:
+
+| Layer | Package | Types | Role |
+| --- | --- | --- | --- |
+| Bootstrap | `com.example.demo` | `DemoApplication` | Spring Boot entrypoint |
+| API | `student.api` | `StudentController`, DTOs, `StudentMapper`, `StudentApiPaths`, `ApiExceptionHandler` | HTTP boundary + stable error JSON |
+| Domain | `student.domain` | `Student` (`@Entity`), `Gender` | Persistence model |
+| Application | `student.application` | `StudentService` | List, add (email uniqueness), delete; class `@Transactional(readOnly = true)`, writes override with `@Transactional` |
+| Persistence | `student.persistence` | `StudentRepository` | CRUD + derived `existsByEmail` |
+| Exceptions | `student.exception` | `DuplicateEmailException`, `StudentNotFoundException`, `BadRequestException` (generic fallback) | Domain/API failure types |
 
 **Request flow (create):**
 
-1. `POST /api/v1/students` with JSON body → controller `@Valid` Student  
-2. Service checks email via repository → `BadRequestException` if taken  
+1. `POST /api/v1/students` with JSON body → controller `@Valid StudentRequest`  
+2. Map to `Student` entity → service checks email via repository → `DuplicateEmailException` if taken  
 3. `save` via JPA  
 
-**Gaps vs a full CRUD product (recorded, not fixed):** no update endpoint; no authn/authz; no DTO boundary (entity exposed over the wire); no global exception advice beyond `@ResponseStatus`; no Flyway/Liquibase (DDL via Hibernate `update`).
+**Gaps vs a full CRUD product (recorded, not fixed):** no update endpoint; no authn/authz; no Flyway/Liquibase (DDL via Hibernate `update`).
 
 ### 2.3 Frontend
 
@@ -202,14 +204,12 @@ These items are intentional backlog for modernization; this branch does not fix 
 - Edit UI without backend update API
 - Placeholder Ant Design sidebar/menu content unrelated to students
 - Hibernate `ddl-auto=update` used for deployed `dev` profile (no migration history)
-- Entity used as API contract
 - Dual lockfiles and tutorial footer/marketing link in production UI
 
 ### Quality
 
 - Frontend Vitest coverage expanded in PRs 18–21; backend service/repo/API tests from PR 14 — still no broad E2E
 - Unused imports in `StudentService` (HttpStatus / ResponseStatus)
-- Manual getters/setters alongside Lombok annotations on `Student`
 
 ## 8. What “done” looks like for this baseline
 

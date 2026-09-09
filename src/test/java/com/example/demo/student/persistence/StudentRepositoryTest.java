@@ -1,5 +1,7 @@
-package com.example.demo.student;
+package com.example.demo.student.persistence;
 
+import com.example.demo.student.domain.Gender;
+import com.example.demo.student.domain.Student;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -15,16 +17,16 @@ class StudentRepositoryTest {
     private StudentRepository underTest;
 
     @Test
-    void selectExistsEmail_isFalseWhenEmpty() {
-        assertThat(underTest.selectExistsEmail("nobody@example.com")).isFalse();
+    void existsByEmail_isFalseWhenEmpty() {
+        assertThat(underTest.existsByEmail("nobody@example.com")).isFalse();
     }
 
     @Test
-    void selectExistsEmail_isTrueWhenEmailSaved() {
-        Student student = new Student(null, "Alex", "alex@example.com", Gender.MALE);
+    void existsByEmail_isTrueWhenEmailSaved() {
+        Student student = Student.createNew("Alex", "alex@example.com", Gender.MALE);
         underTest.save(student);
 
-        assertThat(underTest.selectExistsEmail("alex@example.com")).isTrue();
-        assertThat(underTest.selectExistsEmail("other@example.com")).isFalse();
+        assertThat(underTest.existsByEmail("alex@example.com")).isTrue();
+        assertThat(underTest.existsByEmail("other@example.com")).isFalse();
     }
 }
