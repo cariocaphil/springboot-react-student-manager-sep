@@ -2,6 +2,7 @@ package com.example.demo.integration;
 
 import com.example.demo.student.Gender;
 import com.example.demo.student.Student;
+import com.example.demo.student.StudentApiPaths;
 import com.example.demo.student.StudentRepository;
 import com.example.demo.student.StudentRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -25,6 +26,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 class StudentIntegrationTest {
 
+    private static final String STUDENTS_URI = "/" + StudentApiPaths.BASE;
+    private static final String STUDENT_BY_ID_URI = STUDENTS_URI + "/{id}";
+
     @Autowired
     private MockMvc mockMvc;
 
@@ -41,7 +45,7 @@ class StudentIntegrationTest {
 
     @Test
     void getAllStudents_returnsEmptyListInitially() throws Exception {
-        mockMvc.perform(get("/api/v1/students"))
+        mockMvc.perform(get(STUDENTS_URI))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(0)));
     }
@@ -50,14 +54,14 @@ class StudentIntegrationTest {
     void addStudent_createsStudent() throws Exception {
         StudentRequest payload = new StudentRequest("Jamila", "jamila@example.com", Gender.FEMALE);
 
-        mockMvc.perform(post("/api/v1/students")
+        mockMvc.perform(post(STUDENTS_URI)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(payload)))
                 .andExpect(status().isOk());
 
         assertThat(studentRepository.selectExistsEmail("jamila@example.com")).isTrue();
 
-        mockMvc.perform(get("/api/v1/students"))
+        mockMvc.perform(get(STUDENTS_URI))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(1)))
                 .andExpect(jsonPath("$[0].id").isNumber())
@@ -71,7 +75,7 @@ class StudentIntegrationTest {
         studentRepository.save(new Student(null, "Jamila", "jamila@example.com", Gender.FEMALE));
         StudentRequest duplicate = new StudentRequest("Other", "jamila@example.com", Gender.OTHER);
 
-        mockMvc.perform(post("/api/v1/students")
+        mockMvc.perform(post(STUDENTS_URI)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(duplicate)))
                 .andExpect(status().isBadRequest())
@@ -86,7 +90,7 @@ class StudentIntegrationTest {
                 {"name":"","email":"not-an-email","gender":null}
                 """;
 
-        mockMvc.perform(post("/api/v1/students")
+        mockMvc.perform(post(STUDENTS_URI)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(invalidJson))
                 .andExpect(status().isBadRequest())
@@ -100,7 +104,7 @@ class StudentIntegrationTest {
         Student saved = studentRepository.save(
                 new Student(null, "Alex", "alex@example.com", Gender.MALE));
 
-        mockMvc.perform(delete("/api/v1/students/{id}", saved.getId()))
+        mockMvc.perform(delete(STUDENT_BY_ID_URI, saved.getId()))
                 .andExpect(status().isOk());
 
         assertThat(studentRepository.existsById(saved.getId())).isFalse();
@@ -108,7 +112,7 @@ class StudentIntegrationTest {
 
     @Test
     void deleteStudent_returnsNotFoundWhenMissing() throws Exception {
-        mockMvc.perform(delete("/api/v1/students/{id}", 12345L))
+        mockMvc.perform(delete(STUDENT_BY_ID_URI, 12345L))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.status").value(404))
                 .andExpect(jsonPath("$.error").value("Not Found"))

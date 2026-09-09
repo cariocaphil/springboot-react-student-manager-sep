@@ -13,7 +13,7 @@ import jakarta.validation.Valid;
 import java.util.List;
 
 @RestController
-@RequestMapping(path = "api/v1/students")
+@RequestMapping(path = StudentApiPaths.BASE)
 @AllArgsConstructor
 public class StudentController {
 
