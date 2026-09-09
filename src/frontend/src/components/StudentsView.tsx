@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Spin } from 'antd';
 import { LoadingOutlined } from '@ant-design/icons';
-import StudentDrawerForm from '../StudentDrawerForm';
+import StudentDrawerForm from './StudentDrawerForm';
 import { useStudents } from '../hooks/useStudents';
 import EmptyStudents from './EmptyStudents';
 import StudentsTable from './StudentsTable';
