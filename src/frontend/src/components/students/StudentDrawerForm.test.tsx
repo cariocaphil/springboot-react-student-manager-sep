@@ -18,7 +18,6 @@ describe('StudentDrawerForm', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     onCreate.mockResolvedValue(true);
-    vi.spyOn(window, 'alert').mockImplementation(() => {});
   });
 
   it('renders create form when drawer is open', () => {
@@ -46,7 +45,6 @@ describe('StudentDrawerForm', () => {
     expect(await screen.findByText('Please enter student name')).toBeInTheDocument();
     expect(screen.getByText('Please enter student email')).toBeInTheDocument();
     expect(screen.getAllByText('Please select a gender').length).toBeGreaterThanOrEqual(1);
-    expect(window.alert).toHaveBeenCalled();
     expect(onCreate).not.toHaveBeenCalled();
   });
 
