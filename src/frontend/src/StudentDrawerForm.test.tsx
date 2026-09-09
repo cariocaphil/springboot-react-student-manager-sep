@@ -4,7 +4,6 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import StudentDrawerForm from './StudentDrawerForm';
 import * as client from './client';
 import * as notify from './Notification';
-import type { ApiResponse } from './types';
 
 vi.mock('./client');
 vi.mock('./Notification');
@@ -18,28 +17,17 @@ async function chooseGender(label: string): Promise<void> {
 }
 
 describe('StudentDrawerForm', () => {
-  const setShowDrawer = vi.fn();
-  const fetchStudents = vi.fn();
+  const onClose = vi.fn();
+  const onCreated = vi.fn();
 
   beforeEach(() => {
     vi.clearAllMocks();
-    vi.mocked(client.addNewStudent).mockResolvedValue({
-      ok: true,
-      status: 200,
-      statusText: 'OK',
-      json: async () => undefined,
-    } as ApiResponse);
+    vi.mocked(client.addNewStudent).mockResolvedValue(undefined);
     vi.spyOn(window, 'alert').mockImplementation(() => {});
   });
 
   it('renders create form when drawer is open', () => {
-    render(
-      <StudentDrawerForm
-        showDrawer
-        setShowDrawer={setShowDrawer}
-        fetchStudents={fetchStudents}
-      />
-    );
+    render(<StudentDrawerForm open onClose={onClose} onCreated={onCreated} />);
 
     expect(screen.getByText('Create new student')).toBeInTheDocument();
     expect(screen.getByPlaceholderText('Please enter student name')).toBeInTheDocument();
@@ -48,27 +36,15 @@ describe('StudentDrawerForm', () => {
 
   it('closes drawer when Cancel is clicked', async () => {
     const user = userEvent.setup();
-    render(
-      <StudentDrawerForm
-        showDrawer
-        setShowDrawer={setShowDrawer}
-        fetchStudents={fetchStudents}
-      />
-    );
+    render(<StudentDrawerForm open onClose={onClose} onCreated={onCreated} />);
 
     await user.click(screen.getByRole('button', { name: /cancel/i }));
-    expect(setShowDrawer).toHaveBeenCalledWith(false);
+    expect(onClose).toHaveBeenCalled();
   });
 
   it('shows validation messages when submitting empty form', async () => {
     const user = userEvent.setup();
-    render(
-      <StudentDrawerForm
-        showDrawer
-        setShowDrawer={setShowDrawer}
-        fetchStudents={fetchStudents}
-      />
-    );
+    render(<StudentDrawerForm open onClose={onClose} onCreated={onCreated} />);
 
     await user.click(screen.getByRole('button', { name: /submit/i }));
 
@@ -81,13 +57,7 @@ describe('StudentDrawerForm', () => {
 
   it('submits a new student and refreshes the list', async () => {
     const user = userEvent.setup();
-    render(
-      <StudentDrawerForm
-        showDrawer
-        setShowDrawer={setShowDrawer}
-        fetchStudents={fetchStudents}
-      />
-    );
+    render(<StudentDrawerForm open onClose={onClose} onCreated={onCreated} />);
 
     await user.type(screen.getByPlaceholderText('Please enter student name'), 'Ada Lovelace');
     await user.type(screen.getByPlaceholderText('Please enter student email'), 'ada@example.com');
@@ -106,8 +76,8 @@ describe('StudentDrawerForm', () => {
       'Student successfully added',
       'Ada Lovelace was added to the system'
     );
-    expect(setShowDrawer).toHaveBeenCalledWith(false);
-    expect(fetchStudents).toHaveBeenCalled();
+    expect(onClose).toHaveBeenCalled();
+    expect(onCreated).toHaveBeenCalled();
   });
 
   it('shows error notification when add fails', async () => {
@@ -122,13 +92,7 @@ describe('StudentDrawerForm', () => {
       },
     });
 
-    render(
-      <StudentDrawerForm
-        showDrawer
-        setShowDrawer={setShowDrawer}
-        fetchStudents={fetchStudents}
-      />
-    );
+    render(<StudentDrawerForm open onClose={onClose} onCreated={onCreated} />);
 
     await user.type(screen.getByPlaceholderText('Please enter student name'), 'Ada');
     await user.type(screen.getByPlaceholderText('Please enter student email'), 'ada@example.com');
@@ -142,6 +106,6 @@ describe('StudentDrawerForm', () => {
         'bottomLeft'
       );
     });
-    expect(fetchStudents).not.toHaveBeenCalled();
+    expect(onCreated).not.toHaveBeenCalled();
   });
 });

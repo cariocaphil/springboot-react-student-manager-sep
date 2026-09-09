@@ -4,7 +4,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import App from './App';
 import * as client from './client';
 import * as notify from './Notification';
-import type { ApiResponse, Student } from './types';
+import type { Student } from './types';
 
 vi.mock('./client');
 vi.mock('./Notification');
@@ -24,19 +24,11 @@ const students: Student[] = [
   },
 ];
 
-const okResponse = <T,>(data: T): ApiResponse =>
-  ({
-    ok: true,
-    status: 200,
-    statusText: 'OK',
-    json: async () => data,
-  }) as ApiResponse;
-
 describe('App', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    vi.mocked(client.getAllStudents).mockResolvedValue(okResponse([]));
-    vi.mocked(client.deleteStudent).mockResolvedValue(okResponse(undefined));
+    vi.mocked(client.getAllStudents).mockResolvedValue([]);
+    vi.mocked(client.deleteStudent).mockResolvedValue(undefined);
   });
 
   it('shows empty state when there are no students', async () => {
@@ -61,7 +53,7 @@ describe('App', () => {
   });
 
   it('renders student rows when the API returns data', async () => {
-    vi.mocked(client.getAllStudents).mockResolvedValue(okResponse(students));
+    vi.mocked(client.getAllStudents).mockResolvedValue(students);
 
     render(<App />);
 
@@ -97,8 +89,8 @@ describe('App', () => {
   it('deletes a student after confirm and refreshes the list', async () => {
     const user = userEvent.setup();
     vi.mocked(client.getAllStudents)
-      .mockResolvedValueOnce(okResponse(students))
-      .mockResolvedValueOnce(okResponse([students[1]]));
+      .mockResolvedValueOnce(students)
+      .mockResolvedValueOnce([students[1]]);
 
     render(<App />);
 

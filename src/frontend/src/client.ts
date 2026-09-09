@@ -1,5 +1,5 @@
 import fetch from 'unfetch';
-import type { ApiResponse, HttpError, NewStudent } from './types';
+import type { ApiResponse, HttpError, NewStudent, Student } from './types';
 
 const checkStatus = (response: ApiResponse): ApiResponse => {
   if (response.ok) {
@@ -10,19 +10,25 @@ const checkStatus = (response: ApiResponse): ApiResponse => {
   throw error;
 };
 
-export const getAllStudents = (): Promise<ApiResponse> =>
-  fetch('api/v1/students').then(checkStatus);
+export const getAllStudents = (): Promise<Student[]> =>
+  fetch('api/v1/students')
+    .then(checkStatus)
+    .then((response) => response.json<Student[]>());
 
-export const deleteStudent = (studentId: number): Promise<ApiResponse> =>
+export const deleteStudent = (studentId: number): Promise<void> =>
   fetch(`api/v1/students/${studentId}`, {
     method: 'DELETE',
-  }).then(checkStatus);
+  })
+    .then(checkStatus)
+    .then(() => undefined);
 
-export const addNewStudent = (student: NewStudent): Promise<ApiResponse> =>
+export const addNewStudent = (student: NewStudent): Promise<void> =>
   fetch('api/v1/students', {
     headers: {
       'Content-Type': 'application/json',
     },
     method: 'POST',
     body: JSON.stringify(student),
-  }).then(checkStatus);
+  })
+    .then(checkStatus)
+    .then(() => undefined);

@@ -2,7 +2,7 @@
 
 Build history for the Student Manager modernization.
 
-PR numbers match merged GitHub pull requests. Future work continues from PR 21.
+PR numbers match merged GitHub pull requests. Future work continues from PR 22.
 
 The README keeps a short Status summary; this file holds the full checklist.
 
@@ -126,3 +126,9 @@ PR 20 — React 18 upgrade
 - [x] Switch entry mounting to `createRoot` (required ReactDOM 18 API)
 - [x] Align related deps: `@types/react` 18, `@testing-library/react` 14, Ant Design **4.24.16** (React 18 fixes)
 - [x] Keep Vite/TS/Maven packaging and app behavior unchanged
+
+PR 21 — React architecture refactor
+- [x] Separate shell (`AppLayout`) from students feature (`StudentsView` + `useStudents`)
+- [x] Make `client` return typed domain data; centralize HTTP error → notification formatting
+- [x] Single drawer instance; clearer drawer props (`open` / `onClose` / `onCreated`)
+- [x] Preserve UI/behavior; extend Vitest for `apiError` + `StudentAvatar`

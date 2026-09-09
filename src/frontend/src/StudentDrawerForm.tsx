@@ -3,54 +3,38 @@ import type { ValidateErrorEntity } from 'rc-field-form/es/interface';
 import { LoadingOutlined } from '@ant-design/icons';
 import { addNewStudent } from './client';
 import { useState } from 'react';
-import { successNotification, errorNotification } from './Notification';
-import type { ApiErrorBody, NewStudent } from './types';
-import { isHttpError } from './types';
+import { successNotification } from './Notification';
+import { notifyHttpError } from './apiError';
+import type { NewStudent } from './types';
 
 const { Option } = Select;
 
 const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
 
 interface StudentDrawerFormProps {
-  showDrawer: boolean;
-  setShowDrawer: (open: boolean) => void;
-  fetchStudents: () => void;
+  open: boolean;
+  onClose: () => void;
+  onCreated: () => void | Promise<void>;
 }
 
-function StudentDrawerForm({
-  showDrawer,
-  setShowDrawer,
-  fetchStudents,
-}: StudentDrawerFormProps) {
+function StudentDrawerForm({ open, onClose, onCreated }: StudentDrawerFormProps) {
   const [submitting, setSubmitting] = useState(false);
-
-  const onCLose = () => setShowDrawer(false);
 
   const onFinish = (student: NewStudent) => {
     setSubmitting(true);
-    console.log(JSON.stringify(student, null, 2));
     addNewStudent(student)
-      .then(() => {
-        console.log('student added');
-        onCLose();
+      .then(async () => {
+        onClose();
         successNotification(
           'Student successfully added',
           `${student.name} was added to the system`
         );
-        fetchStudents();
+        await onCreated();
       })
-      .catch((err: unknown) => {
-        console.log(err);
-        if (!isHttpError(err)) {
-          return;
-        }
-        err.response.json<ApiErrorBody>().then((res) => {
-          console.log(res);
-          errorNotification(
-            'There was an issue',
-            `${res.message} [${res.status}] [${res.error}]`,
-            'bottomLeft'
-          );
+      .catch(async (err: unknown) => {
+        await notifyHttpError(err, {
+          descriptionStyle: 'spaced',
+          placement: 'bottomLeft',
         });
       })
       .finally(() => {
@@ -66,8 +50,8 @@ function StudentDrawerForm({
     <Drawer
       title="Create new student"
       width={720}
-      onClose={onCLose}
-      visible={showDrawer}
+      onClose={onClose}
+      visible={open}
       bodyStyle={{ paddingBottom: 80 }}
       footer={
         <div
@@ -75,7 +59,7 @@ function StudentDrawerForm({
             textAlign: 'right',
           }}
         >
-          <Button onClick={onCLose} style={{ marginRight: 8 }}>
+          <Button onClick={onClose} style={{ marginRight: 8 }}>
             Cancel
           </Button>
         </div>

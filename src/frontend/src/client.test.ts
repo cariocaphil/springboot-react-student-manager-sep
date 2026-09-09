@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import fetch from 'unfetch';
 import { addNewStudent, deleteStudent, getAllStudents } from './client';
-import type { ApiResponse } from './types';
+import type { ApiResponse, Student } from './types';
 
 vi.mock('unfetch', () => ({
   default: vi.fn(),
@@ -9,16 +9,28 @@ vi.mock('unfetch', () => ({
 
 const mockedFetch = vi.mocked(fetch);
 
+const ada: Student = {
+  id: 1,
+  name: 'Ada',
+  email: 'ada@example.com',
+  gender: 'FEMALE',
+};
+
 describe('client', () => {
   beforeEach(() => {
     mockedFetch.mockReset();
   });
 
-  it('getAllStudents GETs api/v1/students when response is ok', async () => {
-    const response = { ok: true, status: 200 } as ApiResponse;
+  it('getAllStudents GETs api/v1/students and returns parsed JSON', async () => {
+    const response = {
+      ok: true,
+      status: 200,
+      statusText: 'OK',
+      json: async () => [ada],
+    } as ApiResponse;
     mockedFetch.mockResolvedValue(response as never);
 
-    await expect(getAllStudents()).resolves.toBe(response);
+    await expect(getAllStudents()).resolves.toEqual([ada]);
     expect(mockedFetch).toHaveBeenCalledWith('api/v1/students');
   });
 
@@ -37,19 +49,29 @@ describe('client', () => {
   });
 
   it('deleteStudent DELETEs by id', async () => {
-    const response = { ok: true, status: 200 } as ApiResponse;
+    const response = {
+      ok: true,
+      status: 200,
+      statusText: 'OK',
+      json: async () => undefined,
+    } as ApiResponse;
     mockedFetch.mockResolvedValue(response as never);
 
-    await expect(deleteStudent(42)).resolves.toBe(response);
+    await expect(deleteStudent(42)).resolves.toBeUndefined();
     expect(mockedFetch).toHaveBeenCalledWith('api/v1/students/42', { method: 'DELETE' });
   });
 
   it('addNewStudent POSTs JSON body', async () => {
-    const response = { ok: true, status: 200 } as ApiResponse;
+    const response = {
+      ok: true,
+      status: 200,
+      statusText: 'OK',
+      json: async () => undefined,
+    } as ApiResponse;
     const student = { name: 'Ada', email: 'ada@example.com', gender: 'FEMALE' as const };
     mockedFetch.mockResolvedValue(response as never);
 
-    await expect(addNewStudent(student)).resolves.toBe(response);
+    await expect(addNewStudent(student)).resolves.toBeUndefined();
     expect(mockedFetch).toHaveBeenCalledWith('api/v1/students', {
       headers: { 'Content-Type': 'application/json' },
       method: 'POST',
