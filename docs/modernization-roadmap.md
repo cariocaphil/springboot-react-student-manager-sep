@@ -2,7 +2,7 @@
 
 Build history for the Student Manager modernization.
 
-PR numbers match merged GitHub pull requests. Future work continues from PR 19.
+PR numbers match merged GitHub pull requests. Future work continues from PR 20.
 
 The README keeps a short Status summary; this file holds the full checklist.
 
@@ -114,3 +114,9 @@ PR 18 — Expand Vitest suite
 - [x] Cover notification wrappers and `StudentDrawerForm` (validation, create success/error)
 - [x] Expand `App` tests (list rows, list error, delete confirm, drawer open, footer link)
 - [x] Add jsdom `matchMedia` / `getComputedStyle` shims for Ant Design in Vitest
+
+PR 19 — Migrate frontend to TypeScript
+- [x] Add TypeScript + `@types/react` / `@types/react-dom` (React 17)
+- [x] Convert UI/client sources and Vitest suite to `.ts` / `.tsx`
+- [x] Add `tsconfig.json` / `vite.config.ts`; `npm run build` runs `tsc --noEmit` then Vite
+- [x] Keep React 17 / Ant Design 4 / Maven `build/` → static packaging unchanged

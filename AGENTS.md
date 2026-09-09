@@ -6,7 +6,7 @@ Claude-specific notes live in [CLAUDE.md](CLAUDE.md). Human-oriented Status and 
 
 ## Project
 
-Spring Boot + React student manager: Java 17 / Spring Boot 3.4.5 API, Vite React 17 UI bundled into one JAR/container, CI/CD to Docker Hub + AWS Elastic Beanstalk.
+Spring Boot + React student manager: Java 17 / Spring Boot 3.4.5 API, Vite + TypeScript React 17 UI bundled into one JAR/container, CI/CD to Docker Hub + AWS Elastic Beanstalk.
 
 ## Required reading
 
@@ -35,7 +35,7 @@ Before changing runtime behavior, read:
 | --- | --- |
 | `src/main/java/com/example/demo/` | Spring Boot API (`student` package) |
 | `src/main/resources/` | `application.properties`, `application-dev.properties` |
-| `src/frontend/` | Vite React app |
+| `src/frontend/` | Vite + TypeScript React app |
 | `elasticbeanstalk/docker-compose.yml` | EB deploy package |
 | `.github/workflows/` | `build.yml` (PR CI), `deploy.yml` (main → Hub → EB) |
 | `pom.xml` | Maven, frontend plugin, Jib profiles |
@@ -45,7 +45,7 @@ Before changing runtime behavior, read:
 ## Stack constraints (until upgraded)
 
 - Backend: Java 17, Spring Boot 3.4.x, `jakarta.*`, JPA entity exposed as API
-- Frontend: React 17, Vite 5, Ant Design 4, relative `api/v1/students` via `unfetch`
+- Frontend: React 17 + TypeScript, Vite 5, Ant Design 4, relative `api/v1/students` via `unfetch`
 - Image: Jib → `cariocaphil/spring-react-fullstack` from `eclipse-temurin:17-jre`; compose may pin a numeric tag
 - Deploy profile: `SPRING_PROFILES_ACTIVE=dev` on EB
 

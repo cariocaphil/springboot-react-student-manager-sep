@@ -1,14 +1,15 @@
-# Frontend (Vite)
+# Frontend (Vite + TypeScript)
 
-React 17 + Ant Design 4 UI for the student manager. Production builds land in `build/` and Maven copies them into the Spring Boot JAR (`target/classes/static`).
+React 17 + TypeScript + Ant Design 4 UI for the student manager. Production builds land in `build/` and Maven copies them into the Spring Boot JAR (`target/classes/static`).
 
 ## Scripts
 
 ```bash
 npm install
-npm start      # Vite dev server on :3000 (proxies /api → :8080)
-npm test       # Vitest once
-npm run build  # production bundle → build/
+npm start         # Vite dev server on :3000 (proxies /api → :8080)
+npm test          # Vitest once
+npm run typecheck # tsc --noEmit
+npm run build     # typecheck + production bundle → build/
 ```
 
 See the root [README](../../README.md) for full-stack local run and packaging.
