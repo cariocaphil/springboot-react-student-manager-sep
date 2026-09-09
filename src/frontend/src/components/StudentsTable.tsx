@@ -1,21 +1,7 @@
-import { Badge, Button, Table, Tag } from 'antd';
-import { PlusOutlined } from '@ant-design/icons';
+import { Badge, Table, Tag } from 'antd';
 import type { Student } from '../types';
+import AddStudentButton from './AddStudentButton';
 import { buildColumns } from './studentColumns';
-
-export function AddStudentButton({ onClick }: { onClick: () => void }) {
-  return (
-    <Button
-      onClick={onClick}
-      type="primary"
-      shape="round"
-      icon={<PlusOutlined />}
-      size="small"
-    >
-      Add New Student
-    </Button>
-  );
-}
 
 interface StudentsTableProps {
   students: Student[];

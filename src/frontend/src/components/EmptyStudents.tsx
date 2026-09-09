@@ -1,5 +1,5 @@
 import { Empty } from 'antd';
-import { AddStudentButton } from './StudentsTable';
+import AddStudentButton from './AddStudentButton';
 
 interface EmptyStudentsProps {
   onAddClick: () => void;
