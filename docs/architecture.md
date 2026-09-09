@@ -209,7 +209,6 @@ These items are intentional backlog for modernization; this branch does not fix 
 
 - Frontend Vitest coverage expanded in PRs 18–21; backend service/repo/API tests from PR 14 — still no broad E2E
 - Unused imports in `StudentService` (HttpStatus / ResponseStatus)
-- Manual getters/setters alongside Lombok annotations on `Student`
 
 ## 8. What “done” looks like for this baseline
 

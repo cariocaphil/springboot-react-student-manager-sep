@@ -51,7 +51,10 @@ class StudentServiceTest {
 
         ArgumentCaptor<Student> captor = ArgumentCaptor.forClass(Student.class);
         verify(studentRepository).save(captor.capture());
-        assertThat(captor.getValue()).isEqualTo(student);
+        Student saved = captor.getValue();
+        assertThat(saved.getName()).isEqualTo(student.getName());
+        assertThat(saved.getEmail()).isEqualTo(student.getEmail());
+        assertThat(saved.getGender()).isEqualTo(student.getGender());
     }
 
     @Test
