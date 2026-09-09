@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import fetch from 'unfetch';
+import { studentsApi } from './apiRoutes';
 import { addNewStudent, deleteStudent, getAllStudents } from './client';
 import type { ApiResponse, Student } from './types';
 
@@ -21,7 +22,7 @@ describe('client', () => {
     mockedFetch.mockReset();
   });
 
-  it('getAllStudents GETs api/v1/students and returns parsed JSON', async () => {
+  it('getAllStudents GETs the students collection and returns parsed JSON', async () => {
     const response = {
       ok: true,
       status: 200,
@@ -31,7 +32,7 @@ describe('client', () => {
     mockedFetch.mockResolvedValue(response as never);
 
     await expect(getAllStudents()).resolves.toEqual([ada]);
-    expect(mockedFetch).toHaveBeenCalledWith('api/v1/students');
+    expect(mockedFetch).toHaveBeenCalledWith(studentsApi.collection);
   });
 
   it('getAllStudents rejects with response attached when not ok', async () => {
@@ -58,7 +59,9 @@ describe('client', () => {
     mockedFetch.mockResolvedValue(response as never);
 
     await expect(deleteStudent(42)).resolves.toBeUndefined();
-    expect(mockedFetch).toHaveBeenCalledWith('api/v1/students/42', { method: 'DELETE' });
+    expect(mockedFetch).toHaveBeenCalledWith(studentsApi.byId(42), {
+      method: 'DELETE',
+    });
   });
 
   it('addNewStudent POSTs JSON body', async () => {
@@ -72,7 +75,7 @@ describe('client', () => {
     mockedFetch.mockResolvedValue(response as never);
 
     await expect(addNewStudent(student)).resolves.toBeUndefined();
-    expect(mockedFetch).toHaveBeenCalledWith('api/v1/students', {
+    expect(mockedFetch).toHaveBeenCalledWith(studentsApi.collection, {
       headers: { 'Content-Type': 'application/json' },
       method: 'POST',
       body: JSON.stringify(student),

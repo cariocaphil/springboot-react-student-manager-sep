@@ -1,4 +1,5 @@
 import fetch from 'unfetch';
+import { studentsApi } from './apiRoutes';
 import type { ApiResponse, HttpError, NewStudent, Student } from './types';
 
 const checkStatus = (response: ApiResponse): ApiResponse => {
@@ -11,19 +12,19 @@ const checkStatus = (response: ApiResponse): ApiResponse => {
 };
 
 export const getAllStudents = (): Promise<Student[]> =>
-  fetch('api/v1/students')
+  fetch(studentsApi.collection)
     .then(checkStatus)
     .then((response) => response.json<Student[]>());
 
 export const deleteStudent = (studentId: number): Promise<void> =>
-  fetch(`api/v1/students/${studentId}`, {
+  fetch(studentsApi.byId(studentId), {
     method: 'DELETE',
   })
     .then(checkStatus)
     .then(() => undefined);
 
 export const addNewStudent = (student: NewStudent): Promise<void> =>
-  fetch('api/v1/students', {
+  fetch(studentsApi.collection, {
     headers: {
       'Content-Type': 'application/json',
     },
