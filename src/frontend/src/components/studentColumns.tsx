@@ -1,5 +1,5 @@
 import type { ColumnsType } from 'antd/es/table';
-import { Popconfirm, Radio } from 'antd';
+import StudentActions from './StudentActions';
 import StudentAvatar from './StudentAvatar';
 import type { Student } from '../types';
 
@@ -37,20 +37,11 @@ export function buildColumns(
       title: 'Actions',
       key: 'actions',
       render: (_text, student) => (
-        <Radio.Group>
-          <Popconfirm
-            placement="topRight"
-            title={`Are you sure to delete ${student.name}`}
-            onConfirm={() => {
-              void onDelete(student.id);
-            }}
-            okText="Yes"
-            cancelText="No"
-          >
-            <Radio.Button value="small">Delete</Radio.Button>
-          </Popconfirm>
-          <Radio.Button value="small">Edit</Radio.Button>
-        </Radio.Group>
+        <StudentActions
+          studentName={student.name}
+          studentId={student.id}
+          onDelete={onDelete}
+        />
       ),
     },
   ];
