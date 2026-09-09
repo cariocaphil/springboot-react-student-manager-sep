@@ -1,7 +1,10 @@
-package com.example.demo.student;
+package com.example.demo.student.application;
 
+import com.example.demo.student.domain.Gender;
+import com.example.demo.student.domain.Student;
 import com.example.demo.student.exception.BadRequestException;
 import com.example.demo.student.exception.StudentNotFoundException;
+import com.example.demo.student.persistence.StudentRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

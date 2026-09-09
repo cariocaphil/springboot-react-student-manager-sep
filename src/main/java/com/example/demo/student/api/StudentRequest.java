@@ -1,4 +1,6 @@
-package com.example.demo.student;
+package com.example.demo.student.api;
+
+import com.example.demo.student.domain.Gender;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;

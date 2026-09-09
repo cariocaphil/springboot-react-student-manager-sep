@@ -1,10 +1,10 @@
 package com.example.demo.integration;
 
-import com.example.demo.student.Gender;
-import com.example.demo.student.Student;
-import com.example.demo.student.StudentApiPaths;
-import com.example.demo.student.StudentRepository;
-import com.example.demo.student.StudentRequest;
+import com.example.demo.student.api.StudentApiPaths;
+import com.example.demo.student.api.StudentRequest;
+import com.example.demo.student.domain.Gender;
+import com.example.demo.student.domain.Student;
+import com.example.demo.student.persistence.StudentRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

@@ -1,5 +1,7 @@
-package com.example.demo.student;
+package com.example.demo.student.api;
 
+import com.example.demo.student.domain.Gender;
+import com.example.demo.student.domain.Student;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;

@@ -1,4 +1,4 @@
-package com.example.demo.student.exception;
+package com.example.demo.student.api;
 
 /**
  * Error JSON shape consumed by the React client ({@code ApiErrorBody}).

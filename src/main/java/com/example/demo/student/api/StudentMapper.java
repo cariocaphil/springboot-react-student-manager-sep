@@ -1,4 +1,6 @@
-package com.example.demo.student;
+package com.example.demo.student.api;
+
+import com.example.demo.student.domain.Student;
 
 final class StudentMapper {
 

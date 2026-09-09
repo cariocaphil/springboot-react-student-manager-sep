@@ -33,15 +33,16 @@ This document describes the **as-is** architecture of the student manager applic
 
 Package root: `com.example.demo`
 
-| Layer | Types | Role |
-| --- | --- | --- |
-| Bootstrap | `DemoApplication` | Spring Boot entrypoint |
-| API | `StudentController` | `@RestController` at `api/v1/students`; exposes `StudentRequest` / `StudentResponse` |
-| Domain / persistence model | `Student` (`@Entity`), `Gender` enum | JPA entity (column constraints; API validation lives on DTOs) |
-| Mapping | `StudentMapper` | Request → entity; entity → response |
-| Application service | `StudentService` | List, add (email uniqueness), delete (existence check) |
-| Persistence | `StudentRepository` (`JpaRepository`) | CRUD + derived `existsByEmail` |
-| Errors | `ApiExceptionHandler` + `BadRequestException` / `StudentNotFoundException` | Stable `{message,status,error}` JSON for 400/404 and Bean Validation |
+Student feature packages under `com.example.demo.student`:
+
+| Layer | Package | Types | Role |
+| --- | --- | --- | --- |
+| Bootstrap | `com.example.demo` | `DemoApplication` | Spring Boot entrypoint |
+| API | `student.api` | `StudentController`, DTOs, `StudentMapper`, `StudentApiPaths`, `ApiExceptionHandler` | HTTP boundary + stable error JSON |
+| Domain | `student.domain` | `Student` (`@Entity`), `Gender` | Persistence model |
+| Application | `student.application` | `StudentService` | List, add (email uniqueness), delete |
+| Persistence | `student.persistence` | `StudentRepository` | CRUD + derived `existsByEmail` |
+| Exceptions | `student.exception` | `BadRequestException`, `StudentNotFoundException` | Domain/API failure types |
 
 **Request flow (create):**
 

@@ -1,4 +1,4 @@
-package com.example.demo.student;
+package com.example.demo.student.api;
 
 public final class StudentApiPaths {
 

@@ -33,7 +33,7 @@ Before changing runtime behavior, read:
 
 | Path | Role |
 | --- | --- |
-| `src/main/java/com/example/demo/` | Spring Boot API (`student` package) |
+| `src/main/java/com/example/demo/` | Spring Boot API (`student.api` / `domain` / `application` / `persistence` / `exception`) |
 | `src/main/resources/` | `application.properties`, `application-dev.properties` |
 | `src/frontend/` | Vite + TypeScript React app (`components/layout`, `components/students`, `hooks`, `types`) |
 | `elasticbeanstalk/docker-compose.yml` | EB deploy package |

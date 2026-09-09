@@ -1,5 +1,6 @@
-package com.example.demo.student;
+package com.example.demo.student.api;
 
+import com.example.demo.student.application.StudentService;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
