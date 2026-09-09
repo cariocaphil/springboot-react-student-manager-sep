@@ -2,7 +2,7 @@
 
 Build history for the Student Manager modernization.
 
-PR numbers match merged GitHub pull requests. Future work continues from PR 23.
+PR numbers match merged GitHub pull requests. Future work continues from PR 24.
 
 The README keeps a short Status summary; this file holds the full checklist.
 
@@ -139,7 +139,12 @@ PR 22 — Backend architecture refactor ✅
 - [x] DTOs + mapper; centralized `ApiExceptionHandler`; package split (`api` / `domain` / `application` / `persistence` / `exception`)
 - [x] `existsByEmail`; `DuplicateEmailException`; `Student.createNew`; service `@Transactional` boundaries
 
-PR 23 — REST status semantics
+PR 23 — REST status semantics ✅
 - [x] `POST /api/v1/students` → **201 Created**
 - [x] `DELETE /api/v1/students/{id}` → **204 No Content**
 - [x] Update `StudentIntegrationTest` expectations; document statuses in architecture
+
+PR 24 — TanStack Query
+- [x] Add `@tanstack/react-query` and `QueryClientProvider` in `App`
+- [x] Refactor `useStudents` to `useQuery` (list) + `useMutation` (create/delete) with `studentKeys` + invalidate-on-success
+- [x] Keep `client` / notifications / UI behavior; update Vitest wrappers and docs

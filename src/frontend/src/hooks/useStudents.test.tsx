@@ -1,8 +1,11 @@
+import { QueryClientProvider } from '@tanstack/react-query';
 import { act, renderHook, waitFor } from '@testing-library/react';
+import type { ReactNode } from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { useStudents } from './useStudents';
 import * as client from '../client';
 import * as notify from '../Notification';
+import { createQueryClient } from '../queryClient';
 import type { Student } from '../types/student';
 
 vi.mock('../client');
@@ -15,6 +18,15 @@ const ada: Student = {
   gender: 'FEMALE',
 };
 
+function createWrapper() {
+  const queryClient = createQueryClient();
+  return function Wrapper({ children }: { children: ReactNode }) {
+    return (
+      <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+    );
+  };
+}
+
 describe('useStudents', () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -26,7 +38,9 @@ describe('useStudents', () => {
   it('loads students on mount', async () => {
     vi.mocked(client.getAllStudents).mockResolvedValue([ada]);
 
-    const { result } = renderHook(() => useStudents());
+    const { result } = renderHook(() => useStudents(), {
+      wrapper: createWrapper(),
+    });
 
     await waitFor(() => {
       expect(result.current.fetching).toBe(false);
@@ -39,7 +53,9 @@ describe('useStudents', () => {
       .mockResolvedValueOnce([])
       .mockResolvedValueOnce([ada]);
 
-    const { result } = renderHook(() => useStudents());
+    const { result } = renderHook(() => useStudents(), {
+      wrapper: createWrapper(),
+    });
     await waitFor(() => {
       expect(result.current.fetching).toBe(false);
     });
@@ -63,7 +79,9 @@ describe('useStudents', () => {
       'Student successfully added',
       'Ada Lovelace was added to the system'
     );
-    expect(result.current.students).toEqual([ada]);
+    await waitFor(() => {
+      expect(result.current.students).toEqual([ada]);
+    });
   });
 
   it('createStudent notifies on failure and returns false', async () => {
@@ -77,7 +95,9 @@ describe('useStudents', () => {
       },
     });
 
-    const { result } = renderHook(() => useStudents());
+    const { result } = renderHook(() => useStudents(), {
+      wrapper: createWrapper(),
+    });
     await waitFor(() => {
       expect(result.current.fetching).toBe(false);
     });
@@ -105,7 +125,9 @@ describe('useStudents', () => {
       .mockResolvedValueOnce([ada])
       .mockResolvedValueOnce([]);
 
-    const { result } = renderHook(() => useStudents());
+    const { result } = renderHook(() => useStudents(), {
+      wrapper: createWrapper(),
+    });
     await waitFor(() => {
       expect(result.current.fetching).toBe(false);
     });
@@ -119,7 +141,9 @@ describe('useStudents', () => {
       'Student deleted',
       'Student with 1 was deleted'
     );
-    expect(result.current.students).toEqual([]);
+    await waitFor(() => {
+      expect(result.current.students).toEqual([]);
+    });
   });
 
   it('removeStudentById notifies on failure without clearing the list', async () => {
@@ -134,7 +158,9 @@ describe('useStudents', () => {
       },
     });
 
-    const { result } = renderHook(() => useStudents());
+    const { result } = renderHook(() => useStudents(), {
+      wrapper: createWrapper(),
+    });
     await waitFor(() => {
       expect(result.current.fetching).toBe(false);
     });

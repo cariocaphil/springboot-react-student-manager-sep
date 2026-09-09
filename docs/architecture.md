@@ -60,18 +60,18 @@ Student feature packages under `com.example.demo.student`:
 | --- | --- |
 | Framework | React 18 + TypeScript function components + hooks (Vite 5) |
 | UI kit | Ant Design 4 (Layout, Table, Drawer, Form, notifications) |
-| HTTP | Typed `client` helpers + `apiRoutes` (`studentsApi`) against relative `api/v1/students` (`unfetch`) |
+| HTTP | Typed `client` helpers + `apiRoutes` (`studentsApi`) against relative `api/v1/students` (`unfetch`); TanStack Query (`useQuery` / `useMutation`) via `useStudents` |
 | Errors | `apiError` maps HTTP / unexpected failures → notifications (`notifyHttpError`, `notifyUnexpectedError`) |
 | Domain types | `types/student`, `types/api`, `types/notification` |
-| Structure | `components/layout` (shell) + `components/students` (view/table/drawer leaves) + `hooks/useStudents` (list/create/delete + toasts) |
+| Structure | `components/layout` (shell) + `components/students` (view/table/drawer leaves) + `hooks/useStudents` (TanStack Query list/create/delete + toasts) |
 | Features | List students, add via drawer form, delete with confirm; empty-state CTA |
 | Incomplete UX | Edit button rendered but not connected to any API; placeholder sidebar menu |
 
 ```text
-App
+App (QueryClientProvider)
 └── AppLayout (layout/)
     └── StudentsView (students/)
-        ├── useStudents → client / apiRoutes / apiError / Notification
+        ├── useStudents → TanStack Query + client / apiRoutes / apiError / Notification
         ├── EmptyStudents | StudentsTable (+ studentColumns, StudentActions, …)
         └── StudentDrawerForm (onCreate)
 ```
