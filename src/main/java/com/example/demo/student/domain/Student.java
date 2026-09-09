@@ -51,4 +51,9 @@ public class Student {
         this.email = email;
         this.gender = gender;
     }
+
+    /** New student before persistence; id is assigned by the database. */
+    public static Student createNew(String name, String email, Gender gender) {
+        return new Student(null, name, email, gender);
+    }
 }

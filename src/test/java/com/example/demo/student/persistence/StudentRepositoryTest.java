@@ -23,7 +23,7 @@ class StudentRepositoryTest {
 
     @Test
     void existsByEmail_isTrueWhenEmailSaved() {
-        Student student = new Student(null, "Alex", "alex@example.com", Gender.MALE);
+        Student student = Student.createNew("Alex", "alex@example.com", Gender.MALE);
         underTest.save(student);
 
         assertThat(underTest.existsByEmail("alex@example.com")).isTrue();

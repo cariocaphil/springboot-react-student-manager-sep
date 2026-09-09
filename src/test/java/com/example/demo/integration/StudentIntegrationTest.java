@@ -72,7 +72,7 @@ class StudentIntegrationTest {
 
     @Test
     void addStudent_rejectsDuplicateEmail() throws Exception {
-        studentRepository.save(new Student(null, "Jamila", "jamila@example.com", Gender.FEMALE));
+        studentRepository.save(Student.createNew("Jamila", "jamila@example.com", Gender.FEMALE));
         StudentRequest duplicate = new StudentRequest("Other", "jamila@example.com", Gender.OTHER);
 
         mockMvc.perform(post(STUDENTS_URI)
@@ -102,7 +102,7 @@ class StudentIntegrationTest {
     @Test
     void deleteStudent_removesExistingStudent() throws Exception {
         Student saved = studentRepository.save(
-                new Student(null, "Alex", "alex@example.com", Gender.MALE));
+                Student.createNew("Alex", "alex@example.com", Gender.MALE));
 
         mockMvc.perform(delete(STUDENT_BY_ID_URI, saved.getId()))
                 .andExpect(status().isOk());

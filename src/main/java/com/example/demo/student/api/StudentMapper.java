@@ -8,7 +8,7 @@ final class StudentMapper {
     }
 
     static Student toEntity(StudentRequest request) {
-        return new Student(null, request.name(), request.email(), request.gender());
+        return Student.createNew(request.name(), request.email(), request.gender());
     }
 
     static StudentResponse toResponse(Student student) {
