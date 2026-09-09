@@ -157,10 +157,10 @@ Intended sequence:
 | Area | Present today |
 | --- | --- |
 | Backend | `DemoApplicationTests`; `StudentServiceTest` (Mockito); `StudentRepositoryTest` (`@DataJpaTest`); `StudentIntegrationTest` (MockMvc API) |
-| Frontend | Vitest smoke test (`App.test.jsx`); run by Maven `build-frontend` via `npm test` before `vite build` |
+| Frontend | Vitest suite (`client`, `Notification`, `StudentDrawerForm`, `App`); run by Maven `build-frontend` via `npm test` before `vite build` |
 | Integration / repository / service tests | Present for student create/list/delete and email uniqueness (PR 14) |
 
-CI validates that the project **packages** against a live Postgres; it does not exercise a rich automated test suite.
+CI validates that the project **packages** against a live Postgres and runs the Vitest frontend suite during `build-frontend`.
 
 ## 7. Technical debt & inconsistencies (recorded, not remediated)
 
