@@ -4,13 +4,16 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import StudentDrawerForm from './StudentDrawerForm';
 import * as client from './client';
 import * as notify from './Notification';
+import type { ApiResponse } from './types';
 
 vi.mock('./client');
 vi.mock('./Notification');
 
-async function chooseGender(label) {
+async function chooseGender(label: string): Promise<void> {
   fireEvent.mouseDown(screen.getByRole('combobox'));
-  const option = await screen.findByText(label, { selector: '.ant-select-item-option-content' });
+  const option = await screen.findByText(label, {
+    selector: '.ant-select-item-option-content',
+  });
   fireEvent.click(option);
 }
 
@@ -20,7 +23,12 @@ describe('StudentDrawerForm', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    client.addNewStudent.mockResolvedValue({ ok: true });
+    vi.mocked(client.addNewStudent).mockResolvedValue({
+      ok: true,
+      status: 200,
+      statusText: 'OK',
+      json: async () => undefined,
+    } as ApiResponse);
     vi.spyOn(window, 'alert').mockImplementation(() => {});
   });
 
@@ -104,7 +112,7 @@ describe('StudentDrawerForm', () => {
 
   it('shows error notification when add fails', async () => {
     const user = userEvent.setup();
-    client.addNewStudent.mockRejectedValue({
+    vi.mocked(client.addNewStudent).mockRejectedValue({
       response: {
         json: async () => ({
           message: 'Email taken',

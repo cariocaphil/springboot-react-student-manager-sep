@@ -4,11 +4,12 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import App from './App';
 import * as client from './client';
 import * as notify from './Notification';
+import type { ApiResponse, Student } from './types';
 
 vi.mock('./client');
 vi.mock('./Notification');
 
-const students = [
+const students: Student[] = [
   {
     id: 1,
     name: 'Ada Lovelace',
@@ -23,14 +24,19 @@ const students = [
   },
 ];
 
+const okResponse = <T,>(data: T): ApiResponse =>
+  ({
+    ok: true,
+    status: 200,
+    statusText: 'OK',
+    json: async () => data,
+  }) as ApiResponse;
+
 describe('App', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    client.getAllStudents.mockResolvedValue({
-      ok: true,
-      json: async () => [],
-    });
-    client.deleteStudent.mockResolvedValue({ ok: true });
+    vi.mocked(client.getAllStudents).mockResolvedValue(okResponse([]));
+    vi.mocked(client.deleteStudent).mockResolvedValue(okResponse(undefined));
   });
 
   it('shows empty state when there are no students', async () => {
@@ -55,10 +61,7 @@ describe('App', () => {
   });
 
   it('renders student rows when the API returns data', async () => {
-    client.getAllStudents.mockResolvedValue({
-      ok: true,
-      json: async () => students,
-    });
+    vi.mocked(client.getAllStudents).mockResolvedValue(okResponse(students));
 
     render(<App />);
 
@@ -70,7 +73,7 @@ describe('App', () => {
   });
 
   it('shows an error notification when listing students fails', async () => {
-    client.getAllStudents.mockRejectedValue({
+    vi.mocked(client.getAllStudents).mockRejectedValue({
       response: {
         json: async () => ({
           message: 'Unavailable',
@@ -93,22 +96,17 @@ describe('App', () => {
 
   it('deletes a student after confirm and refreshes the list', async () => {
     const user = userEvent.setup();
-    client.getAllStudents
-      .mockResolvedValueOnce({
-        ok: true,
-        json: async () => students,
-      })
-      .mockResolvedValueOnce({
-        ok: true,
-        json: async () => [students[1]],
-      });
+    vi.mocked(client.getAllStudents)
+      .mockResolvedValueOnce(okResponse(students))
+      .mockResolvedValueOnce(okResponse([students[1]]));
 
     render(<App />);
 
     expect(await screen.findByText('Ada Lovelace')).toBeInTheDocument();
 
     const adaRow = screen.getByText('Ada Lovelace').closest('tr');
-    await user.click(within(adaRow).getByText('Delete'));
+    expect(adaRow).not.toBeNull();
+    await user.click(within(adaRow as HTMLElement).getByText('Delete'));
     await user.click(await screen.findByRole('button', { name: 'Yes' }));
 
     await waitFor(() => {

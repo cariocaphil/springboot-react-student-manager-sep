@@ -54,7 +54,7 @@ Package root: `com.example.demo`
 
 | Concern | Implementation |
 | --- | --- |
-| Framework | React 17 function components + hooks (Vite 5) |
+| Framework | React 17 + TypeScript function components + hooks (Vite 5) |
 | UI kit | Ant Design 4 (Layout, Table, Drawer, Form, notifications) |
 | HTTP | `unfetch` wrappers in `client.js` against relative `api/v1/students` |
 | Features | List students, add via drawer form, delete with confirm; empty-state CTA |
@@ -157,7 +157,7 @@ Intended sequence:
 | Area | Present today |
 | --- | --- |
 | Backend | `DemoApplicationTests`; `StudentServiceTest` (Mockito); `StudentRepositoryTest` (`@DataJpaTest`); `StudentIntegrationTest` (MockMvc API) |
-| Frontend | Vitest suite (`client`, `Notification`, `StudentDrawerForm`, `App`); run by Maven `build-frontend` via `npm test` before `vite build` |
+| Frontend | Vitest suite (`client`, `Notification`, `StudentDrawerForm`, `App` in `.ts`/`.tsx`); run by Maven `build-frontend` via `npm test` before `vite build` |
 | Integration / repository / service tests | Present for student create/list/delete and email uniqueness (PR 14) |
 
 CI validates that the project **packages** against a live Postgres and runs the Vitest frontend suite during `build-frontend`.
@@ -182,7 +182,7 @@ These items are intentional backlog for modernization; this branch does not fix 
 ### Platform age
 
 - Spring Boot **3.4.5** / Java **17** / `jakarta.*` (migrated in PR 16)
-- React 17 / Ant Design 4 / Vite 5 / Node 20 via frontend-maven-plugin (CRA removed in PR 17)
+- React 17 + TypeScript / Ant Design 4 / Vite 5 / Node 20 via frontend-maven-plugin (TS in PR 19)
 - Jib **3.5.2** with `eclipse-temurin:17-jre` (Java 17 runtime as of PR 15)
 
 ### Product / design
