@@ -2,7 +2,7 @@
 
 Build history for the Student Manager modernization.
 
-PR numbers match merged GitHub pull requests. Future work continues from PR 18.
+PR numbers match merged GitHub pull requests. Future work continues from PR 20.
 
 The README keeps a short Status summary; this file holds the full checklist.
 
@@ -108,3 +108,9 @@ PR 17 — CRA → Vite
 - [x] Bump `frontend-maven-plugin` Node to **20** (Vite requirement)
 - [x] Dev proxy `/api` → `localhost:8080` via `vite.config.js`
 - [x] Add Vitest smoke test for empty student list; run via Maven `npm test`; drop unused `yarn.lock`
+
+PR 19 — Migrate frontend to TypeScript
+- [x] Add TypeScript + `@types/react` / `@types/react-dom` (React 17)
+- [x] Convert UI/client sources and Vitest smoke test to `.ts` / `.tsx`
+- [x] Add `tsconfig.json` / `vite.config.ts`; `npm run build` runs `tsc --noEmit` then Vite
+- [x] Keep React 17 / Ant Design 4 / Maven `build/` → static packaging unchanged

@@ -2,15 +2,18 @@ import { render, screen } from '@testing-library/react';
 import { describe, expect, it, vi, beforeEach } from 'vitest';
 import App from './App';
 import * as client from './client';
+import type { ApiResponse } from './types';
 
 vi.mock('./client');
 
 describe('App', () => {
   beforeEach(() => {
-    client.getAllStudents.mockResolvedValue({
+    vi.mocked(client.getAllStudents).mockResolvedValue({
       ok: true,
+      status: 200,
+      statusText: 'OK',
       json: async () => [],
-    });
+    } as ApiResponse);
   });
 
   it('shows empty state when there are no students', async () => {
