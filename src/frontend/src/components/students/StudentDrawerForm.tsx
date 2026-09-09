@@ -3,6 +3,7 @@ import { LoadingOutlined } from '@ant-design/icons';
 import { useEffect } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { GENDERS, type Gender, type NewStudent } from '../../types/student';
+import { EMAIL_INVALID_MESSAGE, EMAIL_PATTERN } from '../../validation/email';
 import StudentDrawerFooter from './StudentDrawerFooter';
 
 const { Option } = Select;
@@ -91,7 +92,13 @@ function StudentDrawerForm({ open, onClose, onCreate }: StudentDrawerFormProps) 
             <Controller
               name="email"
               control={control}
-              rules={{ required: 'Please enter student email' }}
+              rules={{
+                required: 'Please enter student email',
+                pattern: {
+                  value: EMAIL_PATTERN,
+                  message: EMAIL_INVALID_MESSAGE,
+                },
+              }}
               render={({ field }) => (
                 <Form.Item
                   label="Email"
