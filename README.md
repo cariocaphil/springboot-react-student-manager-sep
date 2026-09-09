@@ -4,12 +4,12 @@ Full-stack student CRUD demo: a Spring Boot API and a Vite React UI packaged int
 
 ## Status
 
-**Modernization:** PR 17 migrates the frontend from CRA to Vite 5 + Vitest.
+**Modernization:** PR 18 expands the Vitest frontend suite beyond the empty-state smoke test.
 
 | | |
 | --- | --- |
-| Current | **Java 17** / Spring Boot **3.4.5**; Vite React 17 UI; Jib `eclipse-temurin:17-jre` |
-| Next | PR 18 — Ant Design / React upgrades, or further platform work per roadmap |
+| Current | **Java 17** / Spring Boot **3.4.5**; Vite React 17 UI; Vitest covers client + UI flows |
+| Next | PR 19 — Ant Design / React upgrades, or further platform work per roadmap |
 | Full checklist | [docs/modernization-roadmap.md](docs/modernization-roadmap.md) |
 | Architecture | [docs/architecture.md](docs/architecture.md) |
 
@@ -138,6 +138,8 @@ Frontend Vitest (also run by Maven’s `build-frontend` profile before `vite bui
 ```bash
 cd src/frontend && npm test
 ```
+
+Covers API client helpers, notification wrappers, create-student drawer (validation / success / error), and App list/delete/empty flows.
 
 ## API surface (current)
 
