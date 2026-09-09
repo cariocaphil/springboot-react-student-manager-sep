@@ -2,7 +2,7 @@ import { Drawer, Input, Col, Select, Form, Row, Button, Spin } from 'antd';
 import type { ValidateErrorEntity } from 'rc-field-form/es/interface';
 import { LoadingOutlined } from '@ant-design/icons';
 import { useState } from 'react';
-import type { NewStudent } from '../../types/student';
+import { GENDERS, type NewStudent } from '../../types/student';
 import StudentDrawerFooter from './StudentDrawerFooter';
 
 const { Option } = Select;
@@ -78,9 +78,11 @@ function StudentDrawerForm({ open, onClose, onCreate }: StudentDrawerFormProps) 
               rules={[{ required: true, message: 'Please select a gender' }]}
             >
               <Select placeholder="Please select a gender">
-                <Option value="MALE">MALE</Option>
-                <Option value="FEMALE">FEMALE</Option>
-                <Option value="OTHER">OTHER</Option>
+                {GENDERS.map((gender) => (
+                  <Option key={gender} value={gender}>
+                    {gender}
+                  </Option>
+                ))}
               </Select>
             </Form.Item>
           </Col>
