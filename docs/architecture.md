@@ -40,7 +40,7 @@ Package root: `com.example.demo`
 | Domain / persistence model | `Student` (`@Entity`), `Gender` enum | JPA entity (column constraints; API validation lives on DTOs) |
 | Mapping | `StudentMapper` | Request → entity; entity → response |
 | Application service | `StudentService` | List, add (email uniqueness), delete (existence check) |
-| Persistence | `StudentRepository` (`JpaRepository`) | CRUD + JPQL `selectExistsEmail` |
+| Persistence | `StudentRepository` (`JpaRepository`) | CRUD + derived `existsByEmail` |
 | Errors | `ApiExceptionHandler` + `BadRequestException` / `StudentNotFoundException` | Stable `{message,status,error}` JSON for 400/404 and Bean Validation |
 
 **Request flow (create):**

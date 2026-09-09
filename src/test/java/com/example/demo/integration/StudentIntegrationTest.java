@@ -59,7 +59,7 @@ class StudentIntegrationTest {
                         .content(objectMapper.writeValueAsString(payload)))
                 .andExpect(status().isOk());
 
-        assertThat(studentRepository.selectExistsEmail("jamila@example.com")).isTrue();
+        assertThat(studentRepository.existsByEmail("jamila@example.com")).isTrue();
 
         mockMvc.perform(get(STUDENTS_URI))
                 .andExpect(status().isOk())

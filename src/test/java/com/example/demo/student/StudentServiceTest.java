@@ -45,7 +45,7 @@ class StudentServiceTest {
     @Test
     void addStudent_savesWhenEmailIsFree() {
         Student student = new Student(null, "Jamila", "jamila@gmail.com", Gender.FEMALE);
-        given(studentRepository.selectExistsEmail(student.getEmail())).willReturn(false);
+        given(studentRepository.existsByEmail(student.getEmail())).willReturn(false);
 
         underTest.addStudent(student);
 
@@ -60,7 +60,7 @@ class StudentServiceTest {
     @Test
     void addStudent_throwsWhenEmailTaken() {
         Student student = new Student(null, "Jamila", "jamila@gmail.com", Gender.FEMALE);
-        given(studentRepository.selectExistsEmail(student.getEmail())).willReturn(true);
+        given(studentRepository.existsByEmail(student.getEmail())).willReturn(true);
 
         assertThatThrownBy(() -> underTest.addStudent(student))
                 .isInstanceOf(BadRequestException.class)

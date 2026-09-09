@@ -15,16 +15,16 @@ class StudentRepositoryTest {
     private StudentRepository underTest;
 
     @Test
-    void selectExistsEmail_isFalseWhenEmpty() {
-        assertThat(underTest.selectExistsEmail("nobody@example.com")).isFalse();
+    void existsByEmail_isFalseWhenEmpty() {
+        assertThat(underTest.existsByEmail("nobody@example.com")).isFalse();
     }
 
     @Test
-    void selectExistsEmail_isTrueWhenEmailSaved() {
+    void existsByEmail_isTrueWhenEmailSaved() {
         Student student = new Student(null, "Alex", "alex@example.com", Gender.MALE);
         underTest.save(student);
 
-        assertThat(underTest.selectExistsEmail("alex@example.com")).isTrue();
-        assertThat(underTest.selectExistsEmail("other@example.com")).isFalse();
+        assertThat(underTest.existsByEmail("alex@example.com")).isTrue();
+        assertThat(underTest.existsByEmail("other@example.com")).isFalse();
     }
 }

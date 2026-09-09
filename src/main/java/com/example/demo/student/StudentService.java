@@ -18,10 +18,7 @@ public class StudentService {
     }
 
     public void addStudent(Student student) {
-        // check if email is taken
-        Boolean existsEmail = studentRepository
-                .selectExistsEmail(student.getEmail());
-        if (existsEmail) {
+        if (studentRepository.existsByEmail(student.getEmail())) {
             throw new BadRequestException(
                     "Email " + student.getEmail() + " taken");
         }
