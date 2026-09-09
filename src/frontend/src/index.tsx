@@ -1,5 +1,5 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import 'antd/dist/antd.css';
 import './index.css';
 import App from './App';
@@ -7,11 +7,10 @@ import reportWebVitals from './reportWebVitals';
 
 const rootElement = document.getElementById('root');
 if (rootElement) {
-  ReactDOM.render(
+  createRoot(rootElement).render(
     <React.StrictMode>
       <App />
-    </React.StrictMode>,
-    rootElement
+    </React.StrictMode>
   );
 }
 

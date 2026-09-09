@@ -1,6 +1,6 @@
 # Frontend (Vite + TypeScript)
 
-React 17 + TypeScript + Ant Design 4 UI for the student manager. Production builds land in `build/` and Maven copies them into the Spring Boot JAR (`target/classes/static`).
+React 18 + TypeScript + Ant Design 4 UI for the student manager. Production builds land in `build/` and Maven copies them into the Spring Boot JAR (`target/classes/static`).
 
 ## Scripts
 

@@ -2,7 +2,7 @@
 
 Build history for the Student Manager modernization.
 
-PR numbers match merged GitHub pull requests. Future work continues from PR 20.
+PR numbers match merged GitHub pull requests. Future work continues from PR 21.
 
 The README keeps a short Status summary; this file holds the full checklist.
 
@@ -120,3 +120,9 @@ PR 19 — Migrate frontend to TypeScript
 - [x] Convert UI/client sources and Vitest suite to `.ts` / `.tsx`
 - [x] Add `tsconfig.json` / `vite.config.ts`; `npm run build` runs `tsc --noEmit` then Vite
 - [x] Keep React 17 / Ant Design 4 / Maven `build/` → static packaging unchanged
+
+PR 20 — React 18 upgrade
+- [x] Upgrade `react` / `react-dom` **17 → 18.3.1** (latest stable on Ant Design 4; React 19 needs Ant Design 5)
+- [x] Switch entry mounting to `createRoot` (required ReactDOM 18 API)
+- [x] Align related deps: `@types/react` 18, `@testing-library/react` 14, Ant Design **4.24.16** (React 18 fixes)
+- [x] Keep Vite/TS/Maven packaging and app behavior unchanged

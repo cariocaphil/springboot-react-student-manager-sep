@@ -54,7 +54,7 @@ Package root: `com.example.demo`
 
 | Concern | Implementation |
 | --- | --- |
-| Framework | React 17 + TypeScript function components + hooks (Vite 5) |
+| Framework | React 18 + TypeScript function components + hooks (Vite 5) |
 | UI kit | Ant Design 4 (Layout, Table, Drawer, Form, notifications) |
 | HTTP | `unfetch` wrappers in `client.js` against relative `api/v1/students` |
 | Features | List students, add via drawer form, delete with confirm; empty-state CTA |
@@ -182,7 +182,7 @@ These items are intentional backlog for modernization; this branch does not fix 
 ### Platform age
 
 - Spring Boot **3.4.5** / Java **17** / `jakarta.*` (migrated in PR 16)
-- React 17 + TypeScript / Ant Design 4 / Vite 5 / Node 20 via frontend-maven-plugin (TS in PR 19)
+- React **18.3** + TypeScript / Ant Design **4.24** / Vite 5 / Node 20 via frontend-maven-plugin (React 18 in PR 20; React 19 deferred until Ant Design 5)
 - Jib **3.5.2** with `eclipse-temurin:17-jre` (Java 17 runtime as of PR 15)
 
 ### Product / design
