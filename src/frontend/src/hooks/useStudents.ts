@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useState } from 'react';
-import { deleteStudent, getAllStudents } from '../client';
+import { addNewStudent, deleteStudent, getAllStudents } from '../client';
 import { notifyHttpError } from '../apiError';
 import { successNotification } from '../Notification';
-import type { Student } from '../types';
+import type { NewStudent, Student } from '../types';
 
 export function useStudents() {
   const [students, setStudents] = useState<Student[]>([]);
@@ -23,6 +23,27 @@ export function useStudents() {
     void refreshStudents();
   }, [refreshStudents]);
 
+  const createStudent = useCallback(
+    async (student: NewStudent): Promise<boolean> => {
+      try {
+        await addNewStudent(student);
+        successNotification(
+          'Student successfully added',
+          `${student.name} was added to the system`
+        );
+        await refreshStudents();
+        return true;
+      } catch (err: unknown) {
+        await notifyHttpError(err, {
+          descriptionStyle: 'spaced',
+          placement: 'bottomLeft',
+        });
+        return false;
+      }
+    },
+    [refreshStudents]
+  );
+
   const removeStudentById = useCallback(
     async (studentId: number) => {
       try {
@@ -39,7 +60,7 @@ export function useStudents() {
   return {
     students,
     fetching,
-    refreshStudents,
+    createStudent,
     removeStudentById,
   };
 }

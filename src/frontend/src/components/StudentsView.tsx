@@ -9,7 +9,7 @@ import StudentsTable from './StudentsTable';
 const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
 
 function StudentsView() {
-  const { students, fetching, refreshStudents, removeStudentById } = useStudents();
+  const { students, fetching, createStudent, removeStudentById } = useStudents();
   const [drawerOpen, setDrawerOpen] = useState(false);
 
   const openDrawer = () => setDrawerOpen(true);
@@ -35,7 +35,7 @@ function StudentsView() {
       <StudentDrawerForm
         open={drawerOpen}
         onClose={closeDrawer}
-        onCreated={refreshStudents}
+        onCreate={createStudent}
       />
       {body}
     </>

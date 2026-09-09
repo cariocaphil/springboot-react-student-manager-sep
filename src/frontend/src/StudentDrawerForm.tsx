@@ -1,10 +1,7 @@
 import { Drawer, Input, Col, Select, Form, Row, Button, Spin } from 'antd';
 import type { ValidateErrorEntity } from 'rc-field-form/es/interface';
 import { LoadingOutlined } from '@ant-design/icons';
-import { addNewStudent } from './client';
 import { useState } from 'react';
-import { successNotification } from './Notification';
-import { notifyHttpError } from './apiError';
 import type { NewStudent } from './types';
 import StudentDrawerFooter from './components/StudentDrawerFooter';
 
@@ -15,28 +12,19 @@ const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
 interface StudentDrawerFormProps {
   open: boolean;
   onClose: () => void;
-  onCreated: () => void | Promise<void>;
+  onCreate: (student: NewStudent) => Promise<boolean>;
 }
 
-function StudentDrawerForm({ open, onClose, onCreated }: StudentDrawerFormProps) {
+function StudentDrawerForm({ open, onClose, onCreate }: StudentDrawerFormProps) {
   const [submitting, setSubmitting] = useState(false);
 
   const onFinish = (student: NewStudent) => {
     setSubmitting(true);
-    addNewStudent(student)
-      .then(async () => {
-        onClose();
-        successNotification(
-          'Student successfully added',
-          `${student.name} was added to the system`
-        );
-        await onCreated();
-      })
-      .catch(async (err: unknown) => {
-        await notifyHttpError(err, {
-          descriptionStyle: 'spaced',
-          placement: 'bottomLeft',
-        });
+    void onCreate(student)
+      .then((created) => {
+        if (created) {
+          onClose();
+        }
       })
       .finally(() => {
         setSubmitting(false);
