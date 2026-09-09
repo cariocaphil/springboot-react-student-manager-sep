@@ -1,6 +1,7 @@
 import fetch from 'unfetch';
 import { studentsApi } from './apiRoutes';
-import type { ApiResponse, HttpError, NewStudent, Student } from './types';
+import type { ApiResponse, HttpError } from './types/api';
+import type { NewStudent, Student } from './types/student';
 
 const checkStatus = (response: ApiResponse): ApiResponse => {
   if (response.ok) {

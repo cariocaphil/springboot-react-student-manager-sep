@@ -5,7 +5,7 @@ import {
   notifyUnexpectedError,
 } from './apiError';
 import * as notify from './Notification';
-import type { ApiErrorBody, HttpError } from './types';
+import type { ApiErrorBody, HttpError } from './types/api';
 
 vi.mock('./Notification');
 

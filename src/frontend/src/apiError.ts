@@ -1,9 +1,7 @@
-import type { ArgsProps } from 'antd/es/notification';
 import { errorNotification } from './Notification';
-import type { ApiErrorBody } from './types';
-import { isHttpError } from './types';
-
-type Placement = ArgsProps['placement'];
+import type { ApiErrorBody } from './types/api';
+import { isHttpError } from './types/api';
+import type { NotificationPlacement } from './types/notification';
 
 /** Preserve historical list vs delete/add description spacing. */
 export type ApiErrorDescriptionStyle = 'compact' | 'spaced';
@@ -18,7 +16,7 @@ export function formatApiErrorDescription(
   return `${body.message} [${body.status}] [${body.error}]`;
 }
 
-function notifyIssue(description: string, placement?: Placement): void {
+function notifyIssue(description: string, placement?: NotificationPlacement): void {
   if (placement !== undefined) {
     errorNotification('There was an issue', description, placement);
     return;
@@ -29,7 +27,7 @@ function notifyIssue(description: string, placement?: Placement): void {
 /** Map an unknown failure to a user-facing error toast. */
 export function notifyUnexpectedError(
   error: unknown,
-  options: { placement?: Placement } = {}
+  options: { placement?: NotificationPlacement } = {}
 ): void {
   const description =
     error instanceof Error ? error.message : 'Unexpected error';
@@ -40,7 +38,7 @@ export async function notifyHttpError(
   error: unknown,
   options: {
     descriptionStyle?: ApiErrorDescriptionStyle;
-    placement?: Placement;
+    placement?: NotificationPlacement;
   } = {}
 ): Promise<void> {
   if (!isHttpError(error)) {

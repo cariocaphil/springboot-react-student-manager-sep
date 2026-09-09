@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { addNewStudent, deleteStudent, getAllStudents } from '../client';
 import { notifyHttpError } from '../apiError';
 import { successNotification } from '../Notification';
-import type { NewStudent, Student } from '../types';
+import type { NewStudent, Student } from '../types/student';
 
 export function useStudents() {
   const [students, setStudents] = useState<Student[]>([]);

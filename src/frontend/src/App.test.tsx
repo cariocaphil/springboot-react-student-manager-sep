@@ -4,7 +4,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import App from './App';
 import * as client from './client';
 import * as notify from './Notification';
-import type { Student } from './types';
+import type { Student } from './types/student';
 
 vi.mock('./client');
 vi.mock('./Notification');

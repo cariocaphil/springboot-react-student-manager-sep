@@ -1,5 +1,5 @@
 import { Badge, Table, Tag } from 'antd';
-import type { Student } from '../../types';
+import type { Student } from '../../types/student';
 import AddStudentButton from './AddStudentButton';
 import { buildColumns } from './studentColumns';
 

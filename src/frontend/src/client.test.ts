@@ -2,7 +2,8 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import fetch from 'unfetch';
 import { studentsApi } from './apiRoutes';
 import { addNewStudent, deleteStudent, getAllStudents } from './client';
-import type { ApiResponse, Student } from './types';
+import type { ApiResponse } from './types/api';
+import type { Student } from './types/student';
 
 vi.mock('unfetch', () => ({
   default: vi.fn(),
