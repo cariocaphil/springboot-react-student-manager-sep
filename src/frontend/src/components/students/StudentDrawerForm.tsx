@@ -45,15 +45,8 @@ function StudentDrawerForm({ open, onClose, onCreate }: StudentDrawerFormProps) 
   }, [open, reset]);
 
   const onSubmit = async (values: StudentFormValues) => {
-    if (!values.gender) {
-      return;
-    }
-    const student: NewStudent = {
-      name: values.name,
-      email: values.email,
-      gender: values.gender,
-    };
-    const created = await onCreate(student);
+    // RHF `required` on gender already blocks submit when unset; cast for NewStudent.
+    const created = await onCreate(values as NewStudent);
     if (created) {
       reset(defaultValues);
       onClose();
