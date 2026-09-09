@@ -158,7 +158,7 @@ Intended sequence:
 | Area | Present today |
 | --- | --- |
 | Backend | `DemoApplicationTests`; `StudentServiceTest` (Mockito); `StudentRepositoryTest` (`@DataJpaTest`); `StudentIntegrationTest` (MockMvc API) |
-| Frontend | Vitest suite for client, apiError, notifications, drawer, avatar, and App flows; Maven `build-frontend` runs `npm test` before `vite build` |
+| Frontend | Vitest suite for client, apiError, notifications, `useStudents`, student/layout leaves, drawer, and App flows; Maven `build-frontend` runs `npm test` before `vite build` |
 | Integration / repository / service tests | Present for student create/list/delete and email uniqueness (PR 14) |
 
 CI validates that the project **packages** against a live Postgres and runs the Vitest frontend suite during `build-frontend`.

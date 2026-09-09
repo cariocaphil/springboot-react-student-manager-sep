@@ -99,4 +99,54 @@ describe('useStudents', () => {
     );
     expect(result.current.students).toEqual([]);
   });
+
+  it('removeStudentById deletes, notifies, and refreshes', async () => {
+    vi.mocked(client.getAllStudents)
+      .mockResolvedValueOnce([ada])
+      .mockResolvedValueOnce([]);
+
+    const { result } = renderHook(() => useStudents());
+    await waitFor(() => {
+      expect(result.current.fetching).toBe(false);
+    });
+
+    await act(async () => {
+      await result.current.removeStudentById(1);
+    });
+
+    expect(client.deleteStudent).toHaveBeenCalledWith(1);
+    expect(notify.successNotification).toHaveBeenCalledWith(
+      'Student deleted',
+      'Student with 1 was deleted'
+    );
+    expect(result.current.students).toEqual([]);
+  });
+
+  it('removeStudentById notifies on failure without clearing the list', async () => {
+    vi.mocked(client.getAllStudents).mockResolvedValue([ada]);
+    vi.mocked(client.deleteStudent).mockRejectedValue({
+      response: {
+        json: async () => ({
+          message: 'Not found',
+          status: 404,
+          error: 'Not Found',
+        }),
+      },
+    });
+
+    const { result } = renderHook(() => useStudents());
+    await waitFor(() => {
+      expect(result.current.fetching).toBe(false);
+    });
+
+    await act(async () => {
+      await result.current.removeStudentById(1);
+    });
+
+    expect(notify.errorNotification).toHaveBeenCalledWith(
+      'There was an issue',
+      'Not found [404] [Not Found]'
+    );
+    expect(result.current.students).toEqual([ada]);
+  });
 });
