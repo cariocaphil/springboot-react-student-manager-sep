@@ -6,6 +6,7 @@ import { useState } from 'react';
 import { successNotification } from './Notification';
 import { notifyHttpError } from './apiError';
 import type { NewStudent } from './types';
+import StudentDrawerFooter from './components/StudentDrawerFooter';
 
 const { Option } = Select;
 
@@ -53,17 +54,7 @@ function StudentDrawerForm({ open, onClose, onCreated }: StudentDrawerFormProps)
       onClose={onClose}
       visible={open}
       bodyStyle={{ paddingBottom: 80 }}
-      footer={
-        <div
-          style={{
-            textAlign: 'right',
-          }}
-        >
-          <Button onClick={onClose} style={{ marginRight: 8 }}>
-            Cancel
-          </Button>
-        </div>
-      }
+      footer={<StudentDrawerFooter onClose={onClose} />}
     >
       <Form
         layout="vertical"
