@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { GENDERS, type Gender, type NewStudent } from '../../types/student';
 import { EMAIL_INVALID_MESSAGE, EMAIL_PATTERN } from '../../validation/email';
+import { validationStatus } from '../../utils/form';
 import StudentDrawerFooter from './StudentDrawerFooter';
 
 const { Option } = Select;
@@ -73,7 +74,7 @@ function StudentDrawerForm({ open, onClose, onCreate }: StudentDrawerFormProps) 
                 <Form.Item
                   label="Name"
                   required
-                  validateStatus={errors.name ? 'error' : undefined}
+                  validateStatus={validationStatus(!!errors.name)}
                   help={errors.name?.message}
                 >
                   <Input {...field} placeholder="Please enter student name" />
@@ -96,7 +97,7 @@ function StudentDrawerForm({ open, onClose, onCreate }: StudentDrawerFormProps) 
                 <Form.Item
                   label="Email"
                   required
-                  validateStatus={errors.email ? 'error' : undefined}
+                  validateStatus={validationStatus(!!errors.email)}
                   help={errors.email?.message}
                 >
                   <Input {...field} placeholder="Please enter student email" />
@@ -115,7 +116,7 @@ function StudentDrawerForm({ open, onClose, onCreate }: StudentDrawerFormProps) 
                 <Form.Item
                   label="gender"
                   required
-                  validateStatus={errors.gender ? 'error' : undefined}
+                  validateStatus={validationStatus(!!errors.gender)}
                   help={errors.gender?.message}
                 >
                   <Select
