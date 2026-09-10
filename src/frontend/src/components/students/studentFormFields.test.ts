@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
+  FieldType,
   groupStudentFormFieldsIntoRows,
   studentFormFields,
 } from './studentFormFields';
@@ -11,10 +12,10 @@ describe('studentFormFields', () => {
       'email',
       'gender',
     ]);
-    expect(studentFormFields[0]?.type).toBe('text');
-    expect(studentFormFields[1]?.type).toBe('text');
-    expect(studentFormFields[2]?.type).toBe('select');
-    if (studentFormFields[2]?.type === 'select') {
+    expect(studentFormFields[0]?.type).toBe(FieldType.Text);
+    expect(studentFormFields[1]?.type).toBe(FieldType.Text);
+    expect(studentFormFields[2]?.type).toBe(FieldType.Select);
+    if (studentFormFields[2]?.type === FieldType.Select) {
       expect(studentFormFields[2].options).toEqual(['MALE', 'FEMALE', 'OTHER']);
     }
   });

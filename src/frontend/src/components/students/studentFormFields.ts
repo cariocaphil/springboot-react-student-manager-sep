@@ -1,6 +1,13 @@
 import { GENDERS } from '../../types/student';
 import type { StudentFormValues } from './studentForm';
 
+export const FieldType = {
+  Text: 'text',
+  Select: 'select',
+} as const;
+
+export type FieldType = (typeof FieldType)[keyof typeof FieldType];
+
 type StudentFormFieldBase = {
   name: keyof StudentFormValues;
   label: string;
@@ -10,11 +17,11 @@ type StudentFormFieldBase = {
 };
 
 export type TextStudentFormField = StudentFormFieldBase & {
-  type: 'text';
+  type: typeof FieldType.Text;
 };
 
 export type SelectStudentFormField = StudentFormFieldBase & {
-  type: 'select';
+  type: typeof FieldType.Select;
   options: readonly string[];
 };
 
@@ -23,21 +30,21 @@ export type StudentFormFieldConfig = TextStudentFormField | SelectStudentFormFie
 export const studentFormFields: StudentFormFieldConfig[] = [
   {
     name: 'name',
-    type: 'text',
+    type: FieldType.Text,
     label: 'Name',
     placeholder: 'Please enter student name',
     span: 12,
   },
   {
     name: 'email',
-    type: 'text',
+    type: FieldType.Text,
     label: 'Email',
     placeholder: 'Please enter student email',
     span: 12,
   },
   {
     name: 'gender',
-    type: 'select',
+    type: FieldType.Select,
     label: 'gender',
     placeholder: 'Please select a gender',
     span: 12,

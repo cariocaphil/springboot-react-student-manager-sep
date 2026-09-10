@@ -3,7 +3,7 @@ import type { ControllerRenderProps } from 'react-hook-form';
 import { Controller, type Control, type FieldErrors } from 'react-hook-form';
 import { validationStatus } from '../../utils/form';
 import type { StudentFormValues } from './studentForm';
-import type { StudentFormFieldConfig } from './studentFormFields';
+import { FieldType, type StudentFormFieldConfig } from './studentFormFields';
 
 const { Option } = Select;
 
@@ -18,9 +18,9 @@ function renderFieldControl(
   rhfField: ControllerRenderProps<StudentFormValues, keyof StudentFormValues>
 ) {
   switch (field.type) {
-    case 'text':
+    case FieldType.Text:
       return <Input {...rhfField} placeholder={field.placeholder} />;
-    case 'select':
+    case FieldType.Select:
       return (
         <Select
           placeholder={field.placeholder}
