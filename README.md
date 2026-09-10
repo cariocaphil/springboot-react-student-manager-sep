@@ -4,11 +4,11 @@ Full-stack student CRUD demo: a Spring Boot API and a Vite React UI packaged int
 
 ## Status
 
-**Modernization:** PR 33 improves student list loading / empty / error+retry UX and friendlier API error messages. Future work continues from PR 33.
+**Modernization:** PR 34 makes Spring Boot OpenAPI the source of truth for frontend API TypeScript types. Future work continues from PR 34.
 
 | | |
 | --- | --- |
-| Current | **Java 17** / Spring Boot **3.4.5**; Vite + TypeScript **React 19.3** with **Ant Design 5**, **i18next** (en/de) + header language switcher, **TanStack Query** (list load/error/retry), **React Hook Form**, **Zod**, config-driven drawer fields, **ESLint** + **Prettier**; POST **201** / DELETE **204** |
+| Current | **Java 17** / Spring Boot **3.4.5** + **springdoc**; Vite + TypeScript **React 19.3** with **Ant Design 5**, **i18next** (en/de), **TanStack Query**, **React Hook Form**, **Zod**, OpenAPI-generated wire types, **ESLint** + **Prettier**; POST **201** / DELETE **204** |
 | Next | Further platform work per roadmap |
 | Full checklist | [docs/modernization-roadmap.md](docs/modernization-roadmap.md) |
 | Architecture | [docs/architecture.md](docs/architecture.md) |
@@ -17,9 +17,9 @@ Full-stack student CRUD demo: a Spring Boot API and a Vite React UI packaged int
 
 | Layer | Technology |
 | --- | --- |
-| Backend | Java **17**, Spring Boot **3.4.5**, Spring Web, Spring Data JPA, Bean Validation, Lombok |
+| Backend | Java **17**, Spring Boot **3.4.5**, Spring Web, Spring Data JPA, Bean Validation, Lombok, **springdoc-openapi** |
 | Database | PostgreSQL (local `localhost:5432`; AWS RDS via `dev` profile) |
-| Frontend | React **19.3** + **TypeScript**, **Vite 5**, Ant Design **5.29**, **i18next** / **react-i18next** (en/de), **TanStack Query 5**, **React Hook Form 7**, **Zod**, `unfetch`, Vitest, **ESLint 9**, **Prettier** |
+| Frontend | React **19.3** + **TypeScript**, **Vite 5**, Ant Design **5.29**, **i18next** / **react-i18next** (en/de), **TanStack Query 5**, **React Hook Form 7**, **Zod**, `unfetch`, **openapi-typescript** (generated wire types), Vitest, **ESLint 9**, **Prettier** |
 | Build | Maven Wrapper, `frontend-maven-plugin` (Node **20** / npm **10**), Jib **3.5.2** |
 | Container | Eclipse Temurin **17** JRE base (`eclipse-temurin:17-jre`); image name `cariocaphil/spring-react-fullstack` |
 | CI/CD | GitHub Actions (`.github/workflows/build.yml`, `deploy.yml`) |
@@ -30,6 +30,7 @@ Full-stack student CRUD demo: a Spring Boot API and a Vite React UI packaged int
 ```
 .
 ├── .github/workflows/     # CI (PR) and CICD (main → Docker Hub → Elastic Beanstalk)
+├── api/                   # Committed OpenAPI document (source for frontend typegen)
 ├── elasticbeanstalk/      # docker-compose.yml deployed to EB
 ├── docs/                  # Architecture baseline and modernization roadmap
 ├── src/main/java/         # Spring Boot API (student domain)
@@ -131,17 +132,32 @@ Requires Docker. Pushes tags `cariocaphil/spring-react-fullstack:local` and `:la
 ./mvnw test
 ```
 
-Runs `StudentServiceTest` (no DB), plus Postgres-backed `StudentRepositoryTest`, `StudentIntegrationTest`, and `DemoApplicationTests`. Start local Postgres first (see [Database](#database)). CI starts Postgres 13.1 before `./mvnw clean package`.
+Runs `StudentServiceTest` (no DB), plus Postgres-backed `StudentRepositoryTest`, `StudentIntegrationTest`, `OpenApiContractTest`, and `DemoApplicationTests`. Start local Postgres first (see [Database](#database)). CI starts Postgres 13.1 before `./mvnw clean package`.
 
-Frontend Vitest / lint / format (also run by Maven’s `build-frontend` profile before `vite build`):
+Frontend Vitest / lint / format / OpenAPI typecheck (also run by Maven’s `build-frontend` profile before `vite build`):
 
 ```bash
 cd src/frontend && npm test
 cd src/frontend && npm run lint
 cd src/frontend && npm run format:check
+cd src/frontend && npm run check:api-types
 ```
 
 Covers API client helpers, notification wrappers, create-student drawer (validation / success / error), and App list/delete/empty/load-error+retry flows. Use `npm run format` to apply Prettier.
+
+### OpenAPI contract and generated types
+
+Spring Boot owns the HTTP contract (DTOs + springdoc). The committed snapshot is `api/openapi.json`. The React app generates TypeScript types from that file — **do not edit** `src/frontend/src/types/generated/` by hand.
+
+After changing API DTOs or controller annotations:
+
+```bash
+# Requires local Postgres (same as other @SpringBootTest suites)
+./mvnw -Dopenapi.export=true test -Dtest=OpenApiContractTest -P'!build-frontend'
+cd src/frontend && npm run generate:api-types
+```
+
+CI fails if the committed OpenAPI JSON drifts from the running app (`OpenApiContractTest`) or if generated TS drifts from `api/openapi.json` (`npm run check:api-types`).
 
 ## API surface (current)
 

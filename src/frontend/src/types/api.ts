@@ -1,4 +1,6 @@
-/** Minimal response shape returned by `unfetch`. */
+import type { components } from './generated/schema';
+
+/** Minimal response shape returned by `unfetch` (transport concern, not OpenAPI). */
 export type ApiResponse = {
   ok: boolean;
   status: number;
@@ -6,11 +8,8 @@ export type ApiResponse = {
   json: <T = unknown>() => Promise<T>;
 };
 
-export interface ApiErrorBody {
-  message: string;
-  status: number;
-  error: string;
-}
+/** Structured API error body from OpenAPI `ApiErrorResponse`. */
+export type ApiErrorBody = components['schemas']['ApiErrorResponse'];
 
 export type HttpError = Error & { response: ApiResponse };
 
