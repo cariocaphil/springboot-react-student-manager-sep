@@ -21,10 +21,7 @@ function AppLayout({ children }: AppLayoutProps) {
         <Content style={{ margin: '0 16px' }}>
           <Breadcrumb
             style={{ margin: '16px 0' }}
-            items={[
-              { title: t('layout.breadcrumbUser') },
-              { title: t('layout.breadcrumbBill') },
-            ]}
+            items={[{ title: t('layout.breadcrumbUser') }, { title: t('layout.breadcrumbBill') }]}
           />
           <div className="site-layout-background" style={{ padding: 24, minHeight: 360 }}>
             {children}
