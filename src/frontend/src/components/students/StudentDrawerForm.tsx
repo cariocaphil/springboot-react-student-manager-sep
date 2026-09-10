@@ -2,27 +2,19 @@ import { Drawer, Input, Col, Select, Form, Row, Button, Spin } from 'antd';
 import { LoadingOutlined } from '@ant-design/icons';
 import { useEffect } from 'react';
 import { Controller, useForm } from 'react-hook-form';
-import { GENDERS, type Gender, type NewStudent } from '../../types/student';
+import { GENDERS, type NewStudent } from '../../types/student';
 import { EMAIL_INVALID_MESSAGE, EMAIL_PATTERN } from '../../validation/email';
 import { validationStatus } from '../../utils/form';
-import { createNewStudentFromForm } from './studentForm';
+import {
+  createNewStudentFromForm,
+  defaultValues,
+  type StudentFormValues,
+} from './studentForm';
 import StudentDrawerFooter from './StudentDrawerFooter';
 
 const { Option } = Select;
 
 const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
-
-interface StudentFormValues {
-  name: string;
-  email: string;
-  gender: Gender | undefined;
-}
-
-const defaultValues: StudentFormValues = {
-  name: '',
-  email: '',
-  gender: undefined,
-};
 
 interface StudentDrawerFormProps {
   open: boolean;
