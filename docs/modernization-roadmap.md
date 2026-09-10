@@ -189,6 +189,6 @@ PR 31 — Frontend i18n (en / de) ✅
 - [x] Wire Ant Design `ConfigProvider` locale from active language; keep API/domain values (genders, server error bodies) untranslated
 - [x] Update Vitest + docs
 
-PR 32 — Language switcher
+PR 32 — Language switcher ✅
 - [x] Add `LanguageSwitcher` (EN/DE Ant Design Select) + Vitest
-- [ ] Mount switcher in `AppLayout` header (component exists under `components/layout/`, not yet rendered)
+- [x] Mount switcher in `AppLayout` header

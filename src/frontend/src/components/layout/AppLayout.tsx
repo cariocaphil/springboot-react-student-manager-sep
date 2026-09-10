@@ -3,6 +3,7 @@ import { Breadcrumb, Layout } from 'antd';
 import { useTranslation } from 'react-i18next';
 import AppFooter from './AppFooter';
 import AppSidebar from './AppSidebar';
+import LanguageSwitcher from './LanguageSwitcher';
 
 const { Header, Content } = Layout;
 
@@ -17,7 +18,17 @@ function AppLayout({ children }: AppLayoutProps) {
     <Layout style={{ minHeight: '100vh' }}>
       <AppSidebar />
       <Layout className="site-layout">
-        <Header className="site-layout-background" style={{ padding: 0 }} />
+        <Header
+          className="site-layout-background"
+          style={{
+            padding: '0 16px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'flex-end',
+          }}
+        >
+          <LanguageSwitcher />
+        </Header>
         <Content style={{ margin: '0 16px' }}>
           <Breadcrumb
             style={{ margin: '16px 0' }}
