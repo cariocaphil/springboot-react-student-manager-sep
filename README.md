@@ -4,12 +4,12 @@ Full-stack student CRUD demo: a Spring Boot API and a Vite React UI packaged int
 
 ## Status
 
-**Modernization:** PR 31 adds frontend i18n (English default, German resources). Future work continues from PR 31.
+**Modernization:** PR 31 adds frontend i18n (en/de); PR 32 adds a `LanguageSwitcher` component (not yet mounted in the layout). Future work continues from PR 32.
 
 | | |
 | --- | --- |
 | Current | **Java 17** / Spring Boot **3.4.5**; Vite + TypeScript **React 19.3** with **Ant Design 5**, **i18next** (en/de), **TanStack Query**, **React Hook Form**, **Zod**, config-driven drawer fields, **ESLint** + **Prettier**; POST **201** / DELETE **204** |
-| Next | Further platform work per roadmap |
+| Next | Mount language switcher in `AppLayout` header, or further platform work per roadmap |
 | Full checklist | [docs/modernization-roadmap.md](docs/modernization-roadmap.md) |
 | Architecture | [docs/architecture.md](docs/architecture.md) |
 

@@ -2,7 +2,7 @@
 
 Build history for the Student Manager modernization.
 
-PR numbers match merged GitHub pull requests. Future work continues from PR 31.
+PR numbers match merged GitHub pull requests. Future work continues from PR 32.
 
 The README keeps a short Status summary; this file holds the full checklist.
 
@@ -187,4 +187,8 @@ PR 31 — Frontend i18n (en / de) ✅
 - [x] Add `i18next` + `react-i18next`; English default + German resources under `src/i18n/locales`
 - [x] Replace user-facing UI strings (layout, students, forms, Zod messages, notifications, empty/actions)
 - [x] Wire Ant Design `ConfigProvider` locale from active language; keep API/domain values (genders, server error bodies) untranslated
-- [x] Update Vitest + docs (language switcher deferred)
+- [x] Update Vitest + docs
+
+PR 32 — Language switcher
+- [x] Add `LanguageSwitcher` (EN/DE Ant Design Select) + Vitest
+- [ ] Mount switcher in `AppLayout` header (component exists under `components/layout/`, not yet rendered)
