@@ -10,8 +10,10 @@ export type FieldType = (typeof FieldType)[keyof typeof FieldType];
 
 type StudentFormFieldBase = {
   name: keyof StudentFormValues;
-  label: string;
-  placeholder: string;
+  /** i18n key; resolve with `t()` at render time — do not pass `t` into this config. */
+  labelKey: string;
+  /** i18n key; resolve with `t()` at render time. */
+  placeholderKey: string;
   /** Ant Design Col span (24-grid). */
   span: number;
   /** Shows Ant Design required marker; Zod remains validation source of truth. */
@@ -33,24 +35,24 @@ export const studentFormFields: StudentFormFieldConfig[] = [
   {
     name: 'name',
     type: FieldType.Text,
-    label: 'Name',
-    placeholder: 'Please enter student name',
+    labelKey: 'students.form.name.label',
+    placeholderKey: 'students.form.name.placeholder',
     span: 12,
     required: true,
   },
   {
     name: 'email',
     type: FieldType.Text,
-    label: 'Email',
-    placeholder: 'Please enter student email',
+    labelKey: 'students.form.email.label',
+    placeholderKey: 'students.form.email.placeholder',
     span: 12,
     required: true,
   },
   {
     name: 'gender',
     type: FieldType.Select,
-    label: 'gender',
-    placeholder: 'Please select a gender',
+    labelKey: 'students.form.gender.label',
+    placeholderKey: 'students.form.gender.placeholder',
     span: 12,
     required: true,
     options: GENDERS,

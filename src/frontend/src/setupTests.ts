@@ -1,5 +1,6 @@
 import '@ant-design/v5-patch-for-react-19';
 import '@testing-library/jest-dom';
+import './i18n';
 
 Object.defineProperty(window, 'matchMedia', {
   writable: true,

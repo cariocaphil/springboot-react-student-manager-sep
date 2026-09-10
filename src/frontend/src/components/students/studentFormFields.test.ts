@@ -8,6 +8,8 @@ describe('studentFormFields', () => {
     expect(studentFormFields[1]?.type).toBe(FieldType.Text);
     expect(studentFormFields[2]?.type).toBe(FieldType.Select);
     expect(studentFormFields.every((field) => field.required)).toBe(true);
+    expect(studentFormFields[0]?.labelKey).toBe('students.form.name.label');
+    expect(studentFormFields[0]?.placeholderKey).toBe('students.form.name.placeholder');
     if (studentFormFields[2]?.type === FieldType.Select) {
       expect(studentFormFields[2].options).toEqual(['MALE', 'FEMALE', 'OTHER']);
     }

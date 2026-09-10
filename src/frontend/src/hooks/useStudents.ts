@@ -1,5 +1,6 @@
 import { useCallback, useEffect } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import { addNewStudent, deleteStudent, getAllStudents } from '../client';
 import { notifyHttpError } from '../apiError';
 import { successNotification } from '../Notification';
@@ -7,6 +8,7 @@ import { studentKeys } from '../studentKeys';
 import type { NewStudent, Student } from '../types/student';
 
 export function useStudents() {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
 
   const {
@@ -28,7 +30,10 @@ export function useStudents() {
   const { mutateAsync: createStudentMutation } = useMutation({
     mutationFn: (student: NewStudent) => addNewStudent(student),
     onSuccess: async (_result, student) => {
-      successNotification('Student successfully added', `${student.name} was added to the system`);
+      successNotification(
+        t('students.notifications.addedTitle'),
+        t('students.notifications.addedDescription', { name: student.name })
+      );
       await queryClient.invalidateQueries({ queryKey: studentKeys.all });
     },
   });
@@ -36,7 +41,10 @@ export function useStudents() {
   const { mutateAsync: deleteStudentMutation } = useMutation({
     mutationFn: (studentId: number) => deleteStudent(studentId),
     onSuccess: async (_result, studentId) => {
-      successNotification('Student deleted', `Student with ${studentId} was deleted`);
+      successNotification(
+        t('students.notifications.deletedTitle'),
+        t('students.notifications.deletedDescription', { id: studentId })
+      );
       await queryClient.invalidateQueries({ queryKey: studentKeys.all });
     },
   });

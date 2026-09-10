@@ -1,9 +1,12 @@
 import type { ColumnsType } from 'antd/es/table';
+import { useTranslation } from 'react-i18next';
 import StudentActions from './StudentActions';
 import StudentAvatar from './StudentAvatar';
 import type { Student } from '../../types/student';
 
-export function buildColumns(onDelete: (studentId: number) => void): ColumnsType<Student> {
+export function useStudentColumns(onDelete: (studentId: number) => void): ColumnsType<Student> {
+  const { t } = useTranslation();
+
   return [
     {
       title: '',
@@ -12,27 +15,27 @@ export function buildColumns(onDelete: (studentId: number) => void): ColumnsType
       render: (_text, student) => <StudentAvatar name={student.name} />,
     },
     {
-      title: 'Id',
+      title: t('students.columns.id'),
       dataIndex: 'id',
       key: 'id',
     },
     {
-      title: 'Name',
+      title: t('students.columns.name'),
       dataIndex: 'name',
       key: 'name',
     },
     {
-      title: 'Email',
+      title: t('students.columns.email'),
       dataIndex: 'email',
       key: 'email',
     },
     {
-      title: 'Gender',
+      title: t('students.columns.gender'),
       dataIndex: 'gender',
       key: 'gender',
     },
     {
-      title: 'Actions',
+      title: t('students.columns.actions'),
       key: 'actions',
       render: (_text, student) => (
         <StudentActions studentName={student.name} studentId={student.id} onDelete={onDelete} />
