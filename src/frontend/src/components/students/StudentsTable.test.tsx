@@ -25,20 +25,12 @@ describe('StudentsTable', () => {
     const onDelete = vi.fn();
     const onAddClick = vi.fn();
 
-    render(
-      <StudentsTable
-        students={students}
-        onDelete={onDelete}
-        onAddClick={onAddClick}
-      />
-    );
+    render(<StudentsTable students={students} onDelete={onDelete} onAddClick={onAddClick} />);
 
     expect(screen.getByText('Ada Lovelace')).toBeInTheDocument();
     expect(screen.getByText('alan@example.com')).toBeInTheDocument();
     expect(screen.getByText('Number of students')).toBeInTheDocument();
-    expect(
-      document.querySelector('.site-badge-count-4 .ant-badge-count')
-    ).toHaveTextContent('2');
+    expect(document.querySelector('.site-badge-count-4 .ant-badge-count')).toHaveTextContent('2');
 
     await user.click(screen.getByRole('button', { name: /Add New Student/i }));
     expect(onAddClick).toHaveBeenCalledTimes(1);
@@ -48,13 +40,7 @@ describe('StudentsTable', () => {
     const user = userEvent.setup();
     const onDelete = vi.fn();
 
-    render(
-      <StudentsTable
-        students={students}
-        onDelete={onDelete}
-        onAddClick={vi.fn()}
-      />
-    );
+    render(<StudentsTable students={students} onDelete={onDelete} onAddClick={vi.fn()} />);
 
     const adaRow = screen.getByText('Ada Lovelace').closest('tr');
     expect(adaRow).not.toBeNull();

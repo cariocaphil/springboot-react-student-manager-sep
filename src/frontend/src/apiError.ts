@@ -29,8 +29,7 @@ export function notifyUnexpectedError(
   error: unknown,
   options: { placement?: NotificationPlacement } = {}
 ): void {
-  const description =
-    error instanceof Error ? error.message : 'Unexpected error';
+  const description = error instanceof Error ? error.message : 'Unexpected error';
   notifyIssue(description, options.placement);
 }
 
@@ -47,9 +46,6 @@ export async function notifyHttpError(
   }
 
   const body = await error.response.json<ApiErrorBody>();
-  const description = formatApiErrorDescription(
-    body,
-    options.descriptionStyle ?? 'spaced'
-  );
+  const description = formatApiErrorDescription(body, options.descriptionStyle ?? 'spaced');
   notifyIssue(description, options.placement);
 }

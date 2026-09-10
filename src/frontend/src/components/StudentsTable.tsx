@@ -3,7 +3,6 @@ import { Student } from '../types/student';
 import { buildColumns } from './students/studentColumns';
 import AddStudentButton from './students/AddStudentButton';
 
-
 interface StudentsTableProps {
   students: Student[];
   onDelete: (studentId: number) => void;

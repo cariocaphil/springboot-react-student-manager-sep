@@ -10,10 +10,7 @@ import {
   studentFormSchema,
   type StudentFormValues,
 } from './studentForm';
-import {
-  groupStudentFormFieldsIntoRows,
-  studentFormFields,
-} from './studentFormFields';
+import { groupStudentFormFieldsIntoRows, studentFormFields } from './studentFormFields';
 import StudentDrawerFooter from './StudentDrawerFooter';
 import StudentFormField from './StudentFormField';
 
@@ -42,7 +39,7 @@ function StudentDrawerForm({ open, onClose, onCreate }: StudentDrawerFormProps) 
     if (!open) {
       reset(defaultValues);
     }
-  }, [open]);
+  }, [open, reset]);
 
   const onSubmit = async (values: StudentFormValues) => {
     const student = createNewStudentFromForm(values);

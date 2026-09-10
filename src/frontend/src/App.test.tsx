@@ -44,10 +44,7 @@ describe('App', () => {
     const link = screen.getByRole('link', {
       name: /Fullstack Spring Boot & React for professionals/i,
     });
-    expect(link).toHaveAttribute(
-      'href',
-      'https://amigoscode.com/p/full-stack-spring-boot-react'
-    );
+    expect(link).toHaveAttribute('href', 'https://amigoscode.com/p/full-stack-spring-boot-react');
     expect(link).toHaveAttribute('rel', 'noopener noreferrer');
     expect(link).toHaveAttribute('target', '_blank');
   });
