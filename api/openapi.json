@@ -1,0 +1,183 @@
+{
+  "openapi" : "3.1.0",
+  "info" : {
+    "description" : "HTTP contract for the Student Manager UI. Spring Boot owns this contract; the React app generates TypeScript types from the exported OpenAPI document.",
+    "title" : "Student Manager API",
+    "version" : "v1"
+  },
+  "servers" : [ {
+    "url" : "/",
+    "description" : "Same origin as the bundled UI"
+  } ],
+  "tags" : [ {
+    "description" : "Student collection operations",
+    "name" : "Students"
+  } ],
+  "paths" : {
+    "/api/v1/students" : {
+      "get" : {
+        "operationId" : "getAllStudents",
+        "responses" : {
+          "200" : {
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/StudentResponse"
+                  }
+                }
+              }
+            },
+            "description" : "Students"
+          }
+        },
+        "summary" : "List all students",
+        "tags" : [ "Students" ]
+      },
+      "post" : {
+        "operationId" : "addStudent",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/StudentRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "201" : {
+            "description" : "Created"
+          },
+          "400" : {
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description" : "Validation or business rule failure"
+          }
+        },
+        "summary" : "Create a student",
+        "tags" : [ "Students" ]
+      }
+    },
+    "/api/v1/students/{studentId}" : {
+      "delete" : {
+        "operationId" : "deleteStudent",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "studentId",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        } ],
+        "responses" : {
+          "204" : {
+            "description" : "Deleted"
+          },
+          "404" : {
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description" : "Student not found"
+          }
+        },
+        "summary" : "Delete a student by id",
+        "tags" : [ "Students" ]
+      }
+    }
+  },
+  "components" : {
+    "schemas" : {
+      "ApiErrorResponse" : {
+        "type" : "object",
+        "description" : "Structured API error body",
+        "properties" : {
+          "error" : {
+            "type" : "string",
+            "description" : "HTTP reason phrase",
+            "example" : "Bad Request"
+          },
+          "message" : {
+            "type" : "string",
+            "description" : "User-facing error message",
+            "example" : "Email ada@example.com taken"
+          },
+          "status" : {
+            "type" : "integer",
+            "format" : "int32",
+            "description" : "HTTP status code",
+            "example" : 400
+          }
+        },
+        "required" : [ "error", "message", "status" ]
+      },
+      "StudentRequest" : {
+        "type" : "object",
+        "description" : "Payload to create a student",
+        "properties" : {
+          "email" : {
+            "type" : "string",
+            "format" : "email",
+            "description" : "Email address",
+            "example" : "ada@example.com",
+            "minLength" : 1
+          },
+          "gender" : {
+            "type" : "string",
+            "description" : "Gender",
+            "enum" : [ "MALE", "FEMALE", "OTHER" ]
+          },
+          "name" : {
+            "type" : "string",
+            "description" : "Full name",
+            "example" : "Ada Lovelace",
+            "minLength" : 1
+          }
+        },
+        "required" : [ "email", "gender", "name" ]
+      },
+      "StudentResponse" : {
+        "type" : "object",
+        "description" : "Student as returned by the API",
+        "properties" : {
+          "email" : {
+            "type" : "string",
+            "description" : "Email address",
+            "example" : "ada@example.com",
+            "minLength" : 1
+          },
+          "gender" : {
+            "type" : "string",
+            "description" : "Gender",
+            "enum" : [ "MALE", "FEMALE", "OTHER" ]
+          },
+          "id" : {
+            "type" : "integer",
+            "format" : "int64",
+            "description" : "Student id",
+            "example" : 1
+          },
+          "name" : {
+            "type" : "string",
+            "description" : "Full name",
+            "example" : "Ada Lovelace",
+            "minLength" : 1
+          }
+        },
+        "required" : [ "email", "gender", "id", "name" ]
+      }
+    }
+  }
+}
