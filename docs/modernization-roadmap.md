@@ -2,7 +2,7 @@
 
 Build history for the Student Manager modernization.
 
-PR numbers match merged GitHub pull requests. Future work continues from PR 27.
+PR numbers match merged GitHub pull requests. Future work continues from PR 28.
 
 The README keeps a short Status summary; this file holds the full checklist.
 
@@ -164,3 +164,9 @@ PR 27 — Config-driven student form fields ✅
 - [x] Discriminate field kinds via `FieldType` const map (`Text` / `Select`), not a TS enum
 - [x] Add `StudentFormField` + row grouping; map fields in `StudentDrawerForm` without changing Zod validation
 - [x] Preserve layout/UX/tests; update docs
+
+PR 28 — Frontend ESLint + Prettier
+- [x] Add ESLint flat config (TypeScript, React, React Hooks, react-refresh) + Prettier; `eslint-config-prettier`
+- [x] Add `lint` / `format` / `format:check` scripts; format existing frontend sources
+- [x] Run format:check + lint in Maven `build-frontend` (CI via `./mvnw … -P build-frontend`)
+- [x] Update docs

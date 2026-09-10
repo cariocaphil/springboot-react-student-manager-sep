@@ -1,9 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { EMAIL_INVALID_MESSAGE } from '../../validation/email';
-import {
-  createNewStudentFromForm,
-  studentFormSchema,
-} from './studentForm';
+import { createNewStudentFromForm, studentFormSchema } from './studentForm';
 
 describe('studentFormSchema', () => {
   it('accepts a complete valid student', () => {
@@ -38,9 +35,7 @@ describe('studentFormSchema', () => {
     });
     expect(result.success).toBe(false);
     if (!result.success) {
-      expect(result.error.issues.map((issue) => issue.message)).toContain(
-        EMAIL_INVALID_MESSAGE
-      );
+      expect(result.error.issues.map((issue) => issue.message)).toContain(EMAIL_INVALID_MESSAGE);
     }
   });
 });

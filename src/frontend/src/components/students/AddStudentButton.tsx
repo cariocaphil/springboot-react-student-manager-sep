@@ -7,13 +7,7 @@ interface AddStudentButtonProps {
 
 function AddStudentButton({ onClick }: AddStudentButtonProps) {
   return (
-    <Button
-      onClick={onClick}
-      type="primary"
-      shape="round"
-      icon={<PlusOutlined />}
-      size="small"
-    >
+    <Button onClick={onClick} type="primary" shape="round" icon={<PlusOutlined />} size="small">
       Add New Student
     </Button>
   );

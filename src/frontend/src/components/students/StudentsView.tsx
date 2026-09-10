@@ -22,21 +22,13 @@ function StudentsView() {
     body = <EmptyStudents onAddClick={openDrawer} />;
   } else {
     body = (
-      <StudentsTable
-        students={students}
-        onDelete={removeStudentById}
-        onAddClick={openDrawer}
-      />
+      <StudentsTable students={students} onDelete={removeStudentById} onAddClick={openDrawer} />
     );
   }
 
   return (
     <>
-      <StudentDrawerForm
-        open={drawerOpen}
-        onClose={closeDrawer}
-        onCreate={createStudent}
-      />
+      <StudentDrawerForm open={drawerOpen} onClose={closeDrawer} onCreate={createStudent} />
       {body}
     </>
   );

@@ -28,10 +28,7 @@ export function useStudents() {
   const { mutateAsync: createStudentMutation } = useMutation({
     mutationFn: (student: NewStudent) => addNewStudent(student),
     onSuccess: async (_result, student) => {
-      successNotification(
-        'Student successfully added',
-        `${student.name} was added to the system`
-      );
+      successNotification('Student successfully added', `${student.name} was added to the system`);
       await queryClient.invalidateQueries({ queryKey: studentKeys.all });
     },
   });

@@ -121,7 +121,7 @@ Maven profiles:
 
 | Profile | Default | Purpose |
 | --- | --- | --- |
-| `build-frontend` | **yes** | Install Node/npm via plugin, `npm install`, `npm test` (Vitest), `vite build`, copy to classpath static |
+| `build-frontend` | **yes** | Install Node/npm via plugin, `npm install`, `npm run format:check`, `npm run lint`, `npm test` (Vitest), `vite build`, copy to classpath static |
 | `jib-push-to-dockerhub` | no | On `package`, Jib `build` → Docker Hub (`cariocaphil/spring-react-fullstack`) |
 | `jib-push-to-local` | no | On `package`, Jib `dockerBuild` → local Docker |
 
@@ -174,10 +174,10 @@ Intended sequence:
 | Area | Present today |
 | --- | --- |
 | Backend | `DemoApplicationTests`; `StudentServiceTest` (Mockito); `StudentRepositoryTest` (`@DataJpaTest`); `StudentIntegrationTest` (MockMvc API) |
-| Frontend | Vitest for `client`, `apiRoutes`, `apiError`, notifications, `useStudents`, student/layout leaves, drawer, and App flows; Maven `build-frontend` runs `npm test` before `vite build` |
+| Frontend | Vitest for `client`, `apiRoutes`, `apiError`, notifications, `useStudents`, student/layout leaves, drawer, and App flows; ESLint + Prettier; Maven `build-frontend` runs `format:check`, `lint`, and `npm test` before `vite build` |
 | Integration / repository / service tests | Present for student create/list/delete and email uniqueness (PR 14) |
 
-CI validates that the project **packages** against a live Postgres and runs the Vitest frontend suite during `build-frontend`.
+CI validates that the project **packages** against a live Postgres and runs frontend format check, ESLint, and the Vitest suite during `build-frontend`.
 
 ## 7. Technical debt & inconsistencies (recorded, not remediated)
 

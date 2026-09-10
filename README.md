@@ -4,11 +4,11 @@ Full-stack student CRUD demo: a Spring Boot API and a Vite React UI packaged int
 
 ## Status
 
-**Modernization:** PR 26 Zod form validation is complete; PR 27 makes student drawer fields config-driven. Future work continues from PR 27.
+**Modernization:** PR 27 config-driven form fields is complete; PR 28 adds ESLint and Prettier for the frontend. Future work continues from PR 28.
 
 | | |
 | --- | --- |
-| Current | **Java 17** / Spring Boot **3.4.5**; Vite + TypeScript **React 18.3** with **TanStack Query**, **React Hook Form**, **Zod**, and config-driven drawer fields; POST **201** / DELETE **204** |
+| Current | **Java 17** / Spring Boot **3.4.5**; Vite + TypeScript **React 18.3** with **TanStack Query**, **React Hook Form**, **Zod**, config-driven drawer fields, **ESLint** + **Prettier**; POST **201** / DELETE **204** |
 | Next | Ant Design 5 / React 19, or further platform work per roadmap |
 | Full checklist | [docs/modernization-roadmap.md](docs/modernization-roadmap.md) |
 | Architecture | [docs/architecture.md](docs/architecture.md) |
@@ -19,7 +19,7 @@ Full-stack student CRUD demo: a Spring Boot API and a Vite React UI packaged int
 | --- | --- |
 | Backend | Java **17**, Spring Boot **3.4.5**, Spring Web, Spring Data JPA, Bean Validation, Lombok |
 | Database | PostgreSQL (local `localhost:5432`; AWS RDS via `dev` profile) |
-| Frontend | React **18.3** + **TypeScript**, **Vite 5**, Ant Design **4.24**, **TanStack Query 5**, **React Hook Form 7**, **Zod**, `unfetch`, Vitest |
+| Frontend | React **18.3** + **TypeScript**, **Vite 5**, Ant Design **4.24**, **TanStack Query 5**, **React Hook Form 7**, **Zod**, `unfetch`, Vitest, **ESLint 9**, **Prettier** |
 | Build | Maven Wrapper, `frontend-maven-plugin` (Node **20** / npm **10**), Jib **3.5.2** |
 | Container | Eclipse Temurin **17** JRE base (`eclipse-temurin:17-jre`); image name `cariocaphil/spring-react-fullstack` |
 | CI/CD | GitHub Actions (`.github/workflows/build.yml`, `deploy.yml`) |
@@ -133,13 +133,15 @@ Requires Docker. Pushes tags `cariocaphil/spring-react-fullstack:local` and `:la
 
 Runs `StudentServiceTest` (no DB), plus Postgres-backed `StudentRepositoryTest`, `StudentIntegrationTest`, and `DemoApplicationTests`. Start local Postgres first (see [Database](#database)). CI starts Postgres 13.1 before `./mvnw clean package`.
 
-Frontend Vitest (also run by Maven’s `build-frontend` profile before `vite build`):
+Frontend Vitest / lint / format (also run by Maven’s `build-frontend` profile before `vite build`):
 
 ```bash
 cd src/frontend && npm test
+cd src/frontend && npm run lint
+cd src/frontend && npm run format:check
 ```
 
-Covers API client helpers, notification wrappers, create-student drawer (validation / success / error), and App list/delete/empty flows.
+Covers API client helpers, notification wrappers, create-student drawer (validation / success / error), and App list/delete/empty flows. Use `npm run format` to apply Prettier.
 
 ## API surface (current)
 

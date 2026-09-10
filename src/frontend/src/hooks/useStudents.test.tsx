@@ -21,9 +21,7 @@ const ada: Student = {
 function createWrapper() {
   const queryClient = createQueryClient();
   return function Wrapper({ children }: { children: ReactNode }) {
-    return (
-      <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
-    );
+    return <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>;
   };
 }
 
@@ -49,9 +47,7 @@ describe('useStudents', () => {
   });
 
   it('createStudent posts, notifies, refreshes, and returns true', async () => {
-    vi.mocked(client.getAllStudents)
-      .mockResolvedValueOnce([])
-      .mockResolvedValueOnce([ada]);
+    vi.mocked(client.getAllStudents).mockResolvedValueOnce([]).mockResolvedValueOnce([ada]);
 
     const { result } = renderHook(() => useStudents(), {
       wrapper: createWrapper(),
@@ -121,9 +117,7 @@ describe('useStudents', () => {
   });
 
   it('removeStudentById deletes, notifies, and refreshes', async () => {
-    vi.mocked(client.getAllStudents)
-      .mockResolvedValueOnce([ada])
-      .mockResolvedValueOnce([]);
+    vi.mocked(client.getAllStudents).mockResolvedValueOnce([ada]).mockResolvedValueOnce([]);
 
     const { result } = renderHook(() => useStudents(), {
       wrapper: createWrapper(),

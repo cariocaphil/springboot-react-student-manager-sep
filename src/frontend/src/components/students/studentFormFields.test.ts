@@ -1,17 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import {
-  FieldType,
-  groupStudentFormFieldsIntoRows,
-  studentFormFields,
-} from './studentFormFields';
+import { FieldType, groupStudentFormFieldsIntoRows, studentFormFields } from './studentFormFields';
 
 describe('studentFormFields', () => {
   it('defines text and select fields for name, email, and gender', () => {
-    expect(studentFormFields.map((field) => field.name)).toEqual([
-      'name',
-      'email',
-      'gender',
-    ]);
+    expect(studentFormFields.map((field) => field.name)).toEqual(['name', 'email', 'gender']);
     expect(studentFormFields[0]?.type).toBe(FieldType.Text);
     expect(studentFormFields[1]?.type).toBe(FieldType.Text);
     expect(studentFormFields[2]?.type).toBe(FieldType.Select);

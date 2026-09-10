@@ -3,9 +3,7 @@ import StudentActions from './StudentActions';
 import StudentAvatar from './StudentAvatar';
 import type { Student } from '../../types/student';
 
-export function buildColumns(
-  onDelete: (studentId: number) => void,
-): ColumnsType<Student> {
+export function buildColumns(onDelete: (studentId: number) => void): ColumnsType<Student> {
   return [
     {
       title: '',
@@ -37,11 +35,7 @@ export function buildColumns(
       title: 'Actions',
       key: 'actions',
       render: (_text, student) => (
-        <StudentActions
-          studentName={student.name}
-          studentId={student.id}
-          onDelete={onDelete}
-        />
+        <StudentActions studentName={student.name} studentId={student.id} onDelete={onDelete} />
       ),
     },
   ];
