@@ -43,7 +43,7 @@ function StudentDrawerForm({ open, onClose, onCreate }: StudentDrawerFormProps) 
     if (!open) {
       reset(defaultValues);
     }
-  }, [open, reset]);
+  }, [open]);
 
   const onSubmit = async (values: StudentFormValues) => {
     // RHF `required` on gender already blocks submit when unset; cast for NewStudent.
