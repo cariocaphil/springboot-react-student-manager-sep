@@ -11,22 +11,25 @@ describe('apiError', () => {
     vi.clearAllMocks();
   });
 
-  it('toUserFacingApiErrorMessage uses the API message without status codes', () => {
+  it('toUserFacingApiErrorMessage maps known codes to i18n (not the diagnostic message)', () => {
     const body: ApiErrorBody = {
-      message: 'Email taken',
+      code: 'EMAIL_TAKEN',
+      message: 'Email ada@example.com taken',
       status: 400,
       error: 'Bad Request',
     };
 
-    expect(toUserFacingApiErrorMessage(body)).toBe('Email taken');
+    expect(toUserFacingApiErrorMessage(body)).toBe(i18n.t('errors.codes.emailTaken'));
+    expect(toUserFacingApiErrorMessage(body)).not.toBe(body.message);
   });
 
-  it('toUserFacingApiErrorMessage falls back when message is blank', () => {
-    const body: ApiErrorBody = {
-      message: '   ',
+  it('toUserFacingApiErrorMessage falls back for unknown codes', () => {
+    const body = {
+      code: 'SOME_FUTURE_CODE',
+      message: 'Server detail',
       status: 500,
       error: 'Internal Server Error',
-    };
+    } as unknown as ApiErrorBody;
 
     expect(toUserFacingApiErrorMessage(body)).toBe(i18n.t('errors.unexpected'));
   });
@@ -47,14 +50,16 @@ describe('apiError', () => {
     );
   });
 
-  it('notifyHttpError surfaces the API message with optional placement', async () => {
+  it('notifyHttpError surfaces the i18n message for a known code with optional placement', async () => {
     const error = {
       response: {
-        json: async () => ({
-          message: 'Email taken',
-          status: 400,
-          error: 'Bad Request',
-        }),
+        json: async () =>
+          ({
+            code: 'EMAIL_TAKEN',
+            message: 'Email taken',
+            status: 400,
+            error: 'Bad Request',
+          }) satisfies ApiErrorBody,
       },
     } as HttpError;
 
@@ -62,15 +67,16 @@ describe('apiError', () => {
 
     expect(notify.errorNotification).toHaveBeenCalledWith(
       i18n.t('errors.issueTitle'),
-      'Email taken',
+      i18n.t('errors.codes.emailTaken'),
       'bottomLeft'
     );
   });
 
-  it('notifyHttpError omits placement when unset', async () => {
+  it('notifyHttpError falls back to unexpected for unknown codes', async () => {
     const error = {
       response: {
         json: async () => ({
+          code: 'SOME_FUTURE_CODE',
           message: 'Unavailable',
           status: 503,
           error: 'Service Unavailable',
@@ -82,7 +88,7 @@ describe('apiError', () => {
 
     expect(notify.errorNotification).toHaveBeenCalledWith(
       i18n.t('errors.issueTitle'),
-      'Unavailable'
+      i18n.t('errors.unexpected')
     );
     expect(notify.errorNotification).toHaveBeenCalledTimes(1);
     expect(vi.mocked(notify.errorNotification).mock.calls[0]).toHaveLength(2);
