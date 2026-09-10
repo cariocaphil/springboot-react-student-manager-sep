@@ -2,7 +2,7 @@
 
 Build history for the Student Manager modernization.
 
-PR numbers match merged GitHub pull requests. Future work continues from PR 26.
+PR numbers match merged GitHub pull requests. Future work continues from PR 27.
 
 The README keeps a short Status summary; this file holds the full checklist.
 
@@ -154,7 +154,12 @@ PR 25 — React Hook Form ✅
 - [x] Keep Ant Design inputs + drawer UX; drop validation `alert`; reset on close/success
 - [x] Update drawer Vitest and docs
 
-PR 26 — Zod form validation
+PR 26 — Zod form validation ✅
 - [x] Add `zod` + `@hookform/resolvers`; `studentFormSchema` with required name/email/gender + email pattern
 - [x] Wire `zodResolver` in `StudentDrawerForm`; derive form types from schema; drop Controller `rules`
 - [x] Keep Ant Design error UI; keep thin `createNewStudentFromForm` as form→domain map; update tests/docs
+
+PR 27 — Config-driven student form fields
+- [x] Add typed `studentFormFields` (`text` | `select`) with labels, placeholders, options, and Col `span`
+- [x] Add `StudentFormField` + row grouping; map fields in `StudentDrawerForm` without changing Zod validation
+- [x] Preserve layout/UX/tests; update docs
