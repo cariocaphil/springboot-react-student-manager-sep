@@ -29,6 +29,7 @@ Before changing runtime behavior, read:
 7. **Commands.** Use `./mvnw` (not a global Maven). Frontend lives under `src/frontend`. Full package: `./mvnw clean package -P build-frontend`.
 8. **Git.** Never commit (or push / open a PR) unless the user explicitly asks. Default end state for finished work: **stage** relevant files only (`git add`), leave the commit uncreated, and **propose** a commit message (and PR title when useful) in the reply. If the user later asks to commit, use that proposal via HEREDOC. Don’t amend pushed commits or force-push `main`.
 9. **Frontend i18n.** Do **not** pass `t` / `TFunction` through helpers, factories, or props. Prefer: (a) `useTranslation()` at the React leaf that renders text; (b) translation **keys** in shared config (e.g. `labelKey`), resolved with `t()` at render; (c) outside React, call the `i18n` singleton (`i18n.t(...)`) and rebuild when `i18n.language` changes if messages must update.
+10. **Frontend memoization.** Prefer **not** to add `useMemo` / `useCallback` unless referential stability clearly matters (e.g. expensive work, or an identity that drives a correct rebuild such as a Zod schema keyed on `i18n.language`). Don’t memoize cheap arrays/objects built each render (menu items, table columns).
 
 ## Layout
 
