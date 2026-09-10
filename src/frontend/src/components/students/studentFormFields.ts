@@ -14,6 +14,8 @@ type StudentFormFieldBase = {
   placeholder: string;
   /** Ant Design Col span (24-grid). */
   span: number;
+  /** Shows Ant Design required marker; Zod remains validation source of truth. */
+  required: boolean;
 };
 
 export type TextStudentFormField = StudentFormFieldBase & {
@@ -34,6 +36,7 @@ export const studentFormFields: StudentFormFieldConfig[] = [
     label: 'Name',
     placeholder: 'Please enter student name',
     span: 12,
+    required: true,
   },
   {
     name: 'email',
@@ -41,6 +44,7 @@ export const studentFormFields: StudentFormFieldConfig[] = [
     label: 'Email',
     placeholder: 'Please enter student email',
     span: 12,
+    required: true,
   },
   {
     name: 'gender',
@@ -48,6 +52,7 @@ export const studentFormFields: StudentFormFieldConfig[] = [
     label: 'gender',
     placeholder: 'Please select a gender',
     span: 12,
+    required: true,
     options: GENDERS,
   },
 ];

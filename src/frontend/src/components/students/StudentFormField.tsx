@@ -48,7 +48,7 @@ function StudentFormField({ field, control, errors }: StudentFormFieldProps) {
       render={({ field: rhfField }) => (
         <Form.Item
           label={field.label}
-          required
+          required={field.required}
           validateStatus={validationStatus(!!fieldError)}
           help={fieldError?.message}
         >
