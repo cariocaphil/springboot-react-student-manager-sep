@@ -4,11 +4,11 @@ Full-stack student CRUD demo: a Spring Boot API and a Vite React UI packaged int
 
 ## Status
 
-**Modernization:** PR 34 makes Spring Boot OpenAPI the source of truth for frontend API TypeScript types. Future work continues from PR 34.
+**Modernization:** PR 35 maps stable API error codes to frontend i18n messages. Future work continues from PR 35.
 
 | | |
 | --- | --- |
-| Current | **Java 17** / Spring Boot **3.4.5** + **springdoc**; Vite + TypeScript **React 19.3** with **Ant Design 5**, **i18next** (en/de), **TanStack Query**, **React Hook Form**, **Zod**, OpenAPI-generated wire types, **ESLint** + **Prettier**; POST **201** / DELETE **204** |
+| Current | **Java 17** / Spring Boot **3.4.5** + **springdoc**; Vite + TypeScript **React 19.3** with **Ant Design 5**, **i18next** (en/de), **TanStack Query**, **React Hook Form**, **Zod**, OpenAPI-generated wire types + `ApiErrorCode`→i18n, **ESLint** + **Prettier**; POST **201** / DELETE **204** |
 | Next | Further platform work per roadmap |
 | Full checklist | [docs/modernization-roadmap.md](docs/modernization-roadmap.md) |
 | Architecture | [docs/architecture.md](docs/architecture.md) |
