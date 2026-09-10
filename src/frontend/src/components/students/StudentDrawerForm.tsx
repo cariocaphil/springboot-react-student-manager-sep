@@ -41,7 +41,8 @@ function StudentDrawerForm({ open, onClose, onCreate }: StudentDrawerFormProps) 
   }, [open]);
 
   const onSubmit = async (values: StudentFormValues) => {
-    const created = await onCreate(createNewStudentFromForm(values));
+    const student = createNewStudentFromForm(values);
+    const created = await onCreate(student);
     if (created) {
       reset(defaultValues);
       onClose();
