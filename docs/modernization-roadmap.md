@@ -159,7 +159,8 @@ PR 26 — Zod form validation ✅
 - [x] Wire `zodResolver` in `StudentDrawerForm`; derive form types from schema; drop Controller `rules`
 - [x] Keep Ant Design error UI; keep thin `createNewStudentFromForm` as form→domain map; update tests/docs
 
-PR 27 — Config-driven student form fields
-- [x] Add typed `studentFormFields` (`text` | `select`) with labels, placeholders, options, and Col `span`
+PR 27 — Config-driven student form fields ✅
+- [x] Add typed `studentFormFields` with labels, placeholders, options, and Col `span`
+- [x] Discriminate field kinds via `FieldType` const map (`Text` / `Select`), not a TS enum
 - [x] Add `StudentFormField` + row grouping; map fields in `StudentDrawerForm` without changing Zod validation
 - [x] Preserve layout/UX/tests; update docs

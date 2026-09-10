@@ -61,7 +61,7 @@ Student feature packages under `com.example.demo.student`:
 | Framework | React 18 + TypeScript function components + hooks (Vite 5) |
 | UI kit | Ant Design 4 (Layout, Table, Drawer, Form layout, notifications) |
 | HTTP | Typed `client` helpers + `apiRoutes` (`studentsApi`) against relative `api/v1/students` (`unfetch`); TanStack Query (`useQuery` / `useMutation`) via `useStudents` |
-| Forms | React Hook Form + Zod (`studentFormSchema`); declarative `studentFormFields` + `StudentFormField` for Ant Design controls |
+| Forms | React Hook Form + Zod (`studentFormSchema`); declarative `studentFormFields` with `FieldType` const map (`Text` / `Select`) + `StudentFormField` for Ant Design controls |
 | Errors | `apiError` maps HTTP / unexpected failures → notifications (`notifyHttpError`, `notifyUnexpectedError`) |
 | Domain types | `types/student`, `types/api`, `types/notification` |
 | Structure | `components/layout` (shell) + `components/students` (view/table/drawer leaves) + `hooks/useStudents` (TanStack Query list/create/delete + toasts) |
