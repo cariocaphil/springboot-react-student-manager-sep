@@ -35,6 +35,10 @@ function renderFieldControl(
           ))}
         </Select>
       );
+    default: {
+      const _exhaustive: never = field;
+      throw new Error(`Unsupported field type: ${JSON.stringify(_exhaustive)}`);
+    }
   }
 }
 
