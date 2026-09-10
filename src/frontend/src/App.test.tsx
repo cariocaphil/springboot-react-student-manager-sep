@@ -34,7 +34,9 @@ describe('App', () => {
   it('shows empty state when there are no students', async () => {
     render(<App />);
     expect(await screen.findByText(/Add New Student/i)).toBeInTheDocument();
-    expect(screen.getByText(/No Data/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/No data/i, { selector: '.ant-empty-description' })
+    ).toBeInTheDocument();
   });
 
   it('renders course footer link', async () => {
@@ -80,7 +82,9 @@ describe('App', () => {
         'Unavailable[503] [Service Unavailable]'
       );
     });
-    expect(await screen.findByText(/No Data/i)).toBeInTheDocument();
+    expect(
+      await screen.findByText(/No data/i, { selector: '.ant-empty-description' })
+    ).toBeInTheDocument();
   });
 
   it('deletes a student after confirm and refreshes the list', async () => {
