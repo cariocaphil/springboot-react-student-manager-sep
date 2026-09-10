@@ -2,7 +2,7 @@
 
 Build history for the Student Manager modernization.
 
-PR numbers match merged GitHub pull requests. Future work continues from PR 25.
+PR numbers match merged GitHub pull requests. Future work continues from PR 26.
 
 The README keeps a short Status summary; this file holds the full checklist.
 
@@ -149,7 +149,12 @@ PR 24 — TanStack Query ✅
 - [x] Refactor `useStudents` to `useQuery` (list) + `useMutation` (create/delete) with `studentKeys` + invalidate-on-success
 - [x] Keep `client` / notifications / UI behavior; update Vitest wrappers and docs
 
-PR 25 — React Hook Form
+PR 25 — React Hook Form ✅
 - [x] Add `react-hook-form` and refactor `StudentDrawerForm` to `useForm` / `Controller`
 - [x] Keep Ant Design inputs + drawer UX; drop validation `alert`; reset on close/success
 - [x] Update drawer Vitest and docs
+
+PR 26 — Zod form validation
+- [x] Add `zod` + `@hookform/resolvers`; `studentFormSchema` with required name/email/gender + email pattern
+- [x] Wire `zodResolver` in `StudentDrawerForm`; derive form types from schema; drop Controller `rules`
+- [x] Keep Ant Design error UI; keep thin `createNewStudentFromForm` as form→domain map; update tests/docs

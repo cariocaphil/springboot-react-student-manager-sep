@@ -2,13 +2,13 @@ import { Drawer, Input, Col, Select, Form, Row, Button, Spin } from 'antd';
 import { LoadingOutlined } from '@ant-design/icons';
 import { useEffect } from 'react';
 import { Controller, useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { GENDERS, type NewStudent } from '../../types/student';
-import { errorNotification } from '../../Notification';
-import { EMAIL_INVALID_MESSAGE, EMAIL_PATTERN } from '../../validation/email';
 import { validationStatus } from '../../utils/form';
 import {
   createNewStudentFromForm,
   defaultValues,
+  studentFormSchema,
   type StudentFormValues,
 } from './studentForm';
 import StudentDrawerFooter from './StudentDrawerFooter';
@@ -30,6 +30,7 @@ function StudentDrawerForm({ open, onClose, onCreate }: StudentDrawerFormProps) 
     reset,
     formState: { errors, isSubmitting },
   } = useForm<StudentFormValues>({
+    resolver: zodResolver(studentFormSchema),
     defaultValues,
   });
 
@@ -41,13 +42,6 @@ function StudentDrawerForm({ open, onClose, onCreate }: StudentDrawerFormProps) 
 
   const onSubmit = async (values: StudentFormValues) => {
     const student = createNewStudentFromForm(values);
-    if (!student) {
-      errorNotification(
-        'There was an issue',
-        'Form validation passed but required fields are missing'
-      );
-      return;
-    }
     const created = await onCreate(student);
     if (created) {
       reset(defaultValues);
@@ -70,7 +64,6 @@ function StudentDrawerForm({ open, onClose, onCreate }: StudentDrawerFormProps) 
             <Controller
               name="name"
               control={control}
-              rules={{ required: 'Please enter student name' }}
               render={({ field }) => (
                 <Form.Item
                   label="Name"
@@ -87,13 +80,6 @@ function StudentDrawerForm({ open, onClose, onCreate }: StudentDrawerFormProps) 
             <Controller
               name="email"
               control={control}
-              rules={{
-                required: 'Please enter student email',
-                pattern: {
-                  value: EMAIL_PATTERN,
-                  message: EMAIL_INVALID_MESSAGE,
-                },
-              }}
               render={({ field }) => (
                 <Form.Item
                   label="Email"
@@ -112,7 +98,6 @@ function StudentDrawerForm({ open, onClose, onCreate }: StudentDrawerFormProps) 
             <Controller
               name="gender"
               control={control}
-              rules={{ required: 'Please select a gender' }}
               render={({ field }) => (
                 <Form.Item
                   label="gender"
