@@ -1,4 +1,5 @@
 import { Popconfirm, Radio } from 'antd';
+import { useTranslation } from 'react-i18next';
 
 interface StudentActionsProps {
   studentName: string;
@@ -7,20 +8,22 @@ interface StudentActionsProps {
 }
 
 function StudentActions({ studentName, studentId, onDelete }: StudentActionsProps) {
+  const { t } = useTranslation();
+
   return (
     <Radio.Group>
       <Popconfirm
         placement="topRight"
-        title={`Are you sure to delete ${studentName}`}
+        title={t('students.actions.deleteConfirm', { name: studentName })}
         onConfirm={() => {
           void onDelete(studentId);
         }}
-        okText="Yes"
-        cancelText="No"
+        okText={t('students.actions.yes')}
+        cancelText={t('students.actions.no')}
       >
-        <Radio.Button value="small">Delete</Radio.Button>
+        <Radio.Button value="small">{t('students.actions.delete')}</Radio.Button>
       </Popconfirm>
-      <Radio.Button value="small">Edit</Radio.Button>
+      <Radio.Button value="small">{t('students.actions.edit')}</Radio.Button>
     </Radio.Group>
   );
 }

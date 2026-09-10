@@ -1,22 +1,21 @@
 import { Drawer, Col, Form, Row, Button, Spin } from 'antd';
 import { LoadingOutlined } from '@ant-design/icons';
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useTranslation } from 'react-i18next';
 import type { NewStudent } from '../../types/student';
 import {
   createNewStudentFromForm,
+  createStudentFormSchema,
   defaultValues,
-  studentFormSchema,
   type StudentFormValues,
 } from './studentForm';
-import { groupStudentFormFieldsIntoRows, studentFormFields } from './studentFormFields';
+import { getStudentFormFields, groupStudentFormFieldsIntoRows } from './studentFormFields';
 import StudentDrawerFooter from './StudentDrawerFooter';
 import StudentFormField from './StudentFormField';
 
 const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
-
-const studentFormRows = groupStudentFormFieldsIntoRows(studentFormFields);
 
 interface StudentDrawerFormProps {
   open: boolean;
@@ -25,13 +24,20 @@ interface StudentDrawerFormProps {
 }
 
 function StudentDrawerForm({ open, onClose, onCreate }: StudentDrawerFormProps) {
+  const { t } = useTranslation();
+  const schema = useMemo(() => createStudentFormSchema(t), [t]);
+  const studentFormRows = useMemo(
+    () => groupStudentFormFieldsIntoRows(getStudentFormFields(t)),
+    [t]
+  );
+
   const {
     control,
     handleSubmit,
     reset,
     formState: { errors, isSubmitting },
   } = useForm<StudentFormValues>({
-    resolver: zodResolver(studentFormSchema),
+    resolver: zodResolver(schema),
     defaultValues,
   });
 
@@ -52,7 +58,7 @@ function StudentDrawerForm({ open, onClose, onCreate }: StudentDrawerFormProps) 
 
   return (
     <Drawer
-      title="Create new student"
+      title={t('students.drawer.title')}
       width={720}
       onClose={onClose}
       open={open}
@@ -73,7 +79,7 @@ function StudentDrawerForm({ open, onClose, onCreate }: StudentDrawerFormProps) 
           <Col span={12}>
             <Form.Item>
               <Button type="primary" htmlType="submit" loading={isSubmitting}>
-                Submit
+                {t('students.drawer.submit')}
               </Button>
             </Form.Item>
           </Col>

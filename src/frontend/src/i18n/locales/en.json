@@ -1,0 +1,78 @@
+{
+  "language": {
+    "label": "Language",
+    "en": "EN",
+    "de": "DE"
+  },
+  "layout": {
+    "breadcrumbUser": "User",
+    "breadcrumbBill": "Bill",
+    "menu": {
+      "option1": "Option 1",
+      "option2": "Option 2",
+      "user": "User",
+      "tom": "Tom",
+      "bill": "Bill",
+      "alex": "Alex",
+      "team": "Team",
+      "team1": "Team 1",
+      "team2": "Team 2",
+      "files": "Files"
+    },
+    "footerBy": "By Amigoscode",
+    "footerCourseLink": "Click here to access Fullstack Spring Boot & React for professionals"
+  },
+  "students": {
+    "addNew": "Add New Student",
+    "countTag": "Number of students",
+    "columns": {
+      "id": "Id",
+      "name": "Name",
+      "email": "Email",
+      "gender": "Gender",
+      "actions": "Actions"
+    },
+    "actions": {
+      "delete": "Delete",
+      "edit": "Edit",
+      "deleteConfirm": "Are you sure to delete {{name}}",
+      "yes": "Yes",
+      "no": "No"
+    },
+    "drawer": {
+      "title": "Create new student",
+      "submit": "Submit",
+      "cancel": "Cancel"
+    },
+    "form": {
+      "name": {
+        "label": "Name",
+        "placeholder": "Please enter student name"
+      },
+      "email": {
+        "label": "Email",
+        "placeholder": "Please enter student email"
+      },
+      "gender": {
+        "label": "gender",
+        "placeholder": "Please select a gender"
+      }
+    },
+    "validation": {
+      "nameRequired": "Please enter student name",
+      "emailRequired": "Please enter student email",
+      "emailInvalid": "Please enter a valid email",
+      "genderRequired": "Please select a gender"
+    },
+    "notifications": {
+      "addedTitle": "Student successfully added",
+      "addedDescription": "{{name}} was added to the system",
+      "deletedTitle": "Student deleted",
+      "deletedDescription": "Student with {{id}} was deleted"
+    }
+  },
+  "errors": {
+    "issueTitle": "There was an issue",
+    "unexpected": "Unexpected error"
+  }
+}

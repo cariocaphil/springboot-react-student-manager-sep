@@ -1,4 +1,5 @@
 import { errorNotification } from './Notification';
+import i18n from './i18n';
 import type { ApiErrorBody } from './types/api';
 import { isHttpError } from './types/api';
 import type { NotificationPlacement } from './types/notification';
@@ -17,11 +18,12 @@ export function formatApiErrorDescription(
 }
 
 function notifyIssue(description: string, placement?: NotificationPlacement): void {
+  const title = i18n.t('errors.issueTitle');
   if (placement !== undefined) {
-    errorNotification('There was an issue', description, placement);
+    errorNotification(title, description, placement);
     return;
   }
-  errorNotification('There was an issue', description);
+  errorNotification(title, description);
 }
 
 /** Map an unknown failure to a user-facing error toast. */
@@ -29,7 +31,7 @@ export function notifyUnexpectedError(
   error: unknown,
   options: { placement?: NotificationPlacement } = {}
 ): void {
-  const description = error instanceof Error ? error.message : 'Unexpected error';
+  const description = error instanceof Error ? error.message : i18n.t('errors.unexpected');
   notifyIssue(description, options.placement);
 }
 

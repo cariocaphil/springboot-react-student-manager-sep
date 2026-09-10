@@ -1,3 +1,4 @@
+import type { TFunction } from 'i18next';
 import { GENDERS } from '../../types/student';
 import type { StudentFormValues } from './studentForm';
 
@@ -29,33 +30,35 @@ export type SelectStudentFormField = StudentFormFieldBase & {
 
 export type StudentFormFieldConfig = TextStudentFormField | SelectStudentFormField;
 
-export const studentFormFields: StudentFormFieldConfig[] = [
-  {
-    name: 'name',
-    type: FieldType.Text,
-    label: 'Name',
-    placeholder: 'Please enter student name',
-    span: 12,
-    required: true,
-  },
-  {
-    name: 'email',
-    type: FieldType.Text,
-    label: 'Email',
-    placeholder: 'Please enter student email',
-    span: 12,
-    required: true,
-  },
-  {
-    name: 'gender',
-    type: FieldType.Select,
-    label: 'gender',
-    placeholder: 'Please select a gender',
-    span: 12,
-    required: true,
-    options: GENDERS,
-  },
-];
+export function getStudentFormFields(t: TFunction): StudentFormFieldConfig[] {
+  return [
+    {
+      name: 'name',
+      type: FieldType.Text,
+      label: t('students.form.name.label'),
+      placeholder: t('students.form.name.placeholder'),
+      span: 12,
+      required: true,
+    },
+    {
+      name: 'email',
+      type: FieldType.Text,
+      label: t('students.form.email.label'),
+      placeholder: t('students.form.email.placeholder'),
+      span: 12,
+      required: true,
+    },
+    {
+      name: 'gender',
+      type: FieldType.Select,
+      label: t('students.form.gender.label'),
+      placeholder: t('students.form.gender.placeholder'),
+      span: 12,
+      required: true,
+      options: GENDERS,
+    },
+  ];
+}
 
 /** Pack fields into Ant Design rows using a 24-column grid. */
 export function groupStudentFormFieldsIntoRows(

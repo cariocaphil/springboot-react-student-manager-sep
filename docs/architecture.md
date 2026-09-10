@@ -60,6 +60,7 @@ Student feature packages under `com.example.demo.student`:
 | --- | --- |
 | Framework | React 19 + TypeScript function components + hooks (Vite 5) |
 | UI kit | Ant Design 5 (Layout, Table, Drawer, Form layout, notifications; CSS-in-JS) |
+| i18n | `i18next` + `react-i18next`; default `en`, resources also for `de`; Ant Design `ConfigProvider` locale follows language |
 | HTTP | Typed `client` helpers + `apiRoutes` (`studentsApi`) against relative `api/v1/students` (`unfetch`); TanStack Query (`useQuery` / `useMutation`) via `useStudents` |
 | Forms | React Hook Form + Zod (`studentFormSchema`); declarative `studentFormFields` with `FieldType` const map (`Text` / `Select`) + `StudentFormField` for Ant Design controls |
 | Errors | `apiError` maps HTTP / unexpected failures → notifications (`notifyHttpError`, `notifyUnexpectedError`) |
@@ -199,7 +200,7 @@ These items are intentional backlog for modernization; this branch does not fix 
 ### Platform age
 
 - Spring Boot **3.4.5** / Java **17** / `jakarta.*` (migrated in PR 16)
-- React **19.3** + TypeScript / Ant Design **5.29** / Vite 5 / Node 20 via frontend-maven-plugin (`@ant-design/v5-patch-for-react-19` for static APIs; React 19 in PR 30)
+- React **19.3** + TypeScript / Ant Design **5.29** / i18next (en/de) / Vite 5 / Node 20 via frontend-maven-plugin (`@ant-design/v5-patch-for-react-19` for static APIs; React 19 in PR 30; i18n in PR 31)
 - Jib **3.5.2** with `eclipse-temurin:17-jre` (Java 17 runtime as of PR 15)
 
 ### Product / design

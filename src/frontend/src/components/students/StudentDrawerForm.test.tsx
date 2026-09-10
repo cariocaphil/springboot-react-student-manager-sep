@@ -1,7 +1,7 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { EMAIL_INVALID_MESSAGE } from '../../validation/email';
+import i18n from '../../i18n';
 import StudentDrawerForm from './StudentDrawerForm';
 
 async function chooseGender(label: string): Promise<void> {
@@ -58,7 +58,7 @@ describe('StudentDrawerForm', () => {
     await chooseGender('FEMALE');
     await user.click(screen.getByRole('button', { name: /submit/i }));
 
-    expect(await screen.findByText(EMAIL_INVALID_MESSAGE)).toBeInTheDocument();
+    expect(await screen.findByText(i18n.t('students.validation.emailInvalid'))).toBeInTheDocument();
     expect(onCreate).not.toHaveBeenCalled();
   });
 

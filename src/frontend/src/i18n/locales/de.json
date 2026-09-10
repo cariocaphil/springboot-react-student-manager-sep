@@ -1,0 +1,78 @@
+{
+  "language": {
+    "label": "Sprache",
+    "en": "EN",
+    "de": "DE"
+  },
+  "layout": {
+    "breadcrumbUser": "Benutzer",
+    "breadcrumbBill": "Bill",
+    "menu": {
+      "option1": "Option 1",
+      "option2": "Option 2",
+      "user": "Benutzer",
+      "tom": "Tom",
+      "bill": "Bill",
+      "alex": "Alex",
+      "team": "Team",
+      "team1": "Team 1",
+      "team2": "Team 2",
+      "files": "Dateien"
+    },
+    "footerBy": "Von Amigoscode",
+    "footerCourseLink": "Hier klicken für Fullstack Spring Boot & React für Professionals"
+  },
+  "students": {
+    "addNew": "Neuen Studenten hinzufügen",
+    "countTag": "Anzahl der Studenten",
+    "columns": {
+      "id": "Id",
+      "name": "Name",
+      "email": "E-Mail",
+      "gender": "Geschlecht",
+      "actions": "Aktionen"
+    },
+    "actions": {
+      "delete": "Löschen",
+      "edit": "Bearbeiten",
+      "deleteConfirm": "Möchten Sie {{name}} wirklich löschen?",
+      "yes": "Ja",
+      "no": "Nein"
+    },
+    "drawer": {
+      "title": "Neuen Studenten erstellen",
+      "submit": "Absenden",
+      "cancel": "Abbrechen"
+    },
+    "form": {
+      "name": {
+        "label": "Name",
+        "placeholder": "Bitte Studentennamen eingeben"
+      },
+      "email": {
+        "label": "E-Mail",
+        "placeholder": "Bitte Studenten-E-Mail eingeben"
+      },
+      "gender": {
+        "label": "Geschlecht",
+        "placeholder": "Bitte Geschlecht auswählen"
+      }
+    },
+    "validation": {
+      "nameRequired": "Bitte Studentennamen eingeben",
+      "emailRequired": "Bitte Studenten-E-Mail eingeben",
+      "emailInvalid": "Bitte eine gültige E-Mail eingeben",
+      "genderRequired": "Bitte Geschlecht auswählen"
+    },
+    "notifications": {
+      "addedTitle": "Student erfolgreich hinzugefügt",
+      "addedDescription": "{{name}} wurde dem System hinzugefügt",
+      "deletedTitle": "Student gelöscht",
+      "deletedDescription": "Student mit {{id}} wurde gelöscht"
+    }
+  },
+  "errors": {
+    "issueTitle": "Es ist ein Problem aufgetreten",
+    "unexpected": "Unerwarteter Fehler"
+  }
+}
