@@ -68,9 +68,9 @@ export function useStudents() {
     [deleteStudentMutation]
   );
 
-  const retryLoad = useCallback(() => {
+  const retryLoad = () => {
     void refetch();
-  }, [refetch]);
+  };
 
   return {
     students,
