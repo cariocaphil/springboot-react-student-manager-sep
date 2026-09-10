@@ -3,6 +3,7 @@ import { LoadingOutlined } from '@ant-design/icons';
 import { useEffect } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { GENDERS, type NewStudent } from '../../types/student';
+import { errorNotification } from '../../Notification';
 import { EMAIL_INVALID_MESSAGE, EMAIL_PATTERN } from '../../validation/email';
 import { validationStatus } from '../../utils/form';
 import {
@@ -41,6 +42,10 @@ function StudentDrawerForm({ open, onClose, onCreate }: StudentDrawerFormProps) 
   const onSubmit = async (values: StudentFormValues) => {
     const student = createNewStudentFromForm(values);
     if (!student) {
+      errorNotification(
+        'There was an issue',
+        'Form validation passed but required fields are missing'
+      );
       return;
     }
     const created = await onCreate(student);
