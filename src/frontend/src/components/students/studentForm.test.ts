@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import i18n from '../../i18n';
 import { createNewStudentFromForm, createStudentFormSchema } from './studentForm';
 
-const studentFormSchema = createStudentFormSchema(i18n.t.bind(i18n));
+const studentFormSchema = createStudentFormSchema();
 
 describe('studentFormSchema', () => {
   it('accepts a complete valid student', () => {

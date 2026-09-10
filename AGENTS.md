@@ -28,6 +28,7 @@ Before changing runtime behavior, read:
 6. **Secrets.** Do not print, commit, or hardcode DB credentials. For `dev` / EB use `SPRING_DATASOURCE_URL`, `SPRING_DATASOURCE_USERNAME`, `SPRING_DATASOURCE_PASSWORD`. Local/CI may use the defaults in `application.properties`.
 7. **Commands.** Use `./mvnw` (not a global Maven). Frontend lives under `src/frontend`. Full package: `./mvnw clean package -P build-frontend`.
 8. **Git.** Never commit (or push / open a PR) unless the user explicitly asks. Default end state for finished work: **stage** relevant files only (`git add`), leave the commit uncreated, and **propose** a commit message (and PR title when useful) in the reply. If the user later asks to commit, use that proposal via HEREDOC. Don’t amend pushed commits or force-push `main`.
+9. **Frontend i18n.** Do **not** pass `t` / `TFunction` through helpers, factories, or props. Prefer: (a) `useTranslation()` at the React leaf that renders text; (b) translation **keys** in shared config (e.g. `labelKey`), resolved with `t()` at render; (c) outside React, call the `i18n` singleton (`i18n.t(...)`) and rebuild when `i18n.language` changes if messages must update.
 
 ## Layout
 

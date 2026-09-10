@@ -11,11 +11,13 @@ import {
   defaultValues,
   type StudentFormValues,
 } from './studentForm';
-import { getStudentFormFields, groupStudentFormFieldsIntoRows } from './studentFormFields';
+import { groupStudentFormFieldsIntoRows, studentFormFields } from './studentFormFields';
 import StudentDrawerFooter from './StudentDrawerFooter';
 import StudentFormField from './StudentFormField';
 
 const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
+
+const studentFormRows = groupStudentFormFieldsIntoRows(studentFormFields);
 
 interface StudentDrawerFormProps {
   open: boolean;
@@ -24,12 +26,8 @@ interface StudentDrawerFormProps {
 }
 
 function StudentDrawerForm({ open, onClose, onCreate }: StudentDrawerFormProps) {
-  const { t } = useTranslation();
-  const schema = useMemo(() => createStudentFormSchema(t), [t]);
-  const studentFormRows = useMemo(
-    () => groupStudentFormFieldsIntoRows(getStudentFormFields(t)),
-    [t]
-  );
+  const { t, i18n } = useTranslation();
+  const schema = useMemo(() => createStudentFormSchema(i18n.language), [i18n.language]);
 
   const {
     control,

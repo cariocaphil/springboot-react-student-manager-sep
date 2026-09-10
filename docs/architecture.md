@@ -62,7 +62,7 @@ Student feature packages under `com.example.demo.student`:
 | UI kit | Ant Design 5 (Layout, Table, Drawer, Form layout, notifications; CSS-in-JS) |
 | i18n | `i18next` + `react-i18next`; default `en`, resources also for `de`; Ant Design `ConfigProvider` locale follows language; `LanguageSwitcher` component present but not yet mounted in `AppLayout` |
 | HTTP | Typed `client` helpers + `apiRoutes` (`studentsApi`) against relative `api/v1/students` (`unfetch`); TanStack Query (`useQuery` / `useMutation`) via `useStudents` |
-| Forms | React Hook Form + Zod (`studentFormSchema`); declarative `studentFormFields` with `FieldType` const map (`Text` / `Select`) + `StudentFormField` for Ant Design controls |
+| Forms | React Hook Form + Zod (`createStudentFormSchema` via `i18n.t`); declarative `studentFormFields` with `labelKey` / `placeholderKey` + `StudentFormField` (`useTranslation` at render); table columns via `useStudentColumns` |
 | Errors | `apiError` maps HTTP / unexpected failures → notifications (`notifyHttpError`, `notifyUnexpectedError`) |
 | Domain types | `types/student`, `types/api`, `types/notification` |
 | Structure | `components/layout` (shell) + `components/students` (view/table/drawer leaves) + `hooks/useStudents` (TanStack Query list/create/delete + toasts) |

@@ -1,18 +1,20 @@
 import { z } from 'zod';
 import type { DefaultValues } from 'react-hook-form';
-import type { TFunction } from 'i18next';
+import i18n from '../../i18n';
 import { GENDERS, type NewStudent } from '../../types/student';
 import { EMAIL_PATTERN } from '../../validation/email';
 
-export function createStudentFormSchema(t: TFunction) {
+/** Build schema with messages for the active i18n language (pass `i18n.language` so callers rebuild on change). */
+export function createStudentFormSchema(language: string = i18n.language) {
+  void language;
   return z.object({
-    name: z.string().min(1, t('students.validation.nameRequired')),
+    name: z.string().min(1, i18n.t('students.validation.nameRequired')),
     email: z
       .string()
-      .min(1, t('students.validation.emailRequired'))
-      .regex(EMAIL_PATTERN, t('students.validation.emailInvalid')),
+      .min(1, i18n.t('students.validation.emailRequired'))
+      .regex(EMAIL_PATTERN, i18n.t('students.validation.emailInvalid')),
     gender: z.enum(GENDERS, {
-      message: t('students.validation.genderRequired'),
+      message: i18n.t('students.validation.genderRequired'),
     }),
   });
 }

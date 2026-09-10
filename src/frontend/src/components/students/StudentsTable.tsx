@@ -2,7 +2,7 @@ import { Badge, Table, Tag } from 'antd';
 import { useTranslation } from 'react-i18next';
 import type { Student } from '../../types/student';
 import AddStudentButton from './AddStudentButton';
-import { buildColumns } from './studentColumns';
+import { useStudentColumns } from './studentColumns';
 
 interface StudentsTableProps {
   students: Student[];
@@ -12,11 +12,12 @@ interface StudentsTableProps {
 
 function StudentsTable({ students, onDelete, onAddClick }: StudentsTableProps) {
   const { t } = useTranslation();
+  const columns = useStudentColumns(onDelete);
 
   return (
     <Table
       dataSource={students}
-      columns={buildColumns(onDelete, t)}
+      columns={columns}
       bordered
       title={() => (
         <>

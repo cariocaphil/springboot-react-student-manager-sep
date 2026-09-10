@@ -1,4 +1,3 @@
-import type { TFunction } from 'i18next';
 import { GENDERS } from '../../types/student';
 import type { StudentFormValues } from './studentForm';
 
@@ -11,8 +10,10 @@ export type FieldType = (typeof FieldType)[keyof typeof FieldType];
 
 type StudentFormFieldBase = {
   name: keyof StudentFormValues;
-  label: string;
-  placeholder: string;
+  /** i18n key; resolve with `t()` at render time — do not pass `t` into this config. */
+  labelKey: string;
+  /** i18n key; resolve with `t()` at render time. */
+  placeholderKey: string;
   /** Ant Design Col span (24-grid). */
   span: number;
   /** Shows Ant Design required marker; Zod remains validation source of truth. */
@@ -30,35 +31,33 @@ export type SelectStudentFormField = StudentFormFieldBase & {
 
 export type StudentFormFieldConfig = TextStudentFormField | SelectStudentFormField;
 
-export function getStudentFormFields(t: TFunction): StudentFormFieldConfig[] {
-  return [
-    {
-      name: 'name',
-      type: FieldType.Text,
-      label: t('students.form.name.label'),
-      placeholder: t('students.form.name.placeholder'),
-      span: 12,
-      required: true,
-    },
-    {
-      name: 'email',
-      type: FieldType.Text,
-      label: t('students.form.email.label'),
-      placeholder: t('students.form.email.placeholder'),
-      span: 12,
-      required: true,
-    },
-    {
-      name: 'gender',
-      type: FieldType.Select,
-      label: t('students.form.gender.label'),
-      placeholder: t('students.form.gender.placeholder'),
-      span: 12,
-      required: true,
-      options: GENDERS,
-    },
-  ];
-}
+export const studentFormFields: StudentFormFieldConfig[] = [
+  {
+    name: 'name',
+    type: FieldType.Text,
+    labelKey: 'students.form.name.label',
+    placeholderKey: 'students.form.name.placeholder',
+    span: 12,
+    required: true,
+  },
+  {
+    name: 'email',
+    type: FieldType.Text,
+    labelKey: 'students.form.email.label',
+    placeholderKey: 'students.form.email.placeholder',
+    span: 12,
+    required: true,
+  },
+  {
+    name: 'gender',
+    type: FieldType.Select,
+    labelKey: 'students.form.gender.label',
+    placeholderKey: 'students.form.gender.placeholder',
+    span: 12,
+    required: true,
+    options: GENDERS,
+  },
+];
 
 /** Pack fields into Ant Design rows using a 24-column grid. */
 export function groupStudentFormFieldsIntoRows(
