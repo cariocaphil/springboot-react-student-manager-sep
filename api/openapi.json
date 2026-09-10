@@ -104,6 +104,11 @@
         "type" : "object",
         "description" : "Structured API error body",
         "properties" : {
+          "code" : {
+            "type" : "string",
+            "description" : "Stable error code for clients",
+            "enum" : [ "EMAIL_TAKEN", "STUDENT_NOT_FOUND", "VALIDATION_FAILED", "BAD_REQUEST" ]
+          },
           "error" : {
             "type" : "string",
             "description" : "HTTP reason phrase",
@@ -111,7 +116,7 @@
           },
           "message" : {
             "type" : "string",
-            "description" : "User-facing error message",
+            "description" : "Diagnostic detail (not primary UI copy for known codes)",
             "example" : "Email ada@example.com taken"
           },
           "status" : {
@@ -121,7 +126,7 @@
             "example" : 400
           }
         },
-        "required" : [ "error", "message", "status" ]
+        "required" : [ "code", "error", "message", "status" ]
       },
       "StudentRequest" : {
         "type" : "object",
