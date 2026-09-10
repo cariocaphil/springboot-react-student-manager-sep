@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { formatApiErrorDescription, notifyHttpError, notifyUnexpectedError } from './apiError';
+import { notifyHttpError, notifyUnexpectedError, toUserFacingApiErrorMessage } from './apiError';
+import i18n from './i18n';
 import * as notify from './Notification';
 import type { ApiErrorBody, HttpError } from './types/api';
 
@@ -10,41 +11,43 @@ describe('apiError', () => {
     vi.clearAllMocks();
   });
 
-  it('formatApiErrorDescription preserves compact and spaced layouts', () => {
+  it('toUserFacingApiErrorMessage uses the API message without status codes', () => {
     const body: ApiErrorBody = {
-      message: 'Unavailable',
-      status: 503,
-      error: 'Service Unavailable',
+      message: 'Email taken',
+      status: 400,
+      error: 'Bad Request',
     };
 
-    expect(formatApiErrorDescription(body, 'compact')).toBe(
-      'Unavailable[503] [Service Unavailable]'
-    );
-    expect(formatApiErrorDescription(body, 'spaced')).toBe(
-      'Unavailable [503] [Service Unavailable]'
-    );
+    expect(toUserFacingApiErrorMessage(body)).toBe('Email taken');
   });
 
-  it('notifyUnexpectedError uses Error.message', () => {
+  it('toUserFacingApiErrorMessage falls back when message is blank', () => {
+    const body: ApiErrorBody = {
+      message: '   ',
+      status: 500,
+      error: 'Internal Server Error',
+    };
+
+    expect(toUserFacingApiErrorMessage(body)).toBe(i18n.t('errors.unexpected'));
+  });
+
+  it('notifyUnexpectedError uses a generic user-facing message', () => {
     notifyUnexpectedError(new Error('boom'));
-    expect(notify.errorNotification).toHaveBeenCalledWith('There was an issue', 'boom');
-  });
-
-  it('notifyUnexpectedError falls back for non-Error values', () => {
-    notifyUnexpectedError('nope', { placement: 'bottomLeft' });
     expect(notify.errorNotification).toHaveBeenCalledWith(
-      'There was an issue',
-      'Unexpected error',
-      'bottomLeft'
+      i18n.t('errors.issueTitle'),
+      i18n.t('errors.unexpected')
     );
   });
 
   it('notifyHttpError falls back to notifyUnexpectedError for non-HTTP errors', async () => {
     await notifyHttpError(new Error('boom'));
-    expect(notify.errorNotification).toHaveBeenCalledWith('There was an issue', 'boom');
+    expect(notify.errorNotification).toHaveBeenCalledWith(
+      i18n.t('errors.issueTitle'),
+      i18n.t('errors.unexpected')
+    );
   });
 
-  it('notifyHttpError surfaces API body with optional placement', async () => {
+  it('notifyHttpError surfaces the API message with optional placement', async () => {
     const error = {
       response: {
         json: async () => ({
@@ -55,19 +58,16 @@ describe('apiError', () => {
       },
     } as HttpError;
 
-    await notifyHttpError(error, {
-      descriptionStyle: 'spaced',
-      placement: 'bottomLeft',
-    });
+    await notifyHttpError(error, { placement: 'bottomLeft' });
 
     expect(notify.errorNotification).toHaveBeenCalledWith(
-      'There was an issue',
-      'Email taken [400] [Bad Request]',
+      i18n.t('errors.issueTitle'),
+      'Email taken',
       'bottomLeft'
     );
   });
 
-  it('notifyHttpError omits placement when unset (list-error shape)', async () => {
+  it('notifyHttpError omits placement when unset', async () => {
     const error = {
       response: {
         json: async () => ({
@@ -78,11 +78,11 @@ describe('apiError', () => {
       },
     } as HttpError;
 
-    await notifyHttpError(error, { descriptionStyle: 'compact' });
+    await notifyHttpError(error);
 
     expect(notify.errorNotification).toHaveBeenCalledWith(
-      'There was an issue',
-      'Unavailable[503] [Service Unavailable]'
+      i18n.t('errors.issueTitle'),
+      'Unavailable'
     );
     expect(notify.errorNotification).toHaveBeenCalledTimes(1);
     expect(vi.mocked(notify.errorNotification).mock.calls[0]).toHaveLength(2);

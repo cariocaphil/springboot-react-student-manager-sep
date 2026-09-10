@@ -2,7 +2,7 @@
 
 Build history for the Student Manager modernization.
 
-PR numbers match merged GitHub pull requests. Future work continues from PR 32.
+PR numbers match merged GitHub pull requests. Future work continues from PR 33.
 
 The README keeps a short Status summary; this file holds the full checklist.
 
@@ -192,3 +192,9 @@ PR 31 — Frontend i18n (en / de) ✅
 PR 32 — Language switcher ✅
 - [x] Add `LanguageSwitcher` (EN/DE Ant Design Select) + Vitest
 - [x] Mount switcher in `AppLayout` header
+
+PR 33 — API / error UX ✅
+- [x] Distinguish loading / error / empty / success in `StudentsView` using TanStack Query flags
+- [x] Add in-page list load error + Retry (`refetch`); stop toasting list failures and avoid empty-state fallback on error
+- [x] Friendlier `apiError` mapping: API `message` only (no status/error codes); unexpected errors use generic i18n copy
+- [x] Keep mutation toasts; translate empty/load-error copy; update Vitest + docs

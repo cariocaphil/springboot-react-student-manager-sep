@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from 'react';
+import { useCallback } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { addNewStudent, deleteStudent, getAllStudents } from '../client';
@@ -13,19 +13,14 @@ export function useStudents() {
 
   const {
     data: students = [],
-    isLoading: fetching,
+    isPending,
     isError,
-    error,
+    isFetching,
+    refetch,
   } = useQuery<Student[]>({
     queryKey: studentKeys.all,
     queryFn: getAllStudents,
   });
-
-  useEffect(() => {
-    if (isError && error) {
-      void notifyHttpError(error, { descriptionStyle: 'compact' });
-    }
-  }, [isError, error]);
 
   const { mutateAsync: createStudentMutation } = useMutation({
     mutationFn: (student: NewStudent) => addNewStudent(student),
@@ -55,10 +50,7 @@ export function useStudents() {
         await createStudentMutation(student);
         return true;
       } catch (err: unknown) {
-        await notifyHttpError(err, {
-          descriptionStyle: 'spaced',
-          placement: 'bottomLeft',
-        });
+        await notifyHttpError(err, { placement: 'bottomLeft' });
         return false;
       }
     },
@@ -70,15 +62,23 @@ export function useStudents() {
       try {
         await deleteStudentMutation(studentId);
       } catch (err: unknown) {
-        await notifyHttpError(err, { descriptionStyle: 'spaced' });
+        await notifyHttpError(err);
       }
     },
     [deleteStudentMutation]
   );
 
+  const retryLoad = useCallback(() => {
+    void refetch();
+  }, [refetch]);
+
   return {
     students,
-    fetching,
+    /** True only while there is no cached data yet (initial load). */
+    isLoading: isPending,
+    isError,
+    isFetching,
+    retryLoad,
     createStudent,
     removeStudentById,
   };

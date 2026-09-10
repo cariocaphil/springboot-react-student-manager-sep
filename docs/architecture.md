@@ -63,10 +63,10 @@ Student feature packages under `com.example.demo.student`:
 | i18n | `i18next` + `react-i18next`; default `en`, resources also for `de`; Ant Design `ConfigProvider` locale follows language; header `LanguageSwitcher` (EN/DE) |
 | HTTP | Typed `client` helpers + `apiRoutes` (`studentsApi`) against relative `api/v1/students` (`unfetch`); TanStack Query (`useQuery` / `useMutation`) via `useStudents` |
 | Forms | React Hook Form + Zod (`createStudentFormSchema` via `i18n.t`); declarative `studentFormFields` with `labelKey` / `placeholderKey` + `StudentFormField` (`useTranslation` at render); table columns via `useStudentColumns` |
-| Errors | `apiError` maps HTTP / unexpected failures → notifications (`notifyHttpError`, `notifyUnexpectedError`) |
+| Errors | `apiError` maps HTTP bodies to user-facing `message` (no status codes); unexpected failures → generic i18n toast; list load failures render in-page error + Retry instead of toasting |
 | Domain types | `types/student`, `types/api`, `types/notification` |
-| Structure | `components/layout` (shell) + `components/students` (view/table/drawer leaves) + `hooks/useStudents` (TanStack Query list/create/delete + toasts) |
-| Features | List students, add via drawer form, delete with confirm; empty-state CTA |
+| Structure | `components/layout` (shell) + `components/students` (view/table/drawer leaves) + `hooks/useStudents` (TanStack Query list/create/delete + mutation toasts) |
+| Features | List students (loading / empty / error+retry / table), add via drawer form, delete with confirm |
 | Incomplete UX | Edit button rendered but not connected to any API; placeholder sidebar menu |
 
 ```text
@@ -74,7 +74,7 @@ App (QueryClientProvider)
 └── AppLayout (layout/)
     └── StudentsView (students/)
         ├── useStudents → TanStack Query + client / apiRoutes / apiError / Notification
-        ├── EmptyStudents | StudentsTable (+ studentColumns, StudentActions, …)
+        ├── EmptyStudents | StudentsLoadError | StudentsTable (+ studentColumns, StudentActions, …)
         └── StudentDrawerForm (react-hook-form + Zod + studentFormFields + onCreate)
 ```
 

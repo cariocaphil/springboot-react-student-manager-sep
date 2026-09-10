@@ -4,6 +4,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import App from './App';
 import * as client from './client';
 import * as notify from './Notification';
+import i18n from './i18n';
 import type { Student } from './types/student';
 
 vi.mock('./client');
@@ -35,7 +36,9 @@ describe('App', () => {
     render(<App />);
     expect(await screen.findByText(/Add New Student/i)).toBeInTheDocument();
     expect(
-      screen.getByText(/No data/i, { selector: '.ant-empty-description' })
+      screen.getByText(i18n.t('students.empty.description'), {
+        selector: '.ant-empty-description',
+      })
     ).toBeInTheDocument();
   });
 
@@ -63,28 +66,33 @@ describe('App', () => {
     expect(screen.getByText('MALE')).toBeInTheDocument();
   });
 
-  it('shows an error notification when listing students fails', async () => {
-    vi.mocked(client.getAllStudents).mockRejectedValue({
-      response: {
-        json: async () => ({
-          message: 'Unavailable',
-          status: 503,
-          error: 'Service Unavailable',
-        }),
-      },
-    });
+  it('shows an in-page load error with retry instead of the empty state', async () => {
+    const user = userEvent.setup();
+    vi.mocked(client.getAllStudents)
+      .mockRejectedValueOnce({
+        response: {
+          json: async () => ({
+            message: 'Unavailable',
+            status: 503,
+            error: 'Service Unavailable',
+          }),
+        },
+      })
+      .mockResolvedValueOnce(students);
 
     render(<App />);
 
+    expect(await screen.findByText(i18n.t('students.loadError.title'))).toBeInTheDocument();
+    expect(screen.getByText(i18n.t('students.loadError.description'))).toBeInTheDocument();
+    expect(notify.errorNotification).not.toHaveBeenCalled();
+    expect(screen.queryByText(i18n.t('students.empty.description'))).not.toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: i18n.t('students.loadError.retry') }));
+
+    expect(await screen.findByText('Ada Lovelace')).toBeInTheDocument();
     await waitFor(() => {
-      expect(notify.errorNotification).toHaveBeenCalledWith(
-        'There was an issue',
-        'Unavailable[503] [Service Unavailable]'
-      );
+      expect(client.getAllStudents).toHaveBeenCalledTimes(2);
     });
-    expect(
-      await screen.findByText(/No data/i, { selector: '.ant-empty-description' })
-    ).toBeInTheDocument();
   });
 
   it('deletes a student after confirm and refreshes the list', async () => {
