@@ -69,10 +69,18 @@
       "addedDescription": "{{name}} was added to the system",
       "deletedTitle": "Student deleted",
       "deletedDescription": "Student with {{id}} was deleted"
+    },
+    "empty": {
+      "description": "No students yet. Add one to get started."
+    },
+    "loadError": {
+      "title": "Couldn't load students",
+      "description": "Something went wrong while loading the student list. Please try again.",
+      "retry": "Retry"
     }
   },
   "errors": {
     "issueTitle": "There was an issue",
-    "unexpected": "Unexpected error"
+    "unexpected": "Something went wrong. Please try again."
   }
 }

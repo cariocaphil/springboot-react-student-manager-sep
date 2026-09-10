@@ -41,9 +41,65 @@ describe('useStudents', () => {
     });
 
     await waitFor(() => {
-      expect(result.current.fetching).toBe(false);
+      expect(result.current.isLoading).toBe(false);
     });
     expect(result.current.students).toEqual([ada]);
+    expect(result.current.isError).toBe(false);
+  });
+
+  it('exposes list error state without clearing retryLoad', async () => {
+    vi.mocked(client.getAllStudents).mockRejectedValue({
+      response: {
+        json: async () => ({
+          message: 'Unavailable',
+          status: 503,
+          error: 'Service Unavailable',
+        }),
+      },
+    });
+
+    const { result } = renderHook(() => useStudents(), {
+      wrapper: createWrapper(),
+    });
+
+    await waitFor(() => {
+      expect(result.current.isLoading).toBe(false);
+    });
+    expect(result.current.isError).toBe(true);
+    expect(result.current.students).toEqual([]);
+    expect(notify.errorNotification).not.toHaveBeenCalled();
+  });
+
+  it('retryLoad refetches the student list', async () => {
+    vi.mocked(client.getAllStudents)
+      .mockRejectedValueOnce({
+        response: {
+          json: async () => ({
+            message: 'Unavailable',
+            status: 503,
+            error: 'Service Unavailable',
+          }),
+        },
+      })
+      .mockResolvedValueOnce([ada]);
+
+    const { result } = renderHook(() => useStudents(), {
+      wrapper: createWrapper(),
+    });
+
+    await waitFor(() => {
+      expect(result.current.isError).toBe(true);
+    });
+
+    await act(async () => {
+      result.current.retryLoad();
+    });
+
+    await waitFor(() => {
+      expect(result.current.isError).toBe(false);
+    });
+    expect(result.current.students).toEqual([ada]);
+    expect(client.getAllStudents).toHaveBeenCalledTimes(2);
   });
 
   it('createStudent posts, notifies, refreshes, and returns true', async () => {
@@ -53,7 +109,7 @@ describe('useStudents', () => {
       wrapper: createWrapper(),
     });
     await waitFor(() => {
-      expect(result.current.fetching).toBe(false);
+      expect(result.current.isLoading).toBe(false);
     });
 
     let created = false;
@@ -95,7 +151,7 @@ describe('useStudents', () => {
       wrapper: createWrapper(),
     });
     await waitFor(() => {
-      expect(result.current.fetching).toBe(false);
+      expect(result.current.isLoading).toBe(false);
     });
 
     let created = true;
@@ -110,7 +166,7 @@ describe('useStudents', () => {
     expect(created).toBe(false);
     expect(notify.errorNotification).toHaveBeenCalledWith(
       'There was an issue',
-      'Email taken [400] [Bad Request]',
+      'Email taken',
       'bottomLeft'
     );
     expect(result.current.students).toEqual([]);
@@ -123,7 +179,7 @@ describe('useStudents', () => {
       wrapper: createWrapper(),
     });
     await waitFor(() => {
-      expect(result.current.fetching).toBe(false);
+      expect(result.current.isLoading).toBe(false);
     });
 
     await act(async () => {
@@ -156,17 +212,14 @@ describe('useStudents', () => {
       wrapper: createWrapper(),
     });
     await waitFor(() => {
-      expect(result.current.fetching).toBe(false);
+      expect(result.current.isLoading).toBe(false);
     });
 
     await act(async () => {
       await result.current.removeStudentById(1);
     });
 
-    expect(notify.errorNotification).toHaveBeenCalledWith(
-      'There was an issue',
-      'Not found [404] [Not Found]'
-    );
+    expect(notify.errorNotification).toHaveBeenCalledWith('There was an issue', 'Not found');
     expect(result.current.students).toEqual([ada]);
   });
 });

@@ -4,11 +4,11 @@ Full-stack student CRUD demo: a Spring Boot API and a Vite React UI packaged int
 
 ## Status
 
-**Modernization:** PR 32 mounts the EN/DE language switcher in the layout header. Future work continues from PR 32.
+**Modernization:** PR 33 improves student list loading / empty / error+retry UX and friendlier API error messages. Future work continues from PR 33.
 
 | | |
 | --- | --- |
-| Current | **Java 17** / Spring Boot **3.4.5**; Vite + TypeScript **React 19.3** with **Ant Design 5**, **i18next** (en/de) + header language switcher, **TanStack Query**, **React Hook Form**, **Zod**, config-driven drawer fields, **ESLint** + **Prettier**; POST **201** / DELETE **204** |
+| Current | **Java 17** / Spring Boot **3.4.5**; Vite + TypeScript **React 19.3** with **Ant Design 5**, **i18next** (en/de) + header language switcher, **TanStack Query** (list load/error/retry), **React Hook Form**, **Zod**, config-driven drawer fields, **ESLint** + **Prettier**; POST **201** / DELETE **204** |
 | Next | Further platform work per roadmap |
 | Full checklist | [docs/modernization-roadmap.md](docs/modernization-roadmap.md) |
 | Architecture | [docs/architecture.md](docs/architecture.md) |
@@ -141,7 +141,7 @@ cd src/frontend && npm run lint
 cd src/frontend && npm run format:check
 ```
 
-Covers API client helpers, notification wrappers, create-student drawer (validation / success / error), and App list/delete/empty flows. Use `npm run format` to apply Prettier.
+Covers API client helpers, notification wrappers, create-student drawer (validation / success / error), and App list/delete/empty/load-error+retry flows. Use `npm run format` to apply Prettier.
 
 ## API surface (current)
 

@@ -69,10 +69,18 @@
       "addedDescription": "{{name}} wurde dem System hinzugefügt",
       "deletedTitle": "Student gelöscht",
       "deletedDescription": "Student mit {{id}} wurde gelöscht"
+    },
+    "empty": {
+      "description": "Noch keine Studenten. Fügen Sie einen hinzu, um zu starten."
+    },
+    "loadError": {
+      "title": "Studenten konnten nicht geladen werden",
+      "description": "Beim Laden der Studentenliste ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.",
+      "retry": "Erneut versuchen"
     }
   },
   "errors": {
     "issueTitle": "Es ist ein Problem aufgetreten",
-    "unexpected": "Unerwarteter Fehler"
+    "unexpected": "Etwas ist schiefgelaufen. Bitte versuchen Sie es erneut."
   }
 }
