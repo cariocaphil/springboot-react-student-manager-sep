@@ -1,6 +1,6 @@
 import { Select } from 'antd';
 import { useTranslation } from 'react-i18next';
-import { resolveAppLanguage, type AppLanguage } from '../../i18n/languages';
+import { AppLanguageCode, resolveAppLanguage, type AppLanguage } from '../../i18n/languages';
 
 function LanguageSwitcher() {
   const { t, i18n } = useTranslation();
@@ -15,8 +15,8 @@ function LanguageSwitcher() {
         void i18n.changeLanguage(language);
       }}
       options={[
-        { value: 'en', label: t('language.en') },
-        { value: 'de', label: t('language.de') },
+        { value: AppLanguageCode.En, label: t('language.en') },
+        { value: AppLanguageCode.De, label: t('language.de') },
       ]}
       style={{ width: 72 }}
     />
