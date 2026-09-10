@@ -198,3 +198,4 @@ PR 33 — API / error UX ✅
 - [x] Add in-page list load error + Retry (`refetch`); stop toasting list failures and avoid empty-state fallback on error
 - [x] Friendlier `apiError` mapping: API `message` only (no status/error codes); unexpected errors use generic i18n copy
 - [x] Keep mutation toasts; translate empty/load-error copy; update Vitest + docs
+- [x] Extract reusable `ErrorState` presentation; keep `StudentsLoadError` as thin i18n + retry wrapper

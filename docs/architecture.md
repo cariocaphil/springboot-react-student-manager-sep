@@ -74,7 +74,7 @@ App (QueryClientProvider)
 └── AppLayout (layout/)
     └── StudentsView (students/)
         ├── useStudents → TanStack Query + client / apiRoutes / apiError / Notification
-        ├── EmptyStudents | StudentsLoadError | StudentsTable (+ studentColumns, StudentActions, …)
+        ├── EmptyStudents | StudentsLoadError → ErrorState | StudentsTable (+ studentColumns, StudentActions, …)
         └── StudentDrawerForm (react-hook-form + Zod + studentFormFields + onCreate)
 ```
 

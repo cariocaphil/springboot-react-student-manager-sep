@@ -1,5 +1,6 @@
-import { Button, Empty, Space, Typography } from 'antd';
+import { Button } from 'antd';
 import { useTranslation } from 'react-i18next';
+import ErrorState from '../ErrorState';
 
 interface StudentsLoadErrorProps {
   onRetry: () => void;
@@ -10,18 +11,15 @@ function StudentsLoadError({ onRetry, retrying = false }: StudentsLoadErrorProps
   const { t } = useTranslation();
 
   return (
-    <Empty
-      description={
-        <Space direction="vertical" size="small">
-          <Typography.Text strong>{t('students.loadError.title')}</Typography.Text>
-          <Typography.Text type="secondary">{t('students.loadError.description')}</Typography.Text>
-        </Space>
+    <ErrorState
+      title={t('students.loadError.title')}
+      description={t('students.loadError.description')}
+      action={
+        <Button type="primary" onClick={onRetry} loading={retrying}>
+          {t('students.loadError.retry')}
+        </Button>
       }
-    >
-      <Button type="primary" onClick={onRetry} loading={retrying}>
-        {t('students.loadError.retry')}
-      </Button>
-    </Empty>
+    />
   );
 }
 
