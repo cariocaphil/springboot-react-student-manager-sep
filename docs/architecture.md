@@ -59,8 +59,9 @@ Student feature packages under `com.example.demo.student`:
 | Concern | Implementation |
 | --- | --- |
 | Framework | React 18 + TypeScript function components + hooks (Vite 5) |
-| UI kit | Ant Design 4 (Layout, Table, Drawer, Form, notifications) |
+| UI kit | Ant Design 4 (Layout, Table, Drawer, Form layout, notifications) |
 | HTTP | Typed `client` helpers + `apiRoutes` (`studentsApi`) against relative `api/v1/students` (`unfetch`); TanStack Query (`useQuery` / `useMutation`) via `useStudents` |
+| Forms | React Hook Form (`Controller`) in `StudentDrawerForm`; Ant Design inputs for UI |
 | Errors | `apiError` maps HTTP / unexpected failures → notifications (`notifyHttpError`, `notifyUnexpectedError`) |
 | Domain types | `types/student`, `types/api`, `types/notification` |
 | Structure | `components/layout` (shell) + `components/students` (view/table/drawer leaves) + `hooks/useStudents` (TanStack Query list/create/delete + toasts) |
@@ -73,7 +74,7 @@ App (QueryClientProvider)
     └── StudentsView (students/)
         ├── useStudents → TanStack Query + client / apiRoutes / apiError / Notification
         ├── EmptyStudents | StudentsTable (+ studentColumns, StudentActions, …)
-        └── StudentDrawerForm (onCreate)
+        └── StudentDrawerForm (react-hook-form + onCreate)
 ```
 
 Production: relative API URLs work because UI and API share origin. Dev: Vite `server.proxy` `/api` → `localhost:8080`.

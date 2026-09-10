@@ -2,7 +2,7 @@
 
 Build history for the Student Manager modernization.
 
-PR numbers match merged GitHub pull requests. Future work continues from PR 24.
+PR numbers match merged GitHub pull requests. Future work continues from PR 25.
 
 The README keeps a short Status summary; this file holds the full checklist.
 
@@ -144,7 +144,12 @@ PR 23 — REST status semantics ✅
 - [x] `DELETE /api/v1/students/{id}` → **204 No Content**
 - [x] Update `StudentIntegrationTest` expectations; document statuses in architecture
 
-PR 24 — TanStack Query
+PR 24 — TanStack Query ✅
 - [x] Add `@tanstack/react-query` and `QueryClientProvider` in `App`
 - [x] Refactor `useStudents` to `useQuery` (list) + `useMutation` (create/delete) with `studentKeys` + invalidate-on-success
 - [x] Keep `client` / notifications / UI behavior; update Vitest wrappers and docs
+
+PR 25 — React Hook Form
+- [x] Add `react-hook-form` and refactor `StudentDrawerForm` to `useForm` / `Controller`
+- [x] Keep Ant Design inputs + drawer UX; drop validation `alert`; reset on close/success
+- [x] Update drawer Vitest and docs

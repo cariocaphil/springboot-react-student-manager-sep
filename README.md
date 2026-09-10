@@ -4,11 +4,11 @@ Full-stack student CRUD demo: a Spring Boot API and a Vite React UI packaged int
 
 ## Status
 
-**Modernization:** PR 23 REST status semantics is complete; PR 24 adds TanStack Query for student data. Future work continues from PR 24.
+**Modernization:** PR 24 TanStack Query is complete; PR 25 adds React Hook Form for the student drawer. Future work continues from PR 25.
 
 | | |
 | --- | --- |
-| Current | **Java 17** / Spring Boot **3.4.5**; Vite + TypeScript **React 18.3** with **TanStack Query** for students; POST **201** / DELETE **204** |
+| Current | **Java 17** / Spring Boot **3.4.5**; Vite + TypeScript **React 18.3** with **TanStack Query** + **React Hook Form**; POST **201** / DELETE **204** |
 | Next | Ant Design 5 / React 19, or further platform work per roadmap |
 | Full checklist | [docs/modernization-roadmap.md](docs/modernization-roadmap.md) |
 | Architecture | [docs/architecture.md](docs/architecture.md) |
@@ -19,7 +19,7 @@ Full-stack student CRUD demo: a Spring Boot API and a Vite React UI packaged int
 | --- | --- |
 | Backend | Java **17**, Spring Boot **3.4.5**, Spring Web, Spring Data JPA, Bean Validation, Lombok |
 | Database | PostgreSQL (local `localhost:5432`; AWS RDS via `dev` profile) |
-| Frontend | React **18.3** + **TypeScript**, **Vite 5**, Ant Design **4.24**, **TanStack Query 5**, `unfetch`, Vitest |
+| Frontend | React **18.3** + **TypeScript**, **Vite 5**, Ant Design **4.24**, **TanStack Query 5**, **React Hook Form 7**, `unfetch`, Vitest |
 | Build | Maven Wrapper, `frontend-maven-plugin` (Node **20** / npm **10**), Jib **3.5.2** |
 | Container | Eclipse Temurin **17** JRE base (`eclipse-temurin:17-jre`); image name `cariocaphil/spring-react-fullstack` |
 | CI/CD | GitHub Actions (`.github/workflows/build.yml`, `deploy.yml`) |

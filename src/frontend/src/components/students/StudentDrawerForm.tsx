@@ -1,8 +1,16 @@
 import { Drawer, Input, Col, Select, Form, Row, Button, Spin } from 'antd';
-import type { ValidateErrorEntity } from 'rc-field-form/es/interface';
 import { LoadingOutlined } from '@ant-design/icons';
-import { useState } from 'react';
+import { useEffect } from 'react';
+import { Controller, useForm } from 'react-hook-form';
 import { GENDERS, type NewStudent } from '../../types/student';
+import { errorNotification } from '../../Notification';
+import { EMAIL_INVALID_MESSAGE, EMAIL_PATTERN } from '../../validation/email';
+import { validationStatus } from '../../utils/form';
+import {
+  createNewStudentFromForm,
+  defaultValues,
+  type StudentFormValues,
+} from './studentForm';
 import StudentDrawerFooter from './StudentDrawerFooter';
 
 const { Option } = Select;
@@ -16,23 +24,35 @@ interface StudentDrawerFormProps {
 }
 
 function StudentDrawerForm({ open, onClose, onCreate }: StudentDrawerFormProps) {
-  const [submitting, setSubmitting] = useState(false);
+  const {
+    control,
+    handleSubmit,
+    reset,
+    formState: { errors, isSubmitting },
+  } = useForm<StudentFormValues>({
+    defaultValues,
+  });
 
-  const onFinish = (student: NewStudent) => {
-    setSubmitting(true);
-    void onCreate(student)
-      .then((created) => {
-        if (created) {
-          onClose();
-        }
-      })
-      .finally(() => {
-        setSubmitting(false);
-      });
-  };
+  useEffect(() => {
+    if (!open) {
+      reset(defaultValues);
+    }
+  }, [open]);
 
-  const onFinishFailed = (errorInfo: ValidateErrorEntity<NewStudent>) => {
-    alert(JSON.stringify(errorInfo, null, 2));
+  const onSubmit = async (values: StudentFormValues) => {
+    const student = createNewStudentFromForm(values);
+    if (!student) {
+      errorNotification(
+        'There was an issue',
+        'Form validation passed but required fields are missing'
+      );
+      return;
+    }
+    const created = await onCreate(student);
+    if (created) {
+      reset(defaultValues);
+      onClose();
+    }
   };
 
   return (
@@ -44,60 +64,90 @@ function StudentDrawerForm({ open, onClose, onCreate }: StudentDrawerFormProps) 
       bodyStyle={{ paddingBottom: 80 }}
       footer={<StudentDrawerFooter onClose={onClose} />}
     >
-      <Form
-        layout="vertical"
-        onFinishFailed={onFinishFailed}
-        onFinish={onFinish}
-        hideRequiredMark
-      >
+      <form onSubmit={handleSubmit(onSubmit)}>
         <Row gutter={16}>
           <Col span={12}>
-            <Form.Item
+            <Controller
               name="name"
-              label="Name"
-              rules={[{ required: true, message: 'Please enter student name' }]}
-            >
-              <Input placeholder="Please enter student name" />
-            </Form.Item>
+              control={control}
+              rules={{ required: 'Please enter student name' }}
+              render={({ field }) => (
+                <Form.Item
+                  label="Name"
+                  required
+                  validateStatus={validationStatus(!!errors.name)}
+                  help={errors.name?.message}
+                >
+                  <Input {...field} placeholder="Please enter student name" />
+                </Form.Item>
+              )}
+            />
           </Col>
           <Col span={12}>
-            <Form.Item
+            <Controller
               name="email"
-              label="Email"
-              rules={[{ required: true, message: 'Please enter student email' }]}
-            >
-              <Input placeholder="Please enter student email" />
-            </Form.Item>
+              control={control}
+              rules={{
+                required: 'Please enter student email',
+                pattern: {
+                  value: EMAIL_PATTERN,
+                  message: EMAIL_INVALID_MESSAGE,
+                },
+              }}
+              render={({ field }) => (
+                <Form.Item
+                  label="Email"
+                  required
+                  validateStatus={validationStatus(!!errors.email)}
+                  help={errors.email?.message}
+                >
+                  <Input {...field} placeholder="Please enter student email" />
+                </Form.Item>
+              )}
+            />
           </Col>
         </Row>
         <Row gutter={16}>
           <Col span={12}>
-            <Form.Item
+            <Controller
               name="gender"
-              label="gender"
-              rules={[{ required: true, message: 'Please select a gender' }]}
-            >
-              <Select placeholder="Please select a gender">
-                {GENDERS.map((gender) => (
-                  <Option key={gender} value={gender}>
-                    {gender}
-                  </Option>
-                ))}
-              </Select>
-            </Form.Item>
+              control={control}
+              rules={{ required: 'Please select a gender' }}
+              render={({ field }) => (
+                <Form.Item
+                  label="gender"
+                  required
+                  validateStatus={validationStatus(!!errors.gender)}
+                  help={errors.gender?.message}
+                >
+                  <Select
+                    placeholder="Please select a gender"
+                    value={field.value}
+                    onChange={field.onChange}
+                    onBlur={field.onBlur}
+                  >
+                    {GENDERS.map((gender) => (
+                      <Option key={gender} value={gender}>
+                        {gender}
+                      </Option>
+                    ))}
+                  </Select>
+                </Form.Item>
+              )}
+            />
           </Col>
         </Row>
         <Row>
           <Col span={12}>
             <Form.Item>
-              <Button type="primary" htmlType="submit">
+              <Button type="primary" htmlType="submit" loading={isSubmitting}>
                 Submit
               </Button>
             </Form.Item>
           </Col>
         </Row>
-        <Row>{submitting && <Spin indicator={antIcon} />}</Row>
-      </Form>
+        <Row>{isSubmitting && <Spin indicator={antIcon} />}</Row>
+      </form>
     </Drawer>
   );
 }
