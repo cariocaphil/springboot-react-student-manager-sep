@@ -1,12 +1,8 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import * as notify from '../../Notification';
 import { EMAIL_INVALID_MESSAGE } from '../../validation/email';
-import * as studentForm from './studentForm';
 import StudentDrawerForm from './StudentDrawerForm';
-
-vi.mock('../../Notification');
 
 async function chooseGender(label: string): Promise<void> {
   fireEvent.mouseDown(screen.getByRole('combobox'));
@@ -100,27 +96,6 @@ describe('StudentDrawerForm', () => {
     await waitFor(() => {
       expect(onCreate).toHaveBeenCalled();
     });
-    expect(onClose).not.toHaveBeenCalled();
-  });
-
-  it('notifies when factory returns undefined after validation', async () => {
-    const user = userEvent.setup();
-    vi.spyOn(studentForm, 'createNewStudentFromForm').mockReturnValue(undefined);
-
-    render(<StudentDrawerForm open onClose={onClose} onCreate={onCreate} />);
-
-    await user.type(screen.getByPlaceholderText('Please enter student name'), 'Ada');
-    await user.type(screen.getByPlaceholderText('Please enter student email'), 'ada@example.com');
-    await chooseGender('FEMALE');
-    await user.click(screen.getByRole('button', { name: /submit/i }));
-
-    await waitFor(() => {
-      expect(notify.errorNotification).toHaveBeenCalledWith(
-        'There was an issue',
-        'Form validation passed but required fields are missing'
-      );
-    });
-    expect(onCreate).not.toHaveBeenCalled();
     expect(onClose).not.toHaveBeenCalled();
   });
 });

@@ -45,7 +45,7 @@ Before changing runtime behavior, read:
 ## Stack constraints (until upgraded)
 
 - Backend: Java 17, Spring Boot 3.4.x, `jakarta.*`, JPA entity exposed as API
-- Frontend: React 18 + TypeScript, Vite 5, Ant Design 4, TanStack Query 5, React Hook Form 7; `apiRoutes` + typed `client` (`unfetch`); layout/students component split
+- Frontend: React 18 + TypeScript, Vite 5, Ant Design 4, TanStack Query 5, React Hook Form 7, Zod; `apiRoutes` + typed `client` (`unfetch`); layout/students component split
 - Image: Jib → `cariocaphil/spring-react-fullstack` from `eclipse-temurin:17-jre`; compose may pin a numeric tag
 - Deploy profile: `SPRING_PROFILES_ACTIVE=dev` on EB
 
