@@ -5,6 +5,7 @@ import { Controller, useForm } from 'react-hook-form';
 import { GENDERS, type Gender, type NewStudent } from '../../types/student';
 import { EMAIL_INVALID_MESSAGE, EMAIL_PATTERN } from '../../validation/email';
 import { validationStatus } from '../../utils/form';
+import { createNewStudentFromForm } from './studentForm';
 import StudentDrawerFooter from './StudentDrawerFooter';
 
 const { Option } = Select;
@@ -46,8 +47,11 @@ function StudentDrawerForm({ open, onClose, onCreate }: StudentDrawerFormProps) 
   }, [open]);
 
   const onSubmit = async (values: StudentFormValues) => {
-    // RHF `required` on gender already blocks submit when unset; cast for NewStudent.
-    const created = await onCreate(values as NewStudent);
+    const student = createNewStudentFromForm(values);
+    if (!student) {
+      return;
+    }
+    const created = await onCreate(student);
     if (created) {
       reset(defaultValues);
       onClose();
