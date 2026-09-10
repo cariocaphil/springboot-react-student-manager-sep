@@ -58,7 +58,7 @@ Student feature packages under `com.example.demo.student`:
 
 | Concern | Implementation |
 | --- | --- |
-| Framework | React 18 + TypeScript function components + hooks (Vite 5) |
+| Framework | React 19 + TypeScript function components + hooks (Vite 5) |
 | UI kit | Ant Design 5 (Layout, Table, Drawer, Form layout, notifications; CSS-in-JS) |
 | HTTP | Typed `client` helpers + `apiRoutes` (`studentsApi`) against relative `api/v1/students` (`unfetch`); TanStack Query (`useQuery` / `useMutation`) via `useStudents` |
 | Forms | React Hook Form + Zod (`studentFormSchema`); declarative `studentFormFields` with `FieldType` const map (`Text` / `Select`) + `StudentFormField` for Ant Design controls |
@@ -199,7 +199,7 @@ These items are intentional backlog for modernization; this branch does not fix 
 ### Platform age
 
 - Spring Boot **3.4.5** / Java **17** / `jakarta.*` (migrated in PR 16)
-- React **18.3** + TypeScript / Ant Design **5.29** / Vite 5 / Node 20 via frontend-maven-plugin (Ant Design 5 in PR 29; React 19 still deferred)
+- React **19.3** + TypeScript / Ant Design **5.29** / Vite 5 / Node 20 via frontend-maven-plugin (`@ant-design/v5-patch-for-react-19` for static APIs; React 19 in PR 30)
 - Jib **3.5.2** with `eclipse-temurin:17-jre` (Java 17 runtime as of PR 15)
 
 ### Product / design

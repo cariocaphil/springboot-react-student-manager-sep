@@ -6,7 +6,7 @@ Claude-specific notes live in [CLAUDE.md](CLAUDE.md). Human-oriented Status and 
 
 ## Project
 
-Spring Boot + React student manager: Java 17 / Spring Boot 3.4.5 API, Vite + TypeScript React 18 UI bundled into one JAR/container, CI/CD to Docker Hub + AWS Elastic Beanstalk.
+Spring Boot + React student manager: Java 17 / Spring Boot 3.4.5 API, Vite + TypeScript React 19 UI bundled into one JAR/container, CI/CD to Docker Hub + AWS Elastic Beanstalk.
 
 ## Required reading
 
@@ -45,7 +45,7 @@ Before changing runtime behavior, read:
 ## Stack constraints (until upgraded)
 
 - Backend: Java 17, Spring Boot 3.4.x, `jakarta.*`, JPA entity exposed as API
-- Frontend: React 18 + TypeScript, Vite 5, Ant Design 5, TanStack Query 5, React Hook Form 7, Zod, ESLint 9, Prettier; `apiRoutes` + typed `client` (`unfetch`); layout/students component split
+- Frontend: React 19 + TypeScript, Vite 5, Ant Design 5, TanStack Query 5, React Hook Form 7, Zod, ESLint 9, Prettier; `apiRoutes` + typed `client` (`unfetch`); layout/students component split
 - Image: Jib → `cariocaphil/spring-react-fullstack` from `eclipse-temurin:17-jre`; compose may pin a numeric tag
 - Deploy profile: `SPRING_PROFILES_ACTIVE=dev` on EB
 

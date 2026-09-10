@@ -2,7 +2,7 @@
 
 Build history for the Student Manager modernization.
 
-PR numbers match merged GitHub pull requests. Future work continues from PR 29.
+PR numbers match merged GitHub pull requests. Future work continues from PR 30.
 
 The README keeps a short Status summary; this file holds the full checklist.
 
@@ -176,3 +176,9 @@ PR 29 — Ant Design 5 ✅
 - [x] Keep React **18.3.1** unchanged (React 19 remains a later PR)
 - [x] Migrate v5 APIs: drop `antd/dist/antd.css` (CSS-in-JS); Drawer `visible`/`bodyStyle` → `open`/`styles`; Menu/`Breadcrumb` `items`
 - [x] Adjust Vitest empty-state queries for Ant Design 5 SVG title + description; update docs
+
+PR 30 — React 19 upgrade ✅
+- [x] Upgrade `react` / `react-dom` **18.3.1 → 19.3.0**; align `@types/react` / `@types/react-dom` to **19.3**
+- [x] Keep Ant Design **5.29**; add `@ant-design/v5-patch-for-react-19` and import it from app entry + Vitest setup (static notification APIs)
+- [x] Bump `@testing-library/react` **14 → 16** for React 19 peer support; leave Vite/RHF/Query/Zod/ESLint/Prettier otherwise unchanged
+- [x] Update docs
