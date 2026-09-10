@@ -15,21 +15,19 @@ import java.util.stream.Collectors;
 @RestControllerAdvice
 public class ApiExceptionHandler {
 
-    @ExceptionHandler({
-            BadRequestException.class,
-            DuplicateEmailException.class
-    })
-    public ResponseEntity<ApiErrorResponse> handleBadRequest(RuntimeException ex) {
-        return ResponseEntity
-                .status(HttpStatus.BAD_REQUEST)
-                .body(new ApiErrorResponse(ex.getMessage(), HttpStatus.BAD_REQUEST.value(), "Bad Request"));
+    @ExceptionHandler(DuplicateEmailException.class)
+    public ResponseEntity<ApiErrorResponse> handleDuplicateEmail(DuplicateEmailException ex) {
+        return error(HttpStatus.BAD_REQUEST, ApiErrorCode.EMAIL_TAKEN, ex.getMessage());
+    }
+
+    @ExceptionHandler(BadRequestException.class)
+    public ResponseEntity<ApiErrorResponse> handleBadRequest(BadRequestException ex) {
+        return error(HttpStatus.BAD_REQUEST, ApiErrorCode.BAD_REQUEST, ex.getMessage());
     }
 
     @ExceptionHandler(StudentNotFoundException.class)
     public ResponseEntity<ApiErrorResponse> handleNotFound(StudentNotFoundException ex) {
-        return ResponseEntity
-                .status(HttpStatus.NOT_FOUND)
-                .body(new ApiErrorResponse(ex.getMessage(), HttpStatus.NOT_FOUND.value(), "Not Found"));
+        return error(HttpStatus.NOT_FOUND, ApiErrorCode.STUDENT_NOT_FOUND, ex.getMessage());
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -40,9 +38,13 @@ public class ApiExceptionHandler {
         if (message.isBlank()) {
             message = "Validation failed";
         }
+        return error(HttpStatus.BAD_REQUEST, ApiErrorCode.VALIDATION_FAILED, message);
+    }
+
+    private ResponseEntity<ApiErrorResponse> error(HttpStatus status, ApiErrorCode code, String message) {
         return ResponseEntity
-                .status(HttpStatus.BAD_REQUEST)
-                .body(new ApiErrorResponse(message, HttpStatus.BAD_REQUEST.value(), "Bad Request"));
+                .status(status)
+                .body(new ApiErrorResponse(code, message, status.value(), status.getReasonPhrase()));
     }
 
     private String formatFieldError(FieldError fieldError) {

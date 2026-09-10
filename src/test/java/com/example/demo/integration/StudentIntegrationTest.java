@@ -79,6 +79,7 @@ class StudentIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(duplicate)))
                 .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("EMAIL_TAKEN"))
                 .andExpect(jsonPath("$.status").value(400))
                 .andExpect(jsonPath("$.error").value("Bad Request"))
                 .andExpect(jsonPath("$.message").value("Email jamila@example.com taken"));
@@ -94,6 +95,7 @@ class StudentIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(invalidJson))
                 .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("VALIDATION_FAILED"))
                 .andExpect(jsonPath("$.status").value(400))
                 .andExpect(jsonPath("$.error").value("Bad Request"))
                 .andExpect(jsonPath("$.message").isNotEmpty());
@@ -114,6 +116,7 @@ class StudentIntegrationTest {
     void deleteStudent_returnsNotFoundWhenMissing() throws Exception {
         mockMvc.perform(delete(STUDENT_BY_ID_URI, 12345L))
                 .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.code").value("STUDENT_NOT_FOUND"))
                 .andExpect(jsonPath("$.status").value(404))
                 .andExpect(jsonPath("$.error").value("Not Found"))
                 .andExpect(jsonPath("$.message").value("Student with id 12345 does not exists"));

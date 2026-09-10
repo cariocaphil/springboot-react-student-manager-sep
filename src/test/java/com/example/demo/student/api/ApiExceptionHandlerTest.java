@@ -23,31 +23,39 @@ class ApiExceptionHandlerTest {
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
         assertThat(response.getBody()).isEqualTo(
-                new ApiErrorResponse("Invalid input", 400, "Bad Request"));
+                new ApiErrorResponse(ApiErrorCode.BAD_REQUEST, "Invalid input", 400, "Bad Request"));
     }
 
     @Test
-    void handleDuplicateEmail_returnsStableErrorBody() {
+    void handleDuplicateEmail_returnsEmailTakenCode() {
         ResponseEntity<ApiErrorResponse> response =
-                handler.handleBadRequest(new DuplicateEmailException("jamila@example.com"));
+                handler.handleDuplicateEmail(new DuplicateEmailException("jamila@example.com"));
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
         assertThat(response.getBody()).isEqualTo(
-                new ApiErrorResponse("Email jamila@example.com taken", 400, "Bad Request"));
+                new ApiErrorResponse(
+                        ApiErrorCode.EMAIL_TAKEN,
+                        "Email jamila@example.com taken",
+                        400,
+                        "Bad Request"));
     }
 
     @Test
-    void handleNotFound_returnsStableErrorBody() {
+    void handleNotFound_returnsStudentNotFoundCode() {
         ResponseEntity<ApiErrorResponse> response =
                 handler.handleNotFound(new StudentNotFoundException("Student with id 99 does not exists"));
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
         assertThat(response.getBody()).isEqualTo(
-                new ApiErrorResponse("Student with id 99 does not exists", 404, "Not Found"));
+                new ApiErrorResponse(
+                        ApiErrorCode.STUDENT_NOT_FOUND,
+                        "Student with id 99 does not exists",
+                        404,
+                        "Not Found"));
     }
 
     @Test
-    void handleValidation_joinsFieldErrors() throws Exception {
+    void handleValidation_joinsFieldErrorsWithValidationFailedCode() throws Exception {
         BeanPropertyBindingResult bindingResult =
                 new BeanPropertyBindingResult(new Object(), "studentRequest");
         bindingResult.addError(new FieldError("studentRequest", "email", "must be a well-formed email address"));
@@ -59,6 +67,7 @@ class ApiExceptionHandlerTest {
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
         assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().code()).isEqualTo(ApiErrorCode.VALIDATION_FAILED);
         assertThat(response.getBody().status()).isEqualTo(400);
         assertThat(response.getBody().error()).isEqualTo("Bad Request");
         assertThat(response.getBody().message())
