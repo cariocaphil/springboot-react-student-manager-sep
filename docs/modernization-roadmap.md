@@ -2,7 +2,7 @@
 
 Build history for the Student Manager modernization.
 
-PR numbers match merged GitHub pull requests. Future work continues from PR 33.
+PR numbers match merged GitHub pull requests. Future work continues from PR 34.
 
 The README keeps a short Status summary; this file holds the full checklist.
 
@@ -199,3 +199,10 @@ PR 33 — API / error UX ✅
 - [x] Friendlier `apiError` mapping: API `message` only (no status/error codes); unexpected errors use generic i18n copy
 - [x] Keep mutation toasts; translate empty/load-error copy; update Vitest + docs
 - [x] Extract reusable `ErrorState` presentation; keep `StudentsLoadError` as thin i18n + retry wrapper
+
+PR 34 — OpenAPI + generated frontend API types ✅
+- [x] Add springdoc-openapi (`webmvc-api`); document students endpoints + `ApiErrorResponse` in OpenAPI
+- [x] Commit deterministic `api/openapi.json`; drift-checked by `OpenApiContractTest` (re-export with `-Dopenapi.export=true`)
+- [x] Generate TypeScript types with `openapi-typescript` (`npm run generate:api-types`); commit under `src/frontend/src/types/generated/`
+- [x] Wire frontend DTO aliases (`Student` / `NewStudent` / `ApiErrorBody`) to generated schemas; keep `client` / Query / UI unchanged
+- [x] Fail CI on stale generated types (`npm run check:api-types` in `build-frontend`); update docs
