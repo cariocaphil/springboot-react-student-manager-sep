@@ -10,7 +10,9 @@ describe('EmptyStudents', () => {
 
     render(<EmptyStudents onAddClick={onAddClick} />);
 
-    expect(screen.getByText(/No Data/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/No data/i, { selector: '.ant-empty-description' })
+    ).toBeInTheDocument();
     await user.click(screen.getByRole('button', { name: /Add New Student/i }));
     expect(onAddClick).toHaveBeenCalledTimes(1);
   });

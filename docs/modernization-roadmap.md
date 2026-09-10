@@ -2,7 +2,7 @@
 
 Build history for the Student Manager modernization.
 
-PR numbers match merged GitHub pull requests. Future work continues from PR 28.
+PR numbers match merged GitHub pull requests. Future work continues from PR 29.
 
 The README keeps a short Status summary; this file holds the full checklist.
 
@@ -165,8 +165,14 @@ PR 27 — Config-driven student form fields ✅
 - [x] Add `StudentFormField` + row grouping; map fields in `StudentDrawerForm` without changing Zod validation
 - [x] Preserve layout/UX/tests; update docs
 
-PR 28 — Frontend ESLint + Prettier
+PR 28 — Frontend ESLint + Prettier ✅
 - [x] Add ESLint flat config (TypeScript, React, React Hooks, react-refresh) + Prettier; `eslint-config-prettier`
 - [x] Add `lint` / `format` / `format:check` scripts; format existing frontend sources
 - [x] Run format:check + lint in Maven `build-frontend` (CI via `./mvnw … -P build-frontend`)
 - [x] Update docs
+
+PR 29 — Ant Design 5 ✅
+- [x] Upgrade `antd` **4.24.x → 5.29.3**; add `@ant-design/icons` **5.6.1** as a direct dependency
+- [x] Keep React **18.3.1** unchanged (React 19 remains a later PR)
+- [x] Migrate v5 APIs: drop `antd/dist/antd.css` (CSS-in-JS); Drawer `visible`/`bodyStyle` → `open`/`styles`; Menu/`Breadcrumb` `items`
+- [x] Adjust Vitest empty-state queries for Ant Design 5 SVG title + description; update docs

@@ -55,8 +55,8 @@ function StudentDrawerForm({ open, onClose, onCreate }: StudentDrawerFormProps) 
       title="Create new student"
       width={720}
       onClose={onClose}
-      visible={open}
-      bodyStyle={{ paddingBottom: 80 }}
+      open={open}
+      styles={{ body: { paddingBottom: 80 } }}
       footer={<StudentDrawerFooter onClose={onClose} />}
     >
       <form onSubmit={handleSubmit(onSubmit)}>
