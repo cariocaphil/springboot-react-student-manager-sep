@@ -4,11 +4,11 @@ Full-stack student CRUD demo: a Spring Boot API and a Vite React UI packaged int
 
 ## Status
 
-**Modernization:** PR 25 React Hook Form is complete; PR 26 adds Zod validation for the student drawer. Future work continues from PR 26.
+**Modernization:** PR 26 Zod form validation is complete; PR 27 makes student drawer fields config-driven. Future work continues from PR 27.
 
 | | |
 | --- | --- |
-| Current | **Java 17** / Spring Boot **3.4.5**; Vite + TypeScript **React 18.3** with **TanStack Query**, **React Hook Form**, and **Zod**; POST **201** / DELETE **204** |
+| Current | **Java 17** / Spring Boot **3.4.5**; Vite + TypeScript **React 18.3** with **TanStack Query**, **React Hook Form**, **Zod**, and config-driven drawer fields; POST **201** / DELETE **204** |
 | Next | Ant Design 5 / React 19, or further platform work per roadmap |
 | Full checklist | [docs/modernization-roadmap.md](docs/modernization-roadmap.md) |
 | Architecture | [docs/architecture.md](docs/architecture.md) |

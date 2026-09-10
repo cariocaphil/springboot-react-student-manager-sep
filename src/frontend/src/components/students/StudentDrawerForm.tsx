@@ -1,21 +1,25 @@
-import { Drawer, Input, Col, Select, Form, Row, Button, Spin } from 'antd';
+import { Drawer, Col, Form, Row, Button, Spin } from 'antd';
 import { LoadingOutlined } from '@ant-design/icons';
 import { useEffect } from 'react';
-import { Controller, useForm } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { GENDERS, type NewStudent } from '../../types/student';
-import { validationStatus } from '../../utils/form';
+import type { NewStudent } from '../../types/student';
 import {
   createNewStudentFromForm,
   defaultValues,
   studentFormSchema,
   type StudentFormValues,
 } from './studentForm';
+import {
+  groupStudentFormFieldsIntoRows,
+  studentFormFields,
+} from './studentFormFields';
 import StudentDrawerFooter from './StudentDrawerFooter';
-
-const { Option } = Select;
+import StudentFormField from './StudentFormField';
 
 const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
+
+const studentFormRows = groupStudentFormFieldsIntoRows(studentFormFields);
 
 interface StudentDrawerFormProps {
   open: boolean;
@@ -59,69 +63,15 @@ function StudentDrawerForm({ open, onClose, onCreate }: StudentDrawerFormProps) 
       footer={<StudentDrawerFooter onClose={onClose} />}
     >
       <form onSubmit={handleSubmit(onSubmit)}>
-        <Row gutter={16}>
-          <Col span={12}>
-            <Controller
-              name="name"
-              control={control}
-              render={({ field }) => (
-                <Form.Item
-                  label="Name"
-                  required
-                  validateStatus={validationStatus(!!errors.name)}
-                  help={errors.name?.message}
-                >
-                  <Input {...field} placeholder="Please enter student name" />
-                </Form.Item>
-              )}
-            />
-          </Col>
-          <Col span={12}>
-            <Controller
-              name="email"
-              control={control}
-              render={({ field }) => (
-                <Form.Item
-                  label="Email"
-                  required
-                  validateStatus={validationStatus(!!errors.email)}
-                  help={errors.email?.message}
-                >
-                  <Input {...field} placeholder="Please enter student email" />
-                </Form.Item>
-              )}
-            />
-          </Col>
-        </Row>
-        <Row gutter={16}>
-          <Col span={12}>
-            <Controller
-              name="gender"
-              control={control}
-              render={({ field }) => (
-                <Form.Item
-                  label="gender"
-                  required
-                  validateStatus={validationStatus(!!errors.gender)}
-                  help={errors.gender?.message}
-                >
-                  <Select
-                    placeholder="Please select a gender"
-                    value={field.value}
-                    onChange={field.onChange}
-                    onBlur={field.onBlur}
-                  >
-                    {GENDERS.map((gender) => (
-                      <Option key={gender} value={gender}>
-                        {gender}
-                      </Option>
-                    ))}
-                  </Select>
-                </Form.Item>
-              )}
-            />
-          </Col>
-        </Row>
+        {studentFormRows.map((row, rowIndex) => (
+          <Row gutter={16} key={rowIndex}>
+            {row.map((field) => (
+              <Col span={field.span} key={field.name}>
+                <StudentFormField field={field} control={control} errors={errors} />
+              </Col>
+            ))}
+          </Row>
+        ))}
         <Row>
           <Col span={12}>
             <Form.Item>
