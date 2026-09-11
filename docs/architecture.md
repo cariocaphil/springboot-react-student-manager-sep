@@ -140,7 +140,7 @@ Maven profiles:
 
 | Profile | Default | Purpose |
 | --- | --- | --- |
-| `build-frontend` | **yes** | Install Node/npm via plugin, `npm install`, `npm run format:check`, `npm run lint`, `npm test` (Vitest), `vite build`, copy to classpath static |
+| `build-frontend` | **yes** | Install Node/npm via plugin, `npm install`, `npm run format:check`, `npm run check:api-types`, `npm run lint`, `npm run test:coverage` (Vitest + V8), `vite build`, copy to classpath static |
 | `jib-push-to-dockerhub` | no | On `package`, Jib `build` → Docker Hub (`cariocaphil/spring-react-fullstack`) |
 | `jib-push-to-local` | no | On `package`, Jib `dockerBuild` → local Docker |
 
@@ -192,12 +192,13 @@ Intended sequence:
 
 | Area | Present today |
 | --- | --- |
-| Backend | `DemoApplicationTests`; `StudentServiceTest` (Mockito); `StudentRepositoryTest` (`@DataJpaTest`); `StudentIntegrationTest` (MockMvc API); `OpenApiContractTest` |
-| Frontend | Vitest for `client`, `apiRoutes`, `apiError`, notifications, `useStudents`, student/layout leaves, drawer, and App flows; ESLint + Prettier; Maven `build-frontend` runs `format:check`, `check:api-types`, `lint`, and `npm test` before `vite build` |
+| Backend | `DemoApplicationTests`; `StudentServiceTest` (Mockito); `StudentRepositoryTest` (`@DataJpaTest`); `StudentIntegrationTest` (MockMvc API); `OpenApiContractTest`; JaCoCo report on `test` |
+| Frontend | Vitest for `client`, `apiRoutes`, `apiError`, notifications, `useStudents`, student/layout leaves, drawer, and App flows; ESLint + Prettier; Maven `build-frontend` runs `format:check`, `check:api-types`, `lint`, and `npm run test:coverage` before `vite build` |
 | OpenAPI | `OpenApiContractTest` asserts committed `api/openapi.json` matches `/v3/api-docs`; frontend `check:api-types` asserts generated TS matches that JSON |
 | Integration / repository / service tests | Present for student create/list/delete and email uniqueness (PR 14) |
+| Coverage | CI uploads JaCoCo XML + Vitest Cobertura to Codecov; `codecov.yml` enforces 80% project and patch (PR 38) |
 
-CI validates that the project **packages** against a live Postgres and runs frontend format check, OpenAPI type drift check, ESLint, and the Vitest suite during `build-frontend`.
+CI validates that the project **packages** against a live Postgres and runs frontend format check, OpenAPI type drift check, ESLint, and the Vitest suite (with coverage) during `build-frontend`, then uploads coverage to Codecov.
 
 ## 7. Technical debt & inconsistencies (recorded, not remediated)
 
@@ -230,6 +231,7 @@ These items are intentional backlog for modernization; this branch does not fix 
 ### Quality
 
 - Frontend Vitest coverage expanded in PRs 18–21; backend service/repo/API tests from PR 14 — still no broad E2E
+- Codecov reports overall coverage (PR 38); some frontend entry/boot files remain uncovered (`index.tsx`, `reportWebVitals`, legacy `components/StudentsTable.tsx`) without failing the 80% gates
 - Unused imports in `StudentService` (HttpStatus / ResponseStatus)
 
 ## 8. What “done” looks like for this baseline

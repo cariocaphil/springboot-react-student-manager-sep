@@ -1,0 +1,35 @@
+# Codecov configuration for PR status checks.
+# Project/patch targets are 80% — current measured baseline already exceeds that
+# (backend JaCoCo ~96% lines; frontend Vitest ~93% lines). Do not raise gates
+# without re-measuring.
+
+codecov:
+  require_ci_to_pass: true
+  notify:
+    wait_for_ci: true
+
+coverage:
+  precision: 2
+  round: down
+  range: 70..100
+  status:
+    project:
+      default:
+        target: 80%
+        threshold: 1%
+        informational: false
+    patch:
+      default:
+        target: 80%
+        threshold: 1%
+        informational: false
+
+comment:
+  layout: "reach,diff,flags,files"
+  behavior: default
+  require_changes: false
+  require_base: false
+  require_head: true
+
+github_checks:
+  annotations: true

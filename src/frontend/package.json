@@ -26,6 +26,7 @@
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
     "@vitejs/plugin-react": "^4.3.4",
+    "@vitest/coverage-v8": "^2.1.8",
     "eslint": "^9.39.5",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-react": "^7.37.5",
@@ -52,6 +53,7 @@
     "check:api-types": "openapi-typescript ../../api/openapi.json -o /tmp/student-manager-schema.d.ts && diff -u src/types/generated/schema.d.ts /tmp/student-manager-schema.d.ts",
     "preview": "vite preview",
     "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
     "test:watch": "vitest"
   }
 }
