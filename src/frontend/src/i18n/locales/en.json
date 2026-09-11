@@ -81,6 +81,12 @@
   },
   "errors": {
     "issueTitle": "There was an issue",
-    "unexpected": "Something went wrong. Please try again."
+    "unexpected": "Something went wrong. Please try again.",
+    "codes": {
+      "emailTaken": "That email is already in use.",
+      "studentNotFound": "That student could not be found.",
+      "validationFailed": "Please check the form and try again.",
+      "badRequest": "The request could not be completed."
+    }
   }
 }

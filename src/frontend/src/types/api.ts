@@ -11,6 +11,9 @@ export type ApiResponse = {
 /** Structured API error body from OpenAPI `ApiErrorResponse`. */
 export type ApiErrorBody = components['schemas']['ApiErrorResponse'];
 
+/** Stable error code from OpenAPI (`ApiErrorResponse.code`). */
+export type ApiErrorCode = ApiErrorBody['code'];
+
 export type HttpError = Error & { response: ApiResponse };
 
 export function isHttpError(error: unknown): error is HttpError {

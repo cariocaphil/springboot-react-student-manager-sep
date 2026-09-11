@@ -4,6 +4,7 @@ import type { ReactNode } from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { useStudents } from './useStudents';
 import * as client from '../client';
+import i18n from '../i18n';
 import * as notify from '../Notification';
 import { createQueryClient } from '../queryClient';
 import type { Student } from '../types/student';
@@ -140,6 +141,7 @@ describe('useStudents', () => {
     vi.mocked(client.addNewStudent).mockRejectedValue({
       response: {
         json: async () => ({
+          code: 'EMAIL_TAKEN',
           message: 'Email taken',
           status: 400,
           error: 'Bad Request',
@@ -165,8 +167,8 @@ describe('useStudents', () => {
 
     expect(created).toBe(false);
     expect(notify.errorNotification).toHaveBeenCalledWith(
-      'There was an issue',
-      'Email taken',
+      i18n.t('errors.issueTitle'),
+      i18n.t('errors.codes.emailTaken'),
       'bottomLeft'
     );
     expect(result.current.students).toEqual([]);
@@ -201,6 +203,7 @@ describe('useStudents', () => {
     vi.mocked(client.deleteStudent).mockRejectedValue({
       response: {
         json: async () => ({
+          code: 'STUDENT_NOT_FOUND',
           message: 'Not found',
           status: 404,
           error: 'Not Found',
@@ -219,7 +222,10 @@ describe('useStudents', () => {
       await result.current.removeStudentById(1);
     });
 
-    expect(notify.errorNotification).toHaveBeenCalledWith('There was an issue', 'Not found');
+    expect(notify.errorNotification).toHaveBeenCalledWith(
+      i18n.t('errors.issueTitle'),
+      i18n.t('errors.codes.studentNotFound')
+    );
     expect(result.current.students).toEqual([ada]);
   });
 });

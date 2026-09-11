@@ -46,12 +46,17 @@ export interface components {
         /** @description Structured API error body */
         ApiErrorResponse: {
             /**
+             * @description Stable error code for clients
+             * @enum {string}
+             */
+            code: "EMAIL_TAKEN" | "STUDENT_NOT_FOUND" | "VALIDATION_FAILED" | "BAD_REQUEST";
+            /**
              * @description HTTP reason phrase
              * @example Bad Request
              */
             error: string;
             /**
-             * @description User-facing error message
+             * @description Diagnostic detail (not primary UI copy for known codes)
              * @example Email ada@example.com taken
              */
             message: string;

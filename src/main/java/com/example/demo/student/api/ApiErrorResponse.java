@@ -7,7 +7,9 @@ import io.swagger.v3.oas.annotations.media.Schema;
  */
 @Schema(name = "ApiErrorResponse", description = "Structured API error body")
 public record ApiErrorResponse(
-        @Schema(description = "User-facing error message", example = "Email ada@example.com taken", requiredMode = Schema.RequiredMode.REQUIRED)
+        @Schema(description = "Stable error code for clients", requiredMode = Schema.RequiredMode.REQUIRED)
+        ApiErrorCode code,
+        @Schema(description = "Diagnostic detail (not primary UI copy for known codes)", example = "Email ada@example.com taken", requiredMode = Schema.RequiredMode.REQUIRED)
         String message,
         @Schema(description = "HTTP status code", example = "400", requiredMode = Schema.RequiredMode.REQUIRED)
         int status,

@@ -12,11 +12,13 @@ describe('api types', () => {
 
   it('ApiErrorBody matches the generated ApiErrorResponse schema', () => {
     const body: ApiErrorBody = {
+      code: 'EMAIL_TAKEN',
       message: 'Email taken',
       status: 400,
       error: 'Bad Request',
     };
     const fromSchema: components['schemas']['ApiErrorResponse'] = body;
+    expect(fromSchema.code).toBe('EMAIL_TAKEN');
     expect(fromSchema.message).toBe('Email taken');
   });
 });

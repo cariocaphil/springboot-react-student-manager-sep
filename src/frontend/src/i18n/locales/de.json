@@ -81,6 +81,12 @@
   },
   "errors": {
     "issueTitle": "Es ist ein Problem aufgetreten",
-    "unexpected": "Etwas ist schiefgelaufen. Bitte versuchen Sie es erneut."
+    "unexpected": "Etwas ist schiefgelaufen. Bitte versuchen Sie es erneut.",
+    "codes": {
+      "emailTaken": "Diese E-Mail-Adresse wird bereits verwendet.",
+      "studentNotFound": "Dieser Student konnte nicht gefunden werden.",
+      "validationFailed": "Bitte prüfen Sie das Formular und versuchen Sie es erneut.",
+      "badRequest": "Die Anfrage konnte nicht ausgeführt werden."
+    }
   }
 }

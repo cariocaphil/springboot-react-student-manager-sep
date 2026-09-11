@@ -2,7 +2,7 @@
 
 Build history for the Student Manager modernization.
 
-PR numbers match merged GitHub pull requests. Future work continues from PR 34.
+PR numbers match merged GitHub pull requests. Future work continues from PR 35.
 
 The README keeps a short Status summary; this file holds the full checklist.
 
@@ -206,3 +206,9 @@ PR 34 — OpenAPI + generated frontend API types ✅
 - [x] Generate TypeScript types with `openapi-typescript` (`npm run generate:api-types`); commit under `src/frontend/src/types/generated/`
 - [x] Wire frontend DTO aliases (`Student` / `NewStudent` / `ApiErrorBody`) to generated schemas; keep `client` / Query / UI unchanged
 - [x] Fail CI on stale generated types (`npm run check:api-types` in `build-frontend`); update docs
+
+PR 35 — API error codes → frontend i18n ✅
+- [x] Add `ApiErrorCode` and required `code` on `ApiErrorResponse`; set codes in `ApiExceptionHandler`
+- [x] Refresh committed OpenAPI + generated TypeScript types
+- [x] Map known codes to i18n in `apiError` (diagnostic `message` not primary UI copy); unknown → generic fallback
+- [x] Update Vitest + docs
