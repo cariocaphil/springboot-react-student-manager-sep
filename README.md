@@ -1,10 +1,13 @@
 # Spring Boot + React Student Manager
 
+[![CI](https://github.com/cariocaphil/springboot-react-student-manager-sep/actions/workflows/build.yml/badge.svg?branch=main)](https://github.com/cariocaphil/springboot-react-student-manager-sep/actions/workflows/build.yml?query=branch%3Amain)
+[![codecov](https://codecov.io/gh/cariocaphil/springboot-react-student-manager-sep/branch/main/graph/badge.svg)](https://codecov.io/gh/cariocaphil/springboot-react-student-manager-sep)
+
 Full-stack student CRUD demo: a Spring Boot API and a Vite React UI packaged into a single deployable JAR/container and published to AWS Elastic Beanstalk.
 
 ## Status
 
-**Modernization:** PR 37 cleans and de-tutorializes the UI and establishes project identity (tagline + repo link). Future work continues from PR 37.
+**Modernization:** PR 38 adds README CI and Codecov status badges. Future work continues from PR 38.
 
 | | |
 | --- | --- |
