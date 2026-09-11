@@ -20,7 +20,28 @@ function AppSidebar() {
 
   return (
     <Sider collapsible collapsed={collapsed} onCollapse={setCollapsed}>
-      <div className="logo" />
+      <div
+        style={{
+          height: 64,
+          margin: collapsed ? '16px 8px' : 16,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          overflow: 'hidden',
+          background: '#fff',
+          borderRadius: 6,
+        }}
+      >
+        <img
+          src="/logo.png"
+          alt="SEP"
+          style={{
+            maxHeight: collapsed ? 36 : 52,
+            maxWidth: '100%',
+            objectFit: 'contain',
+          }}
+        />
+      </div>
       <Menu theme="dark" defaultSelectedKeys={['students']} mode="inline" items={menuItems} />
     </Sider>
   );
