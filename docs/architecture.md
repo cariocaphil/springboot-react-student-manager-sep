@@ -226,7 +226,6 @@ These items are intentional backlog for modernization; this branch does not fix 
 
 - Edit UI without backend update API
 - Hibernate `ddl-auto=update` used for deployed `dev` profile (no migration history)
-- Dual lockfiles in the frontend tooling history
 
 ### Quality
 
