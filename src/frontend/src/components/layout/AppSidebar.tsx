@@ -1,13 +1,7 @@
 import { useState } from 'react';
 import { Layout, Menu } from 'antd';
 import type { MenuProps } from 'antd';
-import {
-  DesktopOutlined,
-  FileOutlined,
-  PieChartOutlined,
-  TeamOutlined,
-  UserOutlined,
-} from '@ant-design/icons';
+import { UserOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 
 const { Sider } = Layout;
@@ -17,34 +11,38 @@ function AppSidebar() {
   const [collapsed, setCollapsed] = useState(false);
 
   const menuItems: MenuProps['items'] = [
-    { key: '1', icon: <PieChartOutlined />, label: t('layout.menu.option1') },
-    { key: '2', icon: <DesktopOutlined />, label: t('layout.menu.option2') },
     {
-      key: 'sub1',
+      key: 'students',
       icon: <UserOutlined />,
-      label: t('layout.menu.user'),
-      children: [
-        { key: '3', label: t('layout.menu.tom') },
-        { key: '4', label: t('layout.menu.bill') },
-        { key: '5', label: t('layout.menu.alex') },
-      ],
+      label: t('layout.menu.students'),
     },
-    {
-      key: 'sub2',
-      icon: <TeamOutlined />,
-      label: t('layout.menu.team'),
-      children: [
-        { key: '6', label: t('layout.menu.team1') },
-        { key: '8', label: t('layout.menu.team2') },
-      ],
-    },
-    { key: '9', icon: <FileOutlined />, label: t('layout.menu.files') },
   ];
 
   return (
     <Sider collapsible collapsed={collapsed} onCollapse={setCollapsed}>
-      <div className="logo" />
-      <Menu theme="dark" defaultSelectedKeys={['1']} mode="inline" items={menuItems} />
+      <div
+        style={{
+          height: 64,
+          margin: collapsed ? '16px 8px' : 16,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          overflow: 'hidden',
+          background: '#fff',
+          borderRadius: 6,
+        }}
+      >
+        <img
+          src="/logo.png"
+          alt="SEP"
+          style={{
+            maxHeight: collapsed ? 36 : 52,
+            maxWidth: '100%',
+            objectFit: 'contain',
+          }}
+        />
+      </div>
+      <Menu theme="dark" defaultSelectedKeys={['students']} mode="inline" items={menuItems} />
     </Sider>
   );
 }

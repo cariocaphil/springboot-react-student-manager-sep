@@ -4,7 +4,7 @@ Full-stack student CRUD demo: a Spring Boot API and a Vite React UI packaged int
 
 ## Status
 
-**Modernization:** PR 35 maps stable API error codes to frontend i18n messages. Future work continues from PR 35.
+**Modernization:** PR 37 cleans and de-tutorializes the UI and establishes project identity (tagline + repo link). Future work continues from PR 37.
 
 | | |
 | --- | --- |
@@ -197,4 +197,4 @@ Required secrets (documented as expected by the workflows; not inventing values)
 
 ## License / origin
 
-Tutorial-style fullstack sample (Amigoscode footer/links in the UI). Do not commit database passwords; configure `dev` via environment variables.
+Student manager demo app. Do not commit database passwords; configure `dev` via environment variables.

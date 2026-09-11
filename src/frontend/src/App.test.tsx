@@ -42,14 +42,16 @@ describe('App', () => {
     ).toBeInTheDocument();
   });
 
-  it('renders course footer link', async () => {
+  it('renders project tagline and repository footer link', async () => {
     render(<App />);
     await screen.findByText(/Add New Student/i);
 
-    const link = screen.getByRole('link', {
-      name: /Fullstack Spring Boot & React for professionals/i,
-    });
-    expect(link).toHaveAttribute('href', 'https://amigoscode.com/p/full-stack-spring-boot-react');
+    expect(screen.getByText(i18n.t('layout.tagline'))).toBeInTheDocument();
+    const link = screen.getByRole('link', { name: i18n.t('layout.sourceLink') });
+    expect(link).toHaveAttribute(
+      'href',
+      'https://github.com/cariocaphil/springboot-react-student-manager-sep'
+    );
     expect(link).toHaveAttribute('rel', 'noopener noreferrer');
     expect(link).toHaveAttribute('target', '_blank');
   });

@@ -2,7 +2,7 @@
 
 Build history for the Student Manager modernization.
 
-PR numbers match merged GitHub pull requests. Future work continues from PR 35.
+PR numbers match merged GitHub pull requests. Future work continues from PR 37.
 
 The README keeps a short Status summary; this file holds the full checklist.
 
@@ -212,3 +212,8 @@ PR 35 — API error codes → frontend i18n ✅
 - [x] Refresh committed OpenAPI + generated TypeScript types
 - [x] Map known codes to i18n in `apiError` (diagnostic `message` not primary UI copy); unknown → generic fallback
 - [x] Update Vitest + docs
+
+PR 37 — De-tutorialize UI / project identity ✅
+- [x] Remove placeholder Options / Files / Team (and unused User demo items) from the sidebar; keep a Students nav item
+- [x] Replace Amigoscode footer branding with project tagline; link to this repository’s source
+- [x] Light layout spacing cleanup; leave student CRUD architecture unchanged; update Vitest + docs
