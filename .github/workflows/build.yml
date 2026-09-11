@@ -1,6 +1,8 @@
 name: CI
 
 on:
+  push:
+    branches: [ main ]
   pull_request:
     branches: [ main ]
 
@@ -35,3 +37,12 @@ jobs:
       - name: Maven Clean Package
         run: |
           ./mvnw --no-transfer-progress clean package -P build-frontend
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: target/site/jacoco/jacoco.xml,src/frontend/coverage/cobertura-coverage.xml
+          flags: unittests
+          name: student-manager
+          fail_ci_if_error: true
+          verbose: true

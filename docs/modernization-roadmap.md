@@ -2,7 +2,7 @@
 
 Build history for the Student Manager modernization.
 
-PR numbers match merged GitHub pull requests. Future work continues from PR 37.
+PR numbers match merged GitHub pull requests. Future work continues from PR 38.
 
 The README keeps a short Status summary; this file holds the full checklist.
 
@@ -217,3 +217,11 @@ PR 37 — De-tutorialize UI / project identity ✅
 - [x] Remove placeholder Options / Files / Team (and unused User demo items) from the sidebar; keep a Students nav item
 - [x] Replace Amigoscode footer branding with project tagline; link to this repository’s source
 - [x] Light layout spacing cleanup; leave student CRUD architecture unchanged; update Vitest + docs
+
+PR 38 — README status badges + Codecov coverage gates ✅
+- [x] Add CI (GitHub Actions `build.yml` / main) and Codecov badges under the README title
+- [x] Run CI on `push` to `main` (in addition to PRs) so the main-branch badge can reflect build status
+- [x] Keep badges health-focused (no decorative stack badges); update docs
+- [x] Emit JaCoCo (backend) and Vitest (frontend) coverage during CI; upload to Codecov
+- [x] Add `codecov.yml` with **80%** project and patch status checks (measured baseline already ≥80%; no padding tests)
+- [x] Document `CODECOV_TOKEN` + Codecov GitHub checks on PRs

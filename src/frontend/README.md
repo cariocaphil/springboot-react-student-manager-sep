@@ -8,6 +8,7 @@ React 19 + TypeScript + Ant Design 5 UI for the student manager, with i18next (E
 npm install
 npm start         # Vite dev server on :3000 (proxies /api → :8080)
 npm test          # Vitest once
+npm run test:coverage  # Vitest + V8 coverage (CI / Codecov)
 npm run typecheck # tsc --noEmit
 npm run build     # typecheck + production bundle → build/
 ```

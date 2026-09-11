@@ -1,10 +1,13 @@
 # Spring Boot + React Student Manager
 
+[![CI](https://github.com/cariocaphil/springboot-react-student-manager-sep/actions/workflows/build.yml/badge.svg?branch=main)](https://github.com/cariocaphil/springboot-react-student-manager-sep/actions/workflows/build.yml?query=branch%3Amain)
+[![codecov](https://codecov.io/gh/cariocaphil/springboot-react-student-manager-sep/branch/main/graph/badge.svg)](https://codecov.io/gh/cariocaphil/springboot-react-student-manager-sep)
+
 Full-stack student CRUD demo: a Spring Boot API and a Vite React UI packaged into a single deployable JAR/container and published to AWS Elastic Beanstalk.
 
 ## Status
 
-**Modernization:** PR 37 cleans and de-tutorializes the UI and establishes project identity (tagline + repo link). Future work continues from PR 37.
+**Modernization:** PR 38 adds README CI/Codecov badges, JaCoCo + Vitest coverage upload, and 80% Codecov project/patch gates. Future work continues from PR 38.
 
 | | |
 | --- | --- |
@@ -175,10 +178,12 @@ There is **no** update/PUT endpoint. The UI shows an Edit control that is not wi
 
 | Workflow | Trigger | Purpose |
 | --- | --- | --- |
-| [`.github/workflows/build.yml`](.github/workflows/build.yml) (`CI`) | PRs to `main`, manual | Checkout, Java 17, Postgres 13.1 service, `./mvnw clean package -P build-frontend` |
+| [`.github/workflows/build.yml`](.github/workflows/build.yml) (`CI`) | PRs / push to `main`, manual | Checkout, Java 17, Postgres 13.1 service, `./mvnw clean package -P build-frontend` (includes JaCoCo + Vitest coverage), upload reports to Codecov |
 | [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml) (`CICD`) | Push to `main`, manual | Build + Jib push to Docker Hub, pin compose image tag **in the job** (no commit-back), deploy that compose file to Elastic Beanstalk; Slack notifications |
 
-Required secrets (documented as expected by the workflows; not inventing values): `DOCKER_HUB_PASSWORD`, `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `SLACK_WEBHOOK_URL`.
+Required secrets (documented as expected by the workflows; not inventing values): `DOCKER_HUB_PASSWORD`, `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `SLACK_WEBHOOK_URL`, `CODECOV_TOKEN` (CI coverage upload; Codecov GitHub App should also be enabled so `codecov/project` and `codecov/patch` checks appear on PRs).
+
+Coverage gates live in [`codecov.yml`](codecov.yml): **80%** project and patch (baseline already above that; see roadmap).
 
 ## AWS Elastic Beanstalk (current)
 
