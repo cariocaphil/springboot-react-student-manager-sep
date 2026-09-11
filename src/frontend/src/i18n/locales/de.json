@@ -5,22 +5,12 @@
     "de": "DE"
   },
   "layout": {
-    "breadcrumbUser": "Benutzer",
-    "breadcrumbBill": "Bill",
+    "breadcrumbStudents": "Studenten",
     "menu": {
-      "option1": "Option 1",
-      "option2": "Option 2",
-      "user": "Benutzer",
-      "tom": "Tom",
-      "bill": "Bill",
-      "alex": "Alex",
-      "team": "Team",
-      "team1": "Team 1",
-      "team2": "Team 2",
-      "files": "Dateien"
+      "students": "Studenten"
     },
-    "footerBy": "Von Amigoscode",
-    "footerCourseLink": "Hier klicken für Fullstack Spring Boot & React für Professionals"
+    "tagline": "SEP - Student:innenverwaltung leicht gemacht",
+    "sourceLink": "Quellcode auf GitHub ansehen"
   },
   "students": {
     "addNew": "Neuen Studenten hinzufügen",

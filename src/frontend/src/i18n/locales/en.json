@@ -5,22 +5,12 @@
     "de": "DE"
   },
   "layout": {
-    "breadcrumbUser": "User",
-    "breadcrumbBill": "Bill",
+    "breadcrumbStudents": "Students",
     "menu": {
-      "option1": "Option 1",
-      "option2": "Option 2",
-      "user": "User",
-      "tom": "Tom",
-      "bill": "Bill",
-      "alex": "Alex",
-      "team": "Team",
-      "team1": "Team 1",
-      "team2": "Team 2",
-      "files": "Files"
+      "students": "Students"
     },
-    "footerBy": "By Amigoscode",
-    "footerCourseLink": "Click here to access Fullstack Spring Boot & React for professionals"
+    "tagline": "SEP - Student management made easy",
+    "sourceLink": "View source on GitHub"
   },
   "students": {
     "addNew": "Add New Student",

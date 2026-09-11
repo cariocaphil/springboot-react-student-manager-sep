@@ -29,10 +29,10 @@ function AppLayout({ children }: AppLayoutProps) {
         >
           <LanguageSwitcher />
         </Header>
-        <Content style={{ margin: '0 16px' }}>
+        <Content style={{ margin: '16px' }}>
           <Breadcrumb
-            style={{ margin: '16px 0' }}
-            items={[{ title: t('layout.breadcrumbUser') }, { title: t('layout.breadcrumbBill') }]}
+            style={{ marginBottom: 16 }}
+            items={[{ title: t('layout.breadcrumbStudents') }]}
           />
           <div className="site-layout-background" style={{ padding: 24, minHeight: 360 }}>
             {children}
