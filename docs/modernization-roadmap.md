@@ -247,3 +247,4 @@ PR 41 — Production HTTPS / TLS on Elastic Beanstalk ✅
 - [x] Record LoadBalanced EB (min=max 1), TLS termination at ALB, HTTP→HTTPS 301 on the ALB (not Spring Boot)
 - [x] Note ACM DNS-validation CNAMEs must remain in Route 53 for renewal; regional stack in `eu-central-1`
 - [x] Point deploy Slack completion link at the HTTPS URL; refresh README + architecture
+- [x] Clarify that HTTPS protects Basic Auth credentials in transit (Base64 ≠ encryption; client/server still see the header)

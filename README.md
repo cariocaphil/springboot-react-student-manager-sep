@@ -117,6 +117,8 @@ The API listens on **http://localhost:8080**. In production-style packaging, the
 
 `/api/**` requires **HTTP Basic**. The React app shows a **login screen** that stores credentials **in memory only** (not `localStorage` / `sessionStorage`) and attaches an `Authorization` header on API calls. A page refresh requires signing in again. This is an intentional simple learning step — **JWT, cookie sessions, and persistent users are out of scope** for now.
 
+On the deployed site, use **HTTPS** (`https://sep.learning-projects.dev`): Basic Auth is only Base64-encoded, so TLS protects credentials **in transit** to the ALB — not from DevTools or the server. See [architecture §5.4](docs/architecture.md#54-production-https--tls).
+
 Backend `SECURITY_USER_*` values remain temporary scaffolding for the in-memory Spring Security user; never commit real values to Git.
 
 | | |

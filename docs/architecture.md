@@ -226,6 +226,33 @@ Elastic Beanstalk instance / SEP container (:8080)
 
 HTTPS matters especially because the app uses **HTTP Basic Authentication**, so reusable credentials travel with authenticated requests. The HTTP→HTTPS redirect is configured on the **ALB listener**, not in Spring Boot.
 
+#### What HTTPS protects for Basic Auth
+
+Authenticated requests send credentials in the HTTP header:
+
+```http
+Authorization: Basic <base64(username:password)>
+```
+
+Base64 is **encoding, not encryption** — anyone who obtains that value can decode it back to the username and password. HTTPS/TLS does **not** remove or hide the `Authorization` header from the browser or the application: DevTools can still show it (the browser builds the request), and Spring Boot must receive it to authenticate.
+
+What TLS **does** protect is transmission over the **public** network: headers and body are encrypted inside the TLS connection between the client and the ALB. A network observer should not be able to read Basic Auth credentials from intercepted HTTPS traffic.
+
+```text
+Browser
+  |
+  | Authorization: Basic ...
+  | [HTTP request encrypted by TLS]
+  v
+Application Load Balancer   ← TLS terminates here
+  |
+  | HTTP (VPC-internal) + Authorization header
+  v
+Spring Boot / SEP container
+```
+
+**Precise rationale:** HTTPS protects reusable Basic Auth credentials **in transit over the public network**; it does not make them invisible to the client or server. After TLS termination, ALB→app remains HTTP inside the VPC (that path is trusted, not end-to-end encrypted to the JVM). This is one reason Basic Auth must not be used over unencrypted public HTTP.
+
 ## 6. Testing (current)
 
 | Area | Present today |
