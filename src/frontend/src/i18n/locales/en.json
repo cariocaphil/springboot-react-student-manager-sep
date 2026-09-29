@@ -10,7 +10,26 @@
       "students": "Students"
     },
     "tagline": "SEP - Student management made easy",
-    "sourceLink": "View source on GitHub"
+    "sourceLink": "View source on GitHub",
+    "logout": "Log out"
+  },
+  "login": {
+    "title": "Sign in",
+    "subtitle": "Enter your API credentials to continue.",
+    "username": {
+      "label": "Username",
+      "placeholder": "Username"
+    },
+    "password": {
+      "label": "Password",
+      "placeholder": "Password"
+    },
+    "submit": "Sign in",
+    "invalidCredentials": "Invalid username or password.",
+    "validation": {
+      "usernameRequired": "Please enter a username",
+      "passwordRequired": "Please enter a password"
+    }
   },
   "students": {
     "addNew": "Add New Student",

@@ -10,7 +10,26 @@
       "students": "Studenten"
     },
     "tagline": "SEP - Student:innenverwaltung leicht gemacht",
-    "sourceLink": "Quellcode auf GitHub ansehen"
+    "sourceLink": "Quellcode auf GitHub ansehen",
+    "logout": "Abmelden"
+  },
+  "login": {
+    "title": "Anmelden",
+    "subtitle": "Geben Sie Ihre API-Zugangsdaten ein, um fortzufahren.",
+    "username": {
+      "label": "Benutzername",
+      "placeholder": "Benutzername"
+    },
+    "password": {
+      "label": "Passwort",
+      "placeholder": "Passwort"
+    },
+    "submit": "Anmelden",
+    "invalidCredentials": "Ungültiger Benutzername oder Passwort.",
+    "validation": {
+      "usernameRequired": "Bitte Benutzername eingeben",
+      "passwordRequired": "Bitte Passwort eingeben"
+    }
   },
   "students": {
     "addNew": "Neuen Studenten hinzufügen",

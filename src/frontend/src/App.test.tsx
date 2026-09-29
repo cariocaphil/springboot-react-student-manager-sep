@@ -10,6 +10,18 @@ import type { Student } from './types/student';
 vi.mock('./client');
 vi.mock('./Notification');
 
+vi.mock('./auth/AuthContext', async () => {
+  const actual = await vi.importActual<typeof import('./auth/AuthContext')>('./auth/AuthContext');
+  return {
+    ...actual,
+    useAuth: () => ({
+      isAuthenticated: true,
+      login: vi.fn(),
+      logout: vi.fn(),
+    }),
+  };
+});
+
 const students: Student[] = [
   {
     id: 1,
