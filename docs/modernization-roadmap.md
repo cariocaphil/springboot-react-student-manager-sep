@@ -2,7 +2,7 @@
 
 Build history for the Student Manager modernization.
 
-PR numbers match merged GitHub pull requests. Future work continues from PR 38.
+PR numbers match merged GitHub pull requests. Future work continues from PR 39.
 
 The README keeps a short Status summary; this file holds the full checklist.
 
@@ -225,3 +225,12 @@ PR 38 — README status badges + Codecov coverage gates ✅
 - [x] Emit JaCoCo (backend) and Vitest (frontend) coverage during CI; upload to Codecov
 - [x] Add `codecov.yml` with **80%** project and patch status checks (measured baseline already ≥80%; no padding tests)
 - [x] Document `CODECOV_TOKEN` + Codecov GitHub checks on PRs
+
+PR 39 — Spring Security foundation ✅
+- [x] Add `spring-boot-starter-security` and a dedicated `SecurityFilterChain`
+- [x] Protect `/api/**`; keep `/v3/api-docs` public; serve the SPA/static assets without auth
+- [x] Stateless API (no sessions / form-login); HTTP Basic with in-memory/dev user; CSRF disabled for the session-less API
+- [x] Credentials via `SECURITY_USER_NAME` / `SECURITY_USER_PASSWORD` (documented local defaults)
+- [x] Integration tests: unauthenticated → 401, authenticated access, public OpenAPI; update student API tests for Basic auth
+- [x] No roles beyond `authenticated()`, no React login / JWT / OAuth / user persistence
+- [x] Update README + architecture docs
