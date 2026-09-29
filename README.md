@@ -93,6 +93,8 @@ For the `dev` profile (Elastic Beanstalk), set these in the environment (EB cons
 - `SPRING_DATASOURCE_URL`
 - `SPRING_DATASOURCE_USERNAME`
 - `SPRING_DATASOURCE_PASSWORD`
+- `SECURITY_USER_NAME`
+- `SECURITY_USER_PASSWORD`
 
 ### Backend + packaged frontend (single process)
 
@@ -118,7 +120,8 @@ The API listens on **http://localhost:8080**. In production-style packaging, the
 | | |
 | --- | --- |
 | Default local user | `dev` / `changeme` (`spring.security.user.*` in `application.properties`) |
-| Override | `SECURITY_USER_NAME` / `SECURITY_USER_PASSWORD` |
+| Override locally | `SECURITY_USER_NAME` / `SECURITY_USER_PASSWORD` |
+| EB (`dev` profile) | **Required** — no `dev`/`changeme` fallback (see [Database](#database)) |
 | Public without auth | OpenAPI JSON at `/v3/api-docs` (and the packaged SPA static assets) |
 
 Example:
@@ -206,8 +209,8 @@ Coverage gates live in [`codecov.yml`](codecov.yml): **80%** project and patch (
 - Application: `springboot-react-fullstack`
 - Environment: `springboot-react-fullstack-env`
 - Region: `eu-central-1`
-- Package: `elasticbeanstalk/docker-compose.yml` (maps host `80` → container `8080`, sets `SPRING_PROFILES_ACTIVE=dev`, passes through `SPRING_DATASOURCE_*`)
-- Runtime DB for `dev`: configure `SPRING_DATASOURCE_URL` / `_USERNAME` / `_PASSWORD` on the EB environment (compose does not embed secrets)
+- Package: `elasticbeanstalk/docker-compose.yml` (maps host `80` → container `8080`, sets `SPRING_PROFILES_ACTIVE=dev`, passes through `SPRING_DATASOURCE_*` and `SECURITY_USER_*`)
+- Runtime for `dev`: configure datasource and HTTP Basic env vars on the EB environment (compose does not embed secrets)
 
 ## Documentation
 

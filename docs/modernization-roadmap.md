@@ -230,7 +230,7 @@ PR 39 — Spring Security foundation ✅
 - [x] Add `spring-boot-starter-security` and a dedicated `SecurityFilterChain`
 - [x] Protect `/api/**`; keep `/v3/api-docs` public; serve the SPA/static assets without auth
 - [x] Stateless API (no sessions / form-login); HTTP Basic with in-memory/dev user; CSRF disabled for the session-less API
-- [x] Credentials via `SECURITY_USER_NAME` / `SECURITY_USER_PASSWORD` (documented local defaults)
+- [x] Credentials via `SECURITY_USER_NAME` / `SECURITY_USER_PASSWORD` (local defaults in base properties; required in `application-dev.properties` for EB)
 - [x] Integration tests: unauthenticated → 401, authenticated access, public OpenAPI; update student API tests for Basic auth
 - [x] No roles beyond `authenticated()`, no React login / JWT / OAuth / user persistence
 - [x] Update README + architecture docs
