@@ -7,12 +7,12 @@ Full-stack student CRUD demo: a Spring Boot API and a Vite React UI packaged int
 
 ## Status
 
-**Modernization:** PR 39 adds a Spring Security foundation (stateless HTTP Basic on `/api/**`; OpenAPI remains public). Future work continues from PR 39.
+**Modernization:** PR 40 adds a React login screen and in-memory HTTP Basic integration for the SPA. Future work continues from PR 40.
 
 | | |
 | --- | --- |
-| Current | **Java 17** / Spring Boot **3.4.5** + **springdoc** + **Spring Security** (HTTP Basic); Vite + TypeScript **React 19.3** with **Ant Design 5**, **i18next** (en/de), **TanStack Query**, **React Hook Form**, **Zod**, OpenAPI-generated wire types + `ApiErrorCode`→i18n, **ESLint** + **Prettier**; POST **201** / DELETE **204** |
-| Next | Frontend auth / richer identity (JWT or similar); optional Swagger UI; further platform work per roadmap |
+| Current | **Java 17** / Spring Boot **3.4.5** + **springdoc** + **Spring Security** (HTTP Basic); Vite + TypeScript **React 19.3** with **Ant Design 5**, login screen + in-memory Basic auth, **i18next** (en/de), **TanStack Query**, **React Hook Form**, **Zod**, OpenAPI-generated wire types + `ApiErrorCode`→i18n, **ESLint** + **Prettier**; POST **201** / DELETE **204** |
+| Next | Richer identity (JWT/OAuth or similar), optional Swagger UI; further platform work per roadmap |
 | Full checklist | [docs/modernization-roadmap.md](docs/modernization-roadmap.md) |
 | Architecture | [docs/architecture.md](docs/architecture.md) |
 
@@ -115,9 +115,9 @@ The API listens on **http://localhost:8080**. In production-style packaging, the
 
 ### API authentication (development)
 
-`/api/**` requires **HTTP Basic**. There is no React login screen yet — browser calls from the SPA will get **401** until a later auth PR.
+`/api/**` requires **HTTP Basic**. The React app shows a **login screen** that stores credentials **in memory only** (not `localStorage` / `sessionStorage`) and attaches an `Authorization` header on API calls. A page refresh requires signing in again. This is an intentional simple learning step — **JWT, cookie sessions, and persistent users are out of scope** for now.
 
-These `SECURITY_USER_*` credentials are temporary scaffolding for the Spring Security foundation (in-memory HTTP Basic). They are expected to be replaced when a real authentication/login flow lands; never commit real values to Git.
+Backend `SECURITY_USER_*` values remain temporary scaffolding for the in-memory Spring Security user; never commit real values to Git.
 
 | | |
 | --- | --- |
@@ -125,8 +125,9 @@ These `SECURITY_USER_*` credentials are temporary scaffolding for the Spring Sec
 | Override locally | `SECURITY_USER_NAME` / `SECURITY_USER_PASSWORD` |
 | EB (`dev` profile) | **Required** — no `dev`/`changeme` fallback (see [Database](#database)) |
 | Public without auth | OpenAPI JSON at `/v3/api-docs` (and the packaged SPA static assets) |
+| SPA | Login → Students UI; **Log out** clears credentials; HTTP **401** returns to login |
 
-Example:
+Example (API without the UI):
 
 ```bash
 curl -u dev:changeme http://localhost:8080/api/v1/students

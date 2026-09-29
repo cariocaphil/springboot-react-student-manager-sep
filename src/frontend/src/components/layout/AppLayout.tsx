@@ -1,6 +1,8 @@
 import type { ReactNode } from 'react';
-import { Breadcrumb, Layout } from 'antd';
+import { Button, Breadcrumb, Layout } from 'antd';
+import { LogoutOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
+import { useAuth } from '../../auth/AuthContext';
 import AppFooter from './AppFooter';
 import AppSidebar from './AppSidebar';
 import LanguageSwitcher from './LanguageSwitcher';
@@ -13,6 +15,7 @@ interface AppLayoutProps {
 
 function AppLayout({ children }: AppLayoutProps) {
   const { t } = useTranslation();
+  const { logout } = useAuth();
 
   return (
     <Layout style={{ minHeight: '100vh' }}>
@@ -25,9 +28,13 @@ function AppLayout({ children }: AppLayoutProps) {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'flex-end',
+            gap: 12,
           }}
         >
           <LanguageSwitcher />
+          <Button icon={<LogoutOutlined />} onClick={logout} aria-label={t('layout.logout')}>
+            {t('layout.logout')}
+          </Button>
         </Header>
         <Content style={{ margin: '16px' }}>
           <Breadcrumb
