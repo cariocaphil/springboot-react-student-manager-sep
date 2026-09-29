@@ -38,6 +38,7 @@ Student feature packages under `com.example.demo.student`:
 | Layer | Package | Types | Role |
 | --- | --- | --- | --- |
 | Bootstrap | `com.example.demo` | `DemoApplication` | Spring Boot entrypoint |
+| Security | `com.example.demo.security` | `SecurityConfig` | Stateless `SecurityFilterChain`; HTTP Basic; `/api/**` authenticated |
 | API | `student.api` | `StudentController`, DTOs, `StudentMapper`, `StudentApiPaths`, `ApiExceptionHandler`, `ApiErrorCode`, `OpenApiConfig` | HTTP boundary + stable error JSON + OpenAPI |
 | Domain | `student.domain` | `Student` (`@Entity`), `Gender` | Persistence model (not the frontend wire types) |
 | Application | `student.application` | `StudentService` | List, add (email uniqueness), delete; class `@Transactional(readOnly = true)`, writes override with `@Transactional` |
@@ -54,7 +55,9 @@ Student feature packages under `com.example.demo.student`:
 
 **OpenAPI:** springdoc exposes `/v3/api-docs`. A normalized copy is committed at `api/openapi.json` and drift-checked by `OpenApiContractTest`. Schemas include `StudentRequest`, `StudentResponse`, and `ApiErrorResponse` (required `code` + diagnostic `message` + HTTP `status`/`error`). The JPA `Student` entity is not part of the published contract.
 
-**Gaps vs a full CRUD product (recorded, not fixed):** no update endpoint; no authn/authz; no Flyway/Liquibase (DDL via Hibernate `update`).
+**Security (PR 39):** `SecurityConfig` configures a **stateless** API with **HTTP Basic**. `/api/**` requires authentication (`authenticated()` only — no roles yet). `/v3/api-docs` is public for contract tests and tooling. Packaged SPA/static assets remain public. CSRF is **disabled** because there are no cookie sessions or form-login flows (CSRF tokens do not apply to this Basic-auth REST shape). Form login / logout redirects are disabled so unauthenticated API calls receive **401** (not an HTML login page). Local/CI credentials use `spring.security.user.name` / `.password` with defaults `dev` / `changeme` in `application.properties`. Profile **`dev`** (Elastic Beanstalk) requires `SECURITY_USER_NAME` / `SECURITY_USER_PASSWORD` with no fallback in `application-dev.properties` (same fail-closed pattern as RDS). The EB-required Basic user is scaffolding only until JWT/OAuth (or similar) and a frontend login replace it. The React client does **not** send credentials yet — SPA `/api` calls will 401 until a later frontend auth PR.
+
+**Gaps vs a full CRUD product (recorded, not fixed):** no update endpoint; no roles/JWT/OAuth/user persistence or React login; no Flyway/Liquibase (DDL via Hibernate `update`).
 
 ### 2.3 Frontend
 
@@ -102,10 +105,10 @@ Production: relative API URLs work because UI and API share origin. Dev: Vite `s
 
 | File | When used | Notable settings |
 | --- | --- | --- |
-| `application.properties` | Default / local / CI | Local Postgres JDBC defaults via `${SPRING_DATASOURCE_*:…}` placeholders; `ddl-auto=update`; SQL logging on; error messages included in responses |
-| `application-dev.properties` | `SPRING_PROFILES_ACTIVE=dev` (EB compose) | Datasource **required** from env: `SPRING_DATASOURCE_URL` / `_USERNAME` / `_PASSWORD` (no secrets in git) |
+| `application.properties` | Default / local / CI | Local Postgres JDBC defaults via `${SPRING_DATASOURCE_*:…}` placeholders; HTTP Basic user via `${SECURITY_USER_*:…}` (defaults `dev`/`changeme`); `ddl-auto=update`; SQL logging on; error messages included in responses |
+| `application-dev.properties` | `SPRING_PROFILES_ACTIVE=dev` (EB compose) | Datasource and HTTP Basic **required** from env: `SPRING_DATASOURCE_*`, `SECURITY_USER_*` (no secrets in git) |
 
-Elastic Beanstalk compose sets `SPRING_PROFILES_ACTIVE: dev` and passes through `SPRING_DATASOURCE_*` from the host/EB environment.
+Elastic Beanstalk compose sets `SPRING_PROFILES_ACTIVE: dev` and passes through `SPRING_DATASOURCE_*` and `SECURITY_USER_*` from the host/EB environment.
 
 ## 3. Data model
 
@@ -186,13 +189,13 @@ Intended sequence:
 - Image tag currently pinned in-repo (example: `cariocaphil/spring-react-fullstack:40`)
 - Port map `80:8080`
 - `restart: always`
-- Profile `dev` → datasource from `SPRING_DATASOURCE_*` environment variables (passed through compose)
+- Profile `dev` → datasource and HTTP Basic from `SPRING_DATASOURCE_*` / `SECURITY_USER_*` (passed through compose)
 
 ## 6. Testing (current)
 
 | Area | Present today |
 | --- | --- |
-| Backend | `DemoApplicationTests`; `StudentServiceTest` (Mockito); `StudentRepositoryTest` (`@DataJpaTest`); `StudentIntegrationTest` (MockMvc API); `OpenApiContractTest`; JaCoCo report on `test` |
+| Backend | `DemoApplicationTests`; `StudentServiceTest` (Mockito); `StudentRepositoryTest` (`@DataJpaTest`); `StudentIntegrationTest` (MockMvc API + Basic auth); `SecurityIntegrationTest` (401 / authenticated / public OpenAPI); `OpenApiContractTest`; JaCoCo report on `test` |
 | Frontend | Vitest for `client`, `apiRoutes`, `apiError`, notifications, `useStudents`, student/layout leaves, drawer, and App flows; ESLint + Prettier; Maven `build-frontend` runs `format:check`, `check:api-types`, `lint`, and `npm run test:coverage` before `vite build` |
 | OpenAPI | `OpenApiContractTest` asserts committed `api/openapi.json` matches `/v3/api-docs`; frontend `check:api-types` asserts generated TS matches that JSON |
 | Integration / repository / service tests | Present for student create/list/delete and email uniqueness (PR 14) |
@@ -209,7 +212,8 @@ These items are intentional backlog for modernization; this branch does not fix 
 - ~~RDS credentials committed in `application-dev.properties`~~ — removed in PR 12; `dev` requires env vars
 - ~~Rotate previously leaked RDS password~~ — done in AWS/EB (ops); old values may still exist in git history — optional history scrub if policy requires it
 - Local/CI still use default `postgres`/`password` placeholders (acceptable for local only)
-- No Spring Security / authentication / authorization
+- ~~No Spring Security~~ — PR 39 adds HTTP Basic + `/api/**` protection; still no roles, JWT/OAuth, user store, or React login (SPA API calls 401 until a later PR)
+- Basic defaults (`dev`/`changeme`) apply only when profile `dev` is **not** active; EB `dev` profile requires `SECURITY_USER_*` (no fallback)
 - API and error payloads expose binding/message details (`server.error.include-message=always`)
 
 ### Configuration & ops drift

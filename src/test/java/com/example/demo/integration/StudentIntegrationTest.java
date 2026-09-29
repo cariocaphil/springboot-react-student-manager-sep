@@ -13,9 +13,11 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.RequestPostProcessor;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasSize;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -28,6 +30,9 @@ class StudentIntegrationTest {
 
     private static final String STUDENTS_URI = "/" + StudentApiPaths.BASE;
     private static final String STUDENT_BY_ID_URI = STUDENTS_URI + "/{id}";
+
+    /** Matches spring.security.user.* in src/test/resources/application.properties */
+    private static final RequestPostProcessor BASIC_AUTH = httpBasic("test", "test");
 
     @Autowired
     private MockMvc mockMvc;
@@ -45,7 +50,7 @@ class StudentIntegrationTest {
 
     @Test
     void getAllStudents_returnsEmptyListInitially() throws Exception {
-        mockMvc.perform(get(STUDENTS_URI))
+        mockMvc.perform(get(STUDENTS_URI).with(BASIC_AUTH))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(0)));
     }
@@ -55,13 +60,14 @@ class StudentIntegrationTest {
         StudentRequest payload = new StudentRequest("Jamila", "jamila@example.com", Gender.FEMALE);
 
         mockMvc.perform(post(STUDENTS_URI)
+                        .with(BASIC_AUTH)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(payload)))
                 .andExpect(status().isCreated());
 
         assertThat(studentRepository.existsByEmail("jamila@example.com")).isTrue();
 
-        mockMvc.perform(get(STUDENTS_URI))
+        mockMvc.perform(get(STUDENTS_URI).with(BASIC_AUTH))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(1)))
                 .andExpect(jsonPath("$[0].id").isNumber())
@@ -76,6 +82,7 @@ class StudentIntegrationTest {
         StudentRequest duplicate = new StudentRequest("Other", "jamila@example.com", Gender.OTHER);
 
         mockMvc.perform(post(STUDENTS_URI)
+                        .with(BASIC_AUTH)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(duplicate)))
                 .andExpect(status().isBadRequest())
@@ -92,6 +99,7 @@ class StudentIntegrationTest {
                 """;
 
         mockMvc.perform(post(STUDENTS_URI)
+                        .with(BASIC_AUTH)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(invalidJson))
                 .andExpect(status().isBadRequest())
@@ -106,7 +114,7 @@ class StudentIntegrationTest {
         Student saved = studentRepository.save(
                 Student.createNew("Alex", "alex@example.com", Gender.MALE));
 
-        mockMvc.perform(delete(STUDENT_BY_ID_URI, saved.getId()))
+        mockMvc.perform(delete(STUDENT_BY_ID_URI, saved.getId()).with(BASIC_AUTH))
                 .andExpect(status().isNoContent());
 
         assertThat(studentRepository.existsById(saved.getId())).isFalse();
@@ -114,7 +122,7 @@ class StudentIntegrationTest {
 
     @Test
     void deleteStudent_returnsNotFoundWhenMissing() throws Exception {
-        mockMvc.perform(delete(STUDENT_BY_ID_URI, 12345L))
+        mockMvc.perform(delete(STUDENT_BY_ID_URI, 12345L).with(BASIC_AUTH))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.code").value("STUDENT_NOT_FOUND"))
                 .andExpect(jsonPath("$.status").value(404))

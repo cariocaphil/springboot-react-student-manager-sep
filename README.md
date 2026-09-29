@@ -7,12 +7,12 @@ Full-stack student CRUD demo: a Spring Boot API and a Vite React UI packaged int
 
 ## Status
 
-**Modernization:** PR 38 adds README CI/Codecov badges, JaCoCo + Vitest coverage upload, and 80% Codecov project/patch gates. Future work continues from PR 38.
+**Modernization:** PR 39 adds a Spring Security foundation (stateless HTTP Basic on `/api/**`; OpenAPI remains public). Future work continues from PR 39.
 
 | | |
 | --- | --- |
-| Current | **Java 17** / Spring Boot **3.4.5** + **springdoc**; Vite + TypeScript **React 19.3** with **Ant Design 5**, **i18next** (en/de), **TanStack Query**, **React Hook Form**, **Zod**, OpenAPI-generated wire types + `ApiErrorCode`→i18n, **ESLint** + **Prettier**; POST **201** / DELETE **204** |
-| Next | Further platform work per roadmap |
+| Current | **Java 17** / Spring Boot **3.4.5** + **springdoc** + **Spring Security** (HTTP Basic); Vite + TypeScript **React 19.3** with **Ant Design 5**, **i18next** (en/de), **TanStack Query**, **React Hook Form**, **Zod**, OpenAPI-generated wire types + `ApiErrorCode`→i18n, **ESLint** + **Prettier**; POST **201** / DELETE **204** |
+| Next | Frontend auth / richer identity (JWT or similar); optional Swagger UI; further platform work per roadmap |
 | Full checklist | [docs/modernization-roadmap.md](docs/modernization-roadmap.md) |
 | Architecture | [docs/architecture.md](docs/architecture.md) |
 
@@ -20,7 +20,7 @@ Full-stack student CRUD demo: a Spring Boot API and a Vite React UI packaged int
 
 | Layer | Technology |
 | --- | --- |
-| Backend | Java **17**, Spring Boot **3.4.5**, Spring Web, Spring Data JPA, Bean Validation, Lombok, **springdoc-openapi** |
+| Backend | Java **17**, Spring Boot **3.4.5**, Spring Web, Spring Security (HTTP Basic), Spring Data JPA, Bean Validation, Lombok, **springdoc-openapi** |
 | Database | PostgreSQL (local `localhost:5432`; AWS RDS via `dev` profile) |
 | Frontend | React **19.3** + **TypeScript**, **Vite 5**, Ant Design **5.29**, **i18next** / **react-i18next** (en/de), **TanStack Query 5**, **React Hook Form 7**, **Zod**, `unfetch`, **openapi-typescript** (generated wire types), Vitest, **ESLint 9**, **Prettier** |
 | Build | Maven Wrapper, `frontend-maven-plugin` (Node **20** / npm **10**), Jib **3.5.2** |
@@ -93,6 +93,8 @@ For the `dev` profile (Elastic Beanstalk), set these in the environment (EB cons
 - `SPRING_DATASOURCE_URL`
 - `SPRING_DATASOURCE_USERNAME`
 - `SPRING_DATASOURCE_PASSWORD`
+- `SECURITY_USER_NAME`
+- `SECURITY_USER_PASSWORD`
 
 ### Backend + packaged frontend (single process)
 
@@ -110,6 +112,25 @@ java -jar target/demo-0.0.1-SNAPSHOT.jar
 ```
 
 The API listens on **http://localhost:8080**. In production-style packaging, the React build is served as static content from the same origin.
+
+### API authentication (development)
+
+`/api/**` requires **HTTP Basic**. There is no React login screen yet — browser calls from the SPA will get **401** until a later auth PR.
+
+These `SECURITY_USER_*` credentials are temporary scaffolding for the Spring Security foundation (in-memory HTTP Basic). They are expected to be replaced when a real authentication/login flow lands; never commit real values to Git.
+
+| | |
+| --- | --- |
+| Default local user | `dev` / `changeme` (`spring.security.user.*` in `application.properties`) |
+| Override locally | `SECURITY_USER_NAME` / `SECURITY_USER_PASSWORD` |
+| EB (`dev` profile) | **Required** — no `dev`/`changeme` fallback (see [Database](#database)) |
+| Public without auth | OpenAPI JSON at `/v3/api-docs` (and the packaged SPA static assets) |
+
+Example:
+
+```bash
+curl -u dev:changeme http://localhost:8080/api/v1/students
+```
 
 ### Frontend in watch mode (optional)
 
@@ -135,7 +156,7 @@ Requires Docker. Pushes tags `cariocaphil/spring-react-fullstack:local` and `:la
 ./mvnw test
 ```
 
-Runs `StudentServiceTest` (no DB), plus Postgres-backed `StudentRepositoryTest`, `StudentIntegrationTest`, `OpenApiContractTest`, and `DemoApplicationTests`. Start local Postgres first (see [Database](#database)). CI starts Postgres 13.1 before `./mvnw clean package`.
+Runs `StudentServiceTest` (no DB), plus Postgres-backed `StudentRepositoryTest`, `StudentIntegrationTest`, `SecurityIntegrationTest`, `OpenApiContractTest`, and `DemoApplicationTests`. Start local Postgres first (see [Database](#database)). CI starts Postgres 13.1 before `./mvnw clean package`.
 
 Frontend Vitest / lint / format / OpenAPI typecheck (also run by Maven’s `build-frontend` profile before `vite build`):
 
@@ -190,8 +211,8 @@ Coverage gates live in [`codecov.yml`](codecov.yml): **80%** project and patch (
 - Application: `springboot-react-fullstack`
 - Environment: `springboot-react-fullstack-env`
 - Region: `eu-central-1`
-- Package: `elasticbeanstalk/docker-compose.yml` (maps host `80` → container `8080`, sets `SPRING_PROFILES_ACTIVE=dev`, passes through `SPRING_DATASOURCE_*`)
-- Runtime DB for `dev`: configure `SPRING_DATASOURCE_URL` / `_USERNAME` / `_PASSWORD` on the EB environment (compose does not embed secrets)
+- Package: `elasticbeanstalk/docker-compose.yml` (maps host `80` → container `8080`, sets `SPRING_PROFILES_ACTIVE=dev`, passes through `SPRING_DATASOURCE_*` and `SECURITY_USER_*`)
+- Runtime for `dev`: configure datasource and HTTP Basic env vars on the EB environment (compose does not embed secrets)
 
 ## Documentation
 
