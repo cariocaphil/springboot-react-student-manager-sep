@@ -1,9 +1,7 @@
 import {
   createContext,
-  useCallback,
   useContext,
   useEffect,
-  useMemo,
   useState,
   type ReactNode,
 } from 'react';
@@ -33,11 +31,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const queryClient = useQueryClient();
   const [isAuthenticated, setIsAuthenticated] = useState(() => hasAuthCredentials());
 
-  const logout = useCallback(() => {
+  const logout = () => {
     clearAuthCredentials();
     setIsAuthenticated(false);
     queryClient.clear();
-  }, [queryClient]);
+  };
 
   useEffect(() => {
     setUnauthorizedHandler(() => {
@@ -48,35 +46,27 @@ export function AuthProvider({ children }: AuthProviderProps) {
     return () => setUnauthorizedHandler(null);
   }, [queryClient]);
 
-  const login = useCallback(
-    async (username: string, password: string): Promise<boolean> => {
-      setAuthCredentials({ username, password });
-      try {
-        await getAllStudents();
-        setIsAuthenticated(true);
-        return true;
-      } catch (error: unknown) {
-        clearAuthCredentials();
-        setIsAuthenticated(false);
-        if (isHttpError(error) && error.response.status === 401) {
-          return false;
-        }
-        throw error;
+  const login = async (username: string, password: string): Promise<boolean> => {
+    setAuthCredentials({ username, password });
+    try {
+      await getAllStudents();
+      setIsAuthenticated(true);
+      return true;
+    } catch (error: unknown) {
+      clearAuthCredentials();
+      setIsAuthenticated(false);
+      if (isHttpError(error) && error.response.status === 401) {
+        return false;
       }
-    },
-    []
-  );
+      throw error;
+    }
+  };
 
-  const value = useMemo(
-    () => ({
-      isAuthenticated,
-      login,
-      logout,
-    }),
-    [isAuthenticated, login, logout]
+  return (
+    <AuthContext.Provider value={{ isAuthenticated, login, logout }}>
+      {children}
+    </AuthContext.Provider>
   );
-
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
 export function useAuth(): AuthContextValue {
