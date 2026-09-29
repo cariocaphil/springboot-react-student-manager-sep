@@ -7,11 +7,11 @@ Full-stack student CRUD demo: a Spring Boot API and a Vite React UI packaged int
 
 ## Status
 
-**Modernization:** PR 40 adds a React login screen and in-memory HTTP Basic integration for the SPA. Future work continues from PR 40.
+**Modernization:** PR 41 documents production HTTPS for SEP (`https://sep.learning-projects.dev`, ALB + ACM). Future work continues from PR 41.
 
 | | |
 | --- | --- |
-| Current | **Java 17** / Spring Boot **3.4.5** + **springdoc** + **Spring Security** (HTTP Basic); Vite + TypeScript **React 19.3** with **Ant Design 5**, login screen + in-memory Basic auth, **i18next** (en/de), **TanStack Query**, **React Hook Form**, **Zod**, OpenAPI-generated wire types + `ApiErrorCode`→i18n, **ESLint** + **Prettier**; POST **201** / DELETE **204** |
+| Current | **Java 17** / Spring Boot **3.4.5** + **springdoc** + **Spring Security** (HTTP Basic); Vite + TypeScript **React 19.3** with login + in-memory Basic auth; EB **LoadBalanced** with public **HTTPS** at `sep.learning-projects.dev`; POST **201** / DELETE **204** |
 | Next | Richer identity (JWT/OAuth or similar), optional Swagger UI; further platform work per roadmap |
 | Full checklist | [docs/modernization-roadmap.md](docs/modernization-roadmap.md) |
 | Architecture | [docs/architecture.md](docs/architecture.md) |
@@ -26,7 +26,7 @@ Full-stack student CRUD demo: a Spring Boot API and a Vite React UI packaged int
 | Build | Maven Wrapper, `frontend-maven-plugin` (Node **20** / npm **10**), Jib **3.5.2** |
 | Container | Eclipse Temurin **17** JRE base (`eclipse-temurin:17-jre`); image name `cariocaphil/spring-react-fullstack` |
 | CI/CD | GitHub Actions (`.github/workflows/build.yml`, `deploy.yml`) |
-| Deploy | AWS Elastic Beanstalk (Docker Compose single-service app) |
+| Deploy | AWS Elastic Beanstalk LoadBalanced (ALB + ACM HTTPS → `https://sep.learning-projects.dev`) |
 
 ## Repository layout
 
@@ -209,11 +209,14 @@ Coverage gates live in [`codecov.yml`](codecov.yml): **80%** project and patch (
 
 ## AWS Elastic Beanstalk (current)
 
+- Public URL: **https://sep.learning-projects.dev**
 - Application: `springboot-react-fullstack`
-- Environment: `springboot-react-fullstack-env`
-- Region: `eu-central-1`
+- Environment: `springboot-react-fullstack-env` (LoadBalanced; Auto Scaling min=max 1)
+- Region: `eu-central-1` (Route 53 DNS is global)
 - Package: `elasticbeanstalk/docker-compose.yml` (maps host `80` → container `8080`, sets `SPRING_PROFILES_ACTIVE=dev`, passes through `SPRING_DATASOURCE_*` and `SECURITY_USER_*`)
+- TLS: ACM certificate on the ALB (`:443`); HTTP `:80` → 301 HTTPS; Spring Boot stays HTTP behind the load balancer
 - Runtime for `dev`: configure datasource and HTTP Basic env vars on the EB environment (compose does not embed secrets)
+- Details: [docs/architecture.md](docs/architecture.md) §5.4 Production HTTPS / TLS
 
 ## Documentation
 

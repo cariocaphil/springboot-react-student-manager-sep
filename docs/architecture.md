@@ -19,7 +19,7 @@ This document describes the **as-is** architecture of the student manager applic
                               └──────────────────────────────────────┘
 ```
 
-**Deployment shape today:** one Docker image containing the fat JAR (API + built frontend static assets), run by Elastic Beanstalk via a single-service Docker Compose file. The UI is not a separately deployed SPA in production.
+**Deployment shape today:** one Docker image containing the fat JAR (API + built frontend static assets), run by Elastic Beanstalk (LoadBalanced, min=max 1) via a single-service Docker Compose file. Public traffic reaches the app at **https://sep.learning-projects.dev** (TLS at the ALB). The UI is not a separately deployed SPA in production.
 
 ## 2. Application architecture
 
@@ -175,24 +175,56 @@ Intended sequence:
 6. Slack “pushed … to docker hub” for `cariocaphil/spring-react-fullstack` (Hub link aligned in PR 11)
 7. `sed` rewrite of `cariocaphil/spring-react-fullstack` tag in `elasticbeanstalk/docker-compose.yml` for this job’s EB package only (fails if tag missing; **not** committed back to the repo as of PR 13)
 8. `einaregilsson/beanstalk-deploy` with compose file as deployment package
-9. Slack completion (EB URL in message)
+9. Slack completion (public HTTPS app URL)
 
 **EB target names (from workflow env):**
 
 - Application: `springboot-react-fullstack`
-- Environment: `Springbootreactfullstack-env`
-- Region env var: `eu-west-1`
+- Environment: `springboot-react-fullstack-env`
+- Region: `eu-central-1` (all regional SEP infrastructure; Route 53 DNS is global)
 - Deployment package: `elasticbeanstalk/docker-compose.yml`
+- Public URL: `https://sep.learning-projects.dev`
 
 ### 5.3 Runtime on Elastic Beanstalk
+
+Environment type: **LoadBalanced** (ALB). Auto Scaling is intentionally **min = 1 / max = 1** — the load balancer is used for HTTPS/TLS, not horizontal scaling.
 
 `elasticbeanstalk/docker-compose.yml`:
 
 - Single service `backend`
 - Image tag currently pinned in-repo (example: `cariocaphil/spring-react-fullstack:40`)
-- Port map `80:8080`
+- Port map `80:8080` (container still serves HTTP on 8080; the ALB terminates TLS in front)
 - `restart: always`
 - Profile `dev` → datasource and HTTP Basic from `SPRING_DATASOURCE_*` / `SECURITY_USER_*` (passed through compose)
+
+### 5.4 Production HTTPS / TLS
+
+Public hostname: **https://sep.learning-projects.dev** (`learning-projects.dev` hosted in Route 53).
+
+```text
+Client
+  │
+  │  HTTP :80
+  v
+Application Load Balancer ──301 redirect (preserve host/path/query)──▶ HTTPS :443
+  │
+  │  TLS terminated (ACM cert for sep.learning-projects.dev)
+  v
+Application Load Balancer
+  │
+  │  HTTP (internal)
+  v
+Elastic Beanstalk instance / SEP container (:8080)
+```
+
+| Component | Role |
+| --- | --- |
+| Route 53 | DNS for `learning-projects.dev`; `sep.learning-projects.dev` A/alias to the EB environment; retains ACM DNS-validation CNAMEs for certificate renewal |
+| ACM | Public TLS certificate for `sep.learning-projects.dev` (DNS validation via Route 53), issued in **eu-central-1** |
+| Application Load Balancer | HTTPS :443 with the ACM cert; HTTP :80 → permanent 301 to HTTPS; TLS ends here — not in Spring Boot |
+| Elastic Beanstalk / app | Runs the Dockerized Spring Boot process over HTTP behind the ALB (`80:8080` in compose) |
+
+HTTPS matters especially because the app uses **HTTP Basic Authentication**, so reusable credentials travel with authenticated requests. The HTTP→HTTPS redirect is configured on the **ALB listener**, not in Spring Boot.
 
 ## 6. Testing (current)
 
@@ -222,7 +254,7 @@ These items are intentional backlog for modernization; this branch does not fix 
 
 ### Configuration & ops drift
 
-- Deploy Slack Hub text aligned to `cariocaphil/spring-react-fullstack` in PR 11; final Slack URL remains `http://springbootreactfullstack-env.eba-qtwuxhgp.eu-central-1.elasticbeanstalk.com/`
+- ~~Deploy Slack completion still pointed at HTTP `*.elasticbeanstalk.com`~~ — updated in PR 41 to `https://sep.learning-projects.dev/`
 - Compose image tag is pinned in the deploy job workspace for EB (PR 13); the checked-in compose file may lag the latest Hub tag until someone updates it deliberately
 
 ### Platform age

@@ -2,7 +2,7 @@
 
 Build history for the Student Manager modernization.
 
-PR numbers match merged GitHub pull requests. Future work continues from PR 40.
+PR numbers match merged GitHub pull requests. Future work continues from PR 41.
 
 The README keeps a short Status summary; this file holds the full checklist.
 
@@ -241,3 +241,9 @@ PR 40 — Login screen + Basic Auth frontend ✅
 - [x] Auth gate (login vs students UI), logout, mid-session 401 → login
 - [x] Vitest for login success/failure, Authorization header, logout, 401 handling, protected UI
 - [x] Document intentional Basic Auth learning step (JWT/sessions/persistent users out of scope)
+
+PR 41 — Production HTTPS / TLS on Elastic Beanstalk ✅
+- [x] Document public URL `https://sep.learning-projects.dev` (Route 53 + ACM + ALB)
+- [x] Record LoadBalanced EB (min=max 1), TLS termination at ALB, HTTP→HTTPS 301 on the ALB (not Spring Boot)
+- [x] Note ACM DNS-validation CNAMEs must remain in Route 53 for renewal; regional stack in `eu-central-1`
+- [x] Point deploy Slack completion link at the HTTPS URL; refresh README + architecture
