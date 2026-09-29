@@ -117,6 +117,8 @@ The API listens on **http://localhost:8080**. In production-style packaging, the
 
 `/api/**` requires **HTTP Basic**. There is no React login screen yet — browser calls from the SPA will get **401** until a later auth PR.
 
+These `SECURITY_USER_*` credentials are temporary scaffolding for the Spring Security foundation (in-memory HTTP Basic). They are expected to be replaced when a real authentication/login flow lands; never commit real values to Git.
+
 | | |
 | --- | --- |
 | Default local user | `dev` / `changeme` (`spring.security.user.*` in `application.properties`) |
