@@ -2,7 +2,7 @@
 
 Build history for the Student Manager modernization.
 
-PR numbers match merged GitHub pull requests. Future work continues from PR 39.
+PR numbers match merged GitHub pull requests. Future work continues from PR 40.
 
 The README keeps a short Status summary; this file holds the full checklist.
 
@@ -234,3 +234,10 @@ PR 39 — Spring Security foundation ✅
 - [x] Integration tests: unauthenticated → 401, authenticated access, public OpenAPI; update student API tests for Basic auth
 - [x] No roles beyond `authenticated()`, no React login / JWT / OAuth / user persistence
 - [x] Update README + architecture docs
+
+PR 40 — Login screen + Basic Auth frontend ✅
+- [x] Login screen (Ant Design + i18n) with username/password validation
+- [x] In-memory credentials + shared client `Authorization` header; no password in web storage
+- [x] Auth gate (login vs students UI), logout, mid-session 401 → login
+- [x] Vitest for login success/failure, Authorization header, logout, 401 handling, protected UI
+- [x] Document intentional Basic Auth learning step (JWT/sessions/persistent users out of scope)
