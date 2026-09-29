@@ -3,11 +3,7 @@ import { QueryClientProvider } from '@tanstack/react-query';
 import type { ReactNode } from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { AuthProvider, useAuth } from './AuthContext';
-import {
-  clearAuthCredentials,
-  getAuthCredentials,
-  hasAuthCredentials,
-} from './authCredentials';
+import { clearAuthCredentials, getAuthCredentials, hasAuthCredentials } from './authCredentials';
 import * as client from '../client';
 import { createQueryClient } from '../queryClient';
 

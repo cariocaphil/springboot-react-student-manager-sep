@@ -32,11 +32,7 @@ function AppLayout({ children }: AppLayoutProps) {
           }}
         >
           <LanguageSwitcher />
-          <Button
-            icon={<LogoutOutlined />}
-            onClick={logout}
-            aria-label={t('layout.logout')}
-          >
+          <Button icon={<LogoutOutlined />} onClick={logout} aria-label={t('layout.logout')}>
             {t('layout.logout')}
           </Button>
         </Header>

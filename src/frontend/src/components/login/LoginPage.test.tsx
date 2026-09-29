@@ -39,7 +39,9 @@ describe('LoginPage', () => {
 
     await user.click(screen.getByRole('button', { name: i18n.t('login.submit') }));
 
-    expect(await screen.findByText(i18n.t('login.validation.usernameRequired'))).toBeInTheDocument();
+    expect(
+      await screen.findByText(i18n.t('login.validation.usernameRequired'))
+    ).toBeInTheDocument();
     expect(screen.getByText(i18n.t('login.validation.passwordRequired'))).toBeInTheDocument();
   });
 

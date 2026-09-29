@@ -22,9 +22,7 @@ describe('authCredentials', () => {
     setAuthCredentials({ username: 'dev', password: 'changeme' });
 
     expect(hasAuthCredentials()).toBe(true);
-    expect(getAuthorizationHeader()).toBe(
-      encodeBasicAuthorizationHeader('dev', 'changeme')
-    );
+    expect(getAuthorizationHeader()).toBe(encodeBasicAuthorizationHeader('dev', 'changeme'));
   });
 
   it('clears credentials', () => {

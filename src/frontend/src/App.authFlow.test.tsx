@@ -58,10 +58,12 @@ describe('App auth flow', () => {
     expect(await screen.findByText(/Add New Student/i)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: i18n.t('layout.logout') })).toBeInTheDocument();
     expect(hasAuthCredentials()).toBe(true);
-    expect(mockedFetch.mock.calls.some((call) => {
-      const init = call[1] as { headers?: Record<string, string> } | undefined;
-      return init?.headers?.Authorization?.startsWith('Basic ') === true;
-    })).toBe(true);
+    expect(
+      mockedFetch.mock.calls.some((call) => {
+        const init = call[1] as { headers?: Record<string, string> } | undefined;
+        return init?.headers?.Authorization?.startsWith('Basic ') === true;
+      })
+    ).toBe(true);
   });
 
   it('returns to login after logout and clears credentials', async () => {

@@ -6,11 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../auth/AuthContext';
 import LanguageSwitcher from '../layout/LanguageSwitcher';
 import { validationStatus } from '../../utils/form';
-import {
-  createLoginFormSchema,
-  loginDefaultValues,
-  type LoginFormValues,
-} from './loginForm';
+import { createLoginFormSchema, loginDefaultValues, type LoginFormValues } from './loginForm';
 
 const { Content } = Layout;
 const { Title, Paragraph } = Typography;
