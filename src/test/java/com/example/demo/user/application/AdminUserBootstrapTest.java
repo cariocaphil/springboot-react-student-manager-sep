@@ -61,9 +61,42 @@ class AdminUserBootstrapTest {
     }
 
     @Test
-    void run_failsWhenCredentialsMissing() {
+    void run_failsWhenUsernameBlank() {
         AdminUserBootstrap bootstrap = new AdminUserBootstrap(
-                appUserRepository, passwordEncoder, " ", "");
+                appUserRepository, passwordEncoder, " ", "secret");
+
+        assertThatThrownBy(() -> bootstrap.run(new DefaultApplicationArguments()))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("APP_ADMIN");
+        verify(appUserRepository, never()).save(any());
+    }
+
+    @Test
+    void run_failsWhenUsernameNull() {
+        AdminUserBootstrap bootstrap = new AdminUserBootstrap(
+                appUserRepository, passwordEncoder, null, "secret");
+
+        assertThatThrownBy(() -> bootstrap.run(new DefaultApplicationArguments()))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("APP_ADMIN");
+        verify(appUserRepository, never()).save(any());
+    }
+
+    @Test
+    void run_failsWhenPasswordBlank() {
+        AdminUserBootstrap bootstrap = new AdminUserBootstrap(
+                appUserRepository, passwordEncoder, "admin", " ");
+
+        assertThatThrownBy(() -> bootstrap.run(new DefaultApplicationArguments()))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("APP_ADMIN");
+        verify(appUserRepository, never()).save(any());
+    }
+
+    @Test
+    void run_failsWhenPasswordNull() {
+        AdminUserBootstrap bootstrap = new AdminUserBootstrap(
+                appUserRepository, passwordEncoder, "admin", null);
 
         assertThatThrownBy(() -> bootstrap.run(new DefaultApplicationArguments()))
                 .isInstanceOf(IllegalStateException.class)
