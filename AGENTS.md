@@ -25,7 +25,7 @@ Before changing runtime behavior, read:
 3. **Current vs target.** Keep as-is behavior in `architecture.md` / README Status. Put planned work only in the roadmap checklist. When a PR merges, mark items `[x]` / add `✅` and bump “Future work continues from PR N”.
 4. **Small PRs.** One theme per PR (secrets, tests, Boot upgrade, frontend, etc.). Leave the app deployable unless a cutover is explicit.
 5. **No drive-by cleanup.** Match existing style; don’t rename packages, rewrite UI, or tidy unrelated files.
-6. **Secrets.** Do not print, commit, or hardcode DB or API credentials. For `dev` / EB use `SPRING_DATASOURCE_*` and `SECURITY_USER_*` (required in `application-dev.properties`). Local/CI without the `dev` profile may use defaults in `application.properties`.
+6. **Secrets.** Do not print, commit, or hardcode DB or API credentials. For `dev` / EB use `SPRING_DATASOURCE_*` and `APP_ADMIN_*` (required in `application-dev.properties`). Local/CI without the `dev` profile may use defaults in `application.properties`.
 7. **Commands.** Use `./mvnw` (not a global Maven). Frontend lives under `src/frontend`. Full package: `./mvnw clean package -P build-frontend`.
 8. **Git.** Never commit (or push / open a PR) unless the user explicitly asks. Default end state for finished work: **stage** relevant files only (`git add`), leave the commit uncreated, and **propose** a commit message (and PR title when useful) in the reply. If the user later asks to commit, use that proposal via HEREDOC. Don’t amend pushed commits or force-push `main`.
 9. **Frontend i18n.** Do **not** pass `t` / `TFunction` through helpers, factories, or props. Prefer: (a) `useTranslation()` at the React leaf that renders text; (b) translation **keys** in shared config (e.g. `labelKey`), resolved with `t()` at render; (c) outside React, call the `i18n` singleton (`i18n.t(...)`) and rebuild when `i18n.language` changes if messages must update.
@@ -35,7 +35,7 @@ Before changing runtime behavior, read:
 
 | Path | Role |
 | --- | --- |
-| `src/main/java/com/example/demo/` | Spring Boot API (`student.api` / `domain` / `application` / `persistence` / `exception`) |
+| `src/main/java/com/example/demo/` | Spring Boot API (`student.*`, `user.*`, `security`) |
 | `src/main/resources/` | `application.properties`, `application-dev.properties` |
 | `src/frontend/` | Vite + TypeScript React app (`components/layout`, `components/students`, `hooks`, `types`) |
 | `elasticbeanstalk/docker-compose.yml` | EB deploy package |
@@ -46,7 +46,7 @@ Before changing runtime behavior, read:
 
 ## Stack constraints (until upgraded)
 
-- Backend: Java 17, Spring Boot 3.4.x, `jakarta.*`, Spring Security (stateless HTTP Basic on `/api/**`; `/v3/api-docs` public), API DTOs (`StudentRequest` / `StudentResponse`) — not the JPA entity as the HTTP contract; OpenAPI via springdoc → committed `api/openapi.json`; structured errors with `ApiErrorCode`
+- Backend: Java 17, Spring Boot 3.4.x, `jakarta.*`, Spring Security (stateless HTTP Basic on `/api/**` against PostgreSQL `AppUser` + BCrypt; `/v3/api-docs` public), API DTOs (`StudentRequest` / `StudentResponse`) — not the JPA entity as the HTTP contract; OpenAPI via springdoc → committed `api/openapi.json`; structured errors with `ApiErrorCode`
 - Frontend: React 19 + TypeScript, Vite 5, Ant Design 5, i18next (en/de), TanStack Query 5, React Hook Form 7, Zod, ESLint 9, Prettier; in-memory HTTP Basic login (no JWT/session storage yet); `apiRoutes` + typed `client` (`unfetch`); wire DTOs from `openapi-typescript` (`types/generated`); `apiError` maps known codes to i18n; layout/students component split
 - Image: Jib → `cariocaphil/spring-react-fullstack` from `eclipse-temurin:17-jre`; compose may pin a numeric tag
 - Deploy profile: `SPRING_PROFILES_ACTIVE=dev` on EB; public HTTPS at `https://sep.learning-projects.dev` (TLS at ALB)

@@ -7,12 +7,12 @@ Full-stack student CRUD demo: a Spring Boot API and a Vite React UI packaged int
 
 ## Status
 
-**Modernization:** PR 41 documents production HTTPS for SEP (`https://sep.learning-projects.dev`, ALB + ACM). Future work continues from PR 41.
+**Modernization:** PR 42 stores HTTP Basic users in PostgreSQL (`AppUser` + BCrypt). Future work continues from PR 42.
 
 | | |
 | --- | --- |
-| Current | **Java 17** / Spring Boot **3.4.5** + **springdoc** + **Spring Security** (HTTP Basic); Vite + TypeScript **React 19.3** with login + in-memory Basic auth; EB **LoadBalanced** with public **HTTPS** at `sep.learning-projects.dev`; POST **201** / DELETE **204** |
-| Next | Richer identity (JWT/OAuth or similar), optional Swagger UI; further platform work per roadmap |
+| Current | **Java 17** / Spring Boot **3.4.5** + **springdoc** + **Spring Security** (HTTP Basic against DB users); Vite + TypeScript **React 19.3** with login + in-memory Basic auth; EB **LoadBalanced** with public **HTTPS** at `sep.learning-projects.dev`; POST **201** / DELETE **204** |
+| Next | Roles / richer identity (JWT/OAuth or similar), optional Swagger UI; further platform work per roadmap |
 | Full checklist | [docs/modernization-roadmap.md](docs/modernization-roadmap.md) |
 | Architecture | [docs/architecture.md](docs/architecture.md) |
 
@@ -93,8 +93,10 @@ For the `dev` profile (Elastic Beanstalk), set these in the environment (EB cons
 - `SPRING_DATASOURCE_URL`
 - `SPRING_DATASOURCE_USERNAME`
 - `SPRING_DATASOURCE_PASSWORD`
-- `SECURITY_USER_NAME`
-- `SECURITY_USER_PASSWORD`
+- `APP_ADMIN_USERNAME`
+- `APP_ADMIN_PASSWORD`
+
+Remove obsolete `SECURITY_USER_NAME` / `SECURITY_USER_PASSWORD` from EB if they are still present (they no longer configure auth).
 
 ### Backend + packaged frontend (single process)
 
@@ -115,16 +117,18 @@ The API listens on **http://localhost:8080**. In production-style packaging, the
 
 ### API authentication (development)
 
-`/api/**` requires **HTTP Basic**. The React app shows a **login screen** that stores credentials **in memory only** (not `localStorage` / `sessionStorage`) and attaches an `Authorization` header on API calls. A page refresh requires signing in again. This is an intentional simple learning step — **JWT, cookie sessions, and persistent users are out of scope** for now.
+`/api/**` requires **HTTP Basic**. Users live in PostgreSQL (`app_user`) with **BCrypt** password hashes; Spring Security loads them via `DatabaseUserDetailsService`. Auth is still HTTP Basic — only the credential store changed.
+
+The React app shows a **login screen** that keeps credentials **in memory only** (not `localStorage` / `sessionStorage`) and attaches an `Authorization` header on API calls. A page refresh requires signing in again. **JWT, cookie sessions, OAuth, and roles** remain out of scope for now.
 
 On the deployed site, use **HTTPS** (`https://sep.learning-projects.dev`): Basic Auth is only Base64-encoded, so TLS protects credentials **in transit** to the ALB — not from DevTools or the server. See [architecture §5.4](docs/architecture.md#54-production-https--tls).
 
-Backend `SECURITY_USER_*` values remain temporary scaffolding for the in-memory Spring Security user; never commit real values to Git.
+The first user is bootstrapped on startup from `APP_ADMIN_*` when that username is missing (create-if-absent; never updates an existing row). Never commit real passwords to Git.
 
 | | |
 | --- | --- |
-| Default local user | `dev` / `changeme` (`spring.security.user.*` in `application.properties`) |
-| Override locally | `SECURITY_USER_NAME` / `SECURITY_USER_PASSWORD` |
+| Default local bootstrap | `dev` / `changeme` (`app.admin.*` via `APP_ADMIN_*` defaults in `application.properties`) |
+| Override locally | `APP_ADMIN_USERNAME` / `APP_ADMIN_PASSWORD` |
 | EB (`dev` profile) | **Required** — no `dev`/`changeme` fallback (see [Database](#database)) |
 | Public without auth | OpenAPI JSON at `/v3/api-docs` (and the packaged SPA static assets) |
 | SPA | Login → Students UI; **Log out** clears credentials; HTTP **401** returns to login |
@@ -215,9 +219,9 @@ Coverage gates live in [`codecov.yml`](codecov.yml): **80%** project and patch (
 - Application: `springboot-react-fullstack`
 - Environment: `springboot-react-fullstack-env` (LoadBalanced; Auto Scaling min=max 1)
 - Region: `eu-central-1` (Route 53 DNS is global)
-- Package: `elasticbeanstalk/docker-compose.yml` (maps host `80` → container `8080`, sets `SPRING_PROFILES_ACTIVE=dev`, passes through `SPRING_DATASOURCE_*` and `SECURITY_USER_*`)
+- Package: `elasticbeanstalk/docker-compose.yml` (maps host `80` → container `8080`, sets `SPRING_PROFILES_ACTIVE=dev`, passes through `SPRING_DATASOURCE_*` and `APP_ADMIN_*`)
 - TLS: ACM certificate on the ALB (`:443`); HTTP `:80` → 301 HTTPS; Spring Boot stays HTTP behind the load balancer
-- Runtime for `dev`: configure datasource and HTTP Basic env vars on the EB environment (compose does not embed secrets)
+- Runtime for `dev`: configure datasource and `APP_ADMIN_*` on the EB environment (compose does not embed secrets)
 - Details: [docs/architecture.md](docs/architecture.md) §5.4 Production HTTPS / TLS
 
 ## Documentation
