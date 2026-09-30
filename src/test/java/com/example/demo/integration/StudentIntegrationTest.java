@@ -1,5 +1,6 @@
 package com.example.demo.integration;
 
+import com.example.demo.security.TestAppUserFactory;
 import com.example.demo.student.api.StudentApiPaths;
 import com.example.demo.student.api.StudentRequest;
 import com.example.demo.student.domain.Gender;
@@ -15,6 +16,8 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.RequestPostProcessor;
 
+import static com.example.demo.security.TestAppUserFactory.TEST_PASSWORD;
+import static com.example.demo.security.TestAppUserFactory.TEST_USERNAME;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
@@ -31,8 +34,7 @@ class StudentIntegrationTest {
     private static final String STUDENTS_URI = "/" + StudentApiPaths.BASE;
     private static final String STUDENT_BY_ID_URI = STUDENTS_URI + "/{id}";
 
-    /** Matches spring.security.user.* in src/test/resources/application.properties */
-    private static final RequestPostProcessor BASIC_AUTH = httpBasic("test", "test");
+    private static final RequestPostProcessor BASIC_AUTH = httpBasic(TEST_USERNAME, TEST_PASSWORD);
 
     @Autowired
     private MockMvc mockMvc;
@@ -43,9 +45,13 @@ class StudentIntegrationTest {
     @Autowired
     private StudentRepository studentRepository;
 
+    @Autowired
+    private TestAppUserFactory testAppUserFactory;
+
     @BeforeEach
-    void cleanDatabase() {
-        studentRepository.deleteAll();
+    void setUp() {
+        studentRepository.deleteAllInBatch();
+        testAppUserFactory.ensureTestUser();
     }
 
     @Test

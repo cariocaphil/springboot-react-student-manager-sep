@@ -2,7 +2,7 @@
 
 Build history for the Student Manager modernization.
 
-PR numbers match merged GitHub pull requests. Future work continues from PR 41.
+PR numbers match merged GitHub pull requests. Future work continues from PR 42.
 
 The README keeps a short Status summary; this file holds the full checklist.
 
@@ -248,3 +248,11 @@ PR 41 — Production HTTPS / TLS on Elastic Beanstalk ✅
 - [x] Note ACM DNS-validation CNAMEs must remain in Route 53 for renewal; regional stack in `eu-central-1`
 - [x] Point deploy Slack completion link at the HTTPS URL; refresh README + architecture
 - [x] Clarify that HTTPS protects Basic Auth credentials in transit (Base64 ≠ encryption; client/server still see the header)
+
+PR 42 — Database-backed users ✅
+- [x] `AppUser` entity + `AppUserRepository` (unique username; BCrypt `password_hash` only)
+- [x] `DatabaseUserDetailsService` + `PasswordEncoder`; keep HTTP Basic and existing endpoint rules
+- [x] Remove `spring.security.user.*` / `SECURITY_USER_*` from properties and EB compose
+- [x] Bootstrap first user via `APP_ADMIN_USERNAME` / `APP_ADMIN_PASSWORD` (create-if-absent; required on `dev`)
+- [x] Tests: DB auth success/fail, BCrypt storage, protected endpoints; bootstrap unit coverage
+- [x] Docs: README + architecture + AGENTS; ops note to set `APP_ADMIN_*` and drop `SECURITY_USER_*` on EB
