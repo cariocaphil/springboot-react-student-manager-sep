@@ -6,13 +6,19 @@ import { useStudentColumns } from './studentColumns';
 
 interface StudentsTableProps {
   students: Student[];
+  canManageStudents: boolean;
   onDelete: (studentId: number) => void;
   onAddClick: () => void;
 }
 
-function StudentsTable({ students, onDelete, onAddClick }: StudentsTableProps) {
+function StudentsTable({
+  students,
+  canManageStudents,
+  onDelete,
+  onAddClick,
+}: StudentsTableProps) {
   const { t } = useTranslation();
-  const columns = useStudentColumns(onDelete);
+  const columns = useStudentColumns({ canManageStudents, onDelete });
 
   return (
     <Table
@@ -23,9 +29,13 @@ function StudentsTable({ students, onDelete, onAddClick }: StudentsTableProps) {
         <>
           <Tag>{t('students.countTag')}</Tag>
           <Badge count={students.length} className="site-badge-count-4" />
-          <br />
-          <br />
-          <AddStudentButton onClick={onAddClick} />
+          {canManageStudents ? (
+            <>
+              <br />
+              <br />
+              <AddStudentButton onClick={onAddClick} />
+            </>
+          ) : null}
         </>
       )}
       pagination={{ pageSize: 50 }}

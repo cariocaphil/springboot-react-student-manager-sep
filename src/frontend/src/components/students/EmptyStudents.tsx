@@ -3,15 +3,16 @@ import { useTranslation } from 'react-i18next';
 import AddStudentButton from './AddStudentButton';
 
 interface EmptyStudentsProps {
+  canManageStudents: boolean;
   onAddClick: () => void;
 }
 
-function EmptyStudents({ onAddClick }: EmptyStudentsProps) {
+function EmptyStudents({ canManageStudents, onAddClick }: EmptyStudentsProps) {
   const { t } = useTranslation();
 
   return (
     <>
-      <AddStudentButton onClick={onAddClick} />
+      {canManageStudents ? <AddStudentButton onClick={onAddClick} /> : null}
       <Empty description={t('students.empty.description')} />
     </>
   );
