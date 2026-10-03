@@ -13,8 +13,15 @@ import org.springframework.stereotype.Component;
 @Component
 public class TestAppUserFactory {
 
-    public static final String TEST_USERNAME = "test";
-    public static final String TEST_PASSWORD = "test";
+    public static final String ADMIN_USERNAME = "test";
+    public static final String ADMIN_PASSWORD = "test";
+
+    public static final String USER_USERNAME = "user";
+    public static final String USER_PASSWORD = "user";
+
+    /** Alias kept for existing tests; same credentials as {@link #ADMIN_USERNAME}. */
+    public static final String TEST_USERNAME = ADMIN_USERNAME;
+    public static final String TEST_PASSWORD = ADMIN_PASSWORD;
 
     private final AppUserRepository appUserRepository;
     private final PasswordEncoder passwordEncoder;
@@ -24,9 +31,17 @@ public class TestAppUserFactory {
         this.passwordEncoder = passwordEncoder;
     }
 
-    /** Default test user with {@link Role#ADMIN} so existing write tests stay green until role rules land. */
+    public AppUser ensureAdminUser() {
+        return ensureUser(ADMIN_USERNAME, ADMIN_PASSWORD, Role.ADMIN);
+    }
+
+    public AppUser ensureRegularUser() {
+        return ensureUser(USER_USERNAME, USER_PASSWORD, Role.USER);
+    }
+
+    /** Alias for {@link #ensureAdminUser()} used by existing student integration tests. */
     public AppUser ensureTestUser() {
-        return ensureUser(TEST_USERNAME, TEST_PASSWORD, Role.ADMIN);
+        return ensureAdminUser();
     }
 
     public AppUser ensureUser(String username, String password, Role role) {

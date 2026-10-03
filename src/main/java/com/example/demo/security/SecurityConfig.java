@@ -3,6 +3,7 @@ package com.example.demo.security;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -15,7 +16,8 @@ import org.springframework.security.web.SecurityFilterChain;
  * Stateless API security boundary.
  *
  * <p>Protects {@code /api/**} with HTTP Basic. Users are loaded from PostgreSQL via
- * {@link DatabaseUserDetailsService} (BCrypt password hashes). OpenAPI JSON at
+ * {@link DatabaseUserDetailsService} (BCrypt password hashes). Role checks use
+ * {@code @PreAuthorize} on controllers ({@code @EnableMethodSecurity}). OpenAPI JSON at
  * {@code /v3/api-docs} stays public for contract tests and tooling. CSRF is disabled
  * because this API is session-less and does not use cookie-based browser form auth.
  * Form login and logout redirects are disabled so unauthenticated API calls get
@@ -23,6 +25,7 @@ import org.springframework.security.web.SecurityFilterChain;
  */
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
 public class SecurityConfig {
 
     @Bean
