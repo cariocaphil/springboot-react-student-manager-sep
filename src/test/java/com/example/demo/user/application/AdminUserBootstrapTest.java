@@ -1,6 +1,7 @@
 package com.example.demo.user.application;
 
 import com.example.demo.user.domain.AppUser;
+import com.example.demo.user.domain.Role;
 import com.example.demo.user.persistence.AppUserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -44,6 +45,7 @@ class AdminUserBootstrapTest {
         verify(appUserRepository).save(captor.capture());
         AppUser saved = captor.getValue();
         assertThat(saved.getUsername()).isEqualTo("admin");
+        assertThat(saved.getRole()).isEqualTo(Role.ADMIN);
         assertThat(saved.getPasswordHash()).startsWith("$2");
         assertThat(saved.getPasswordHash()).isNotEqualTo("secret");
         assertThat(passwordEncoder.matches("secret", saved.getPasswordHash())).isTrue();

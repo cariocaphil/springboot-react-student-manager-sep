@@ -1,12 +1,13 @@
 package com.example.demo.security;
 
 import com.example.demo.user.domain.AppUser;
+import com.example.demo.user.domain.Role;
 import com.example.demo.user.persistence.AppUserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 /**
- * Test helper to seed a database-backed Basic-auth user (BCrypt hash).
+ * Test helper to seed a database-backed Basic-auth user (BCrypt hash + role).
  * Production bootstrap via env vars is a separate concern.
  */
 @Component
@@ -23,9 +24,14 @@ public class TestAppUserFactory {
         this.passwordEncoder = passwordEncoder;
     }
 
+    /** Default test user with {@link Role#ADMIN} so existing write tests stay green until role rules land. */
     public AppUser ensureTestUser() {
-        return appUserRepository.findByUsername(TEST_USERNAME)
+        return ensureUser(TEST_USERNAME, TEST_PASSWORD, Role.ADMIN);
+    }
+
+    public AppUser ensureUser(String username, String password, Role role) {
+        return appUserRepository.findByUsername(username)
                 .orElseGet(() -> appUserRepository.save(
-                        AppUser.createNew(TEST_USERNAME, passwordEncoder.encode(TEST_PASSWORD))));
+                        AppUser.createNew(username, passwordEncoder.encode(password), role)));
     }
 }

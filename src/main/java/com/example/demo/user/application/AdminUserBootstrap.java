@@ -1,6 +1,7 @@
 package com.example.demo.user.application;
 
 import com.example.demo.user.domain.AppUser;
+import com.example.demo.user.domain.Role;
 import com.example.demo.user.persistence.AppUserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,7 +45,7 @@ public class AdminUserBootstrap implements ApplicationRunner {
         if (appUserRepository.existsByUsername(username)) {
             return;
         }
-        appUserRepository.save(AppUser.createNew(username, passwordEncoder.encode(password)));
-        log.info("Bootstrapped AppUser '{}'", username);
+        appUserRepository.save(AppUser.createNew(username, passwordEncoder.encode(password), Role.ADMIN));
+        log.info("Bootstrapped AppUser '{}' with role {}", username, Role.ADMIN);
     }
 }
