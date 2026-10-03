@@ -20,12 +20,19 @@ const students: Student[] = [
 ];
 
 describe('StudentsTable', () => {
-  it('renders rows, count badge, and add control', async () => {
+  it('renders rows, count badge, and add control for admins', async () => {
     const user = userEvent.setup();
     const onDelete = vi.fn();
     const onAddClick = vi.fn();
 
-    render(<StudentsTable students={students} onDelete={onDelete} onAddClick={onAddClick} />);
+    render(
+      <StudentsTable
+        students={students}
+        canManageStudents
+        onDelete={onDelete}
+        onAddClick={onAddClick}
+      />
+    );
 
     expect(screen.getByText('Ada Lovelace')).toBeInTheDocument();
     expect(screen.getByText('alan@example.com')).toBeInTheDocument();
@@ -36,11 +43,18 @@ describe('StudentsTable', () => {
     expect(onAddClick).toHaveBeenCalledTimes(1);
   });
 
-  it('confirms delete for a row', async () => {
+  it('confirms delete for a row when manage is allowed', async () => {
     const user = userEvent.setup();
     const onDelete = vi.fn();
 
-    render(<StudentsTable students={students} onDelete={onDelete} onAddClick={vi.fn()} />);
+    render(
+      <StudentsTable
+        students={students}
+        canManageStudents
+        onDelete={onDelete}
+        onAddClick={vi.fn()}
+      />
+    );
 
     const adaRow = screen.getByText('Ada Lovelace').closest('tr');
     expect(adaRow).not.toBeNull();
@@ -48,5 +62,21 @@ describe('StudentsTable', () => {
     await user.click(await screen.findByRole('button', { name: 'Yes' }));
 
     expect(onDelete).toHaveBeenCalledWith(1);
+  });
+
+  it('hides add and delete controls when the caller cannot manage students', () => {
+    render(
+      <StudentsTable
+        students={students}
+        canManageStudents={false}
+        onDelete={vi.fn()}
+        onAddClick={vi.fn()}
+      />
+    );
+
+    expect(screen.getByText('Ada Lovelace')).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /Add New Student/i })).not.toBeInTheDocument();
+    expect(screen.queryByText('Delete')).not.toBeInTheDocument();
+    expect(screen.queryByText('Actions')).not.toBeInTheDocument();
   });
 });

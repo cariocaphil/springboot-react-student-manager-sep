@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import fetch from 'unfetch';
 import App from './App';
+import { meApi, studentsApi } from './apiRoutes';
 import { clearAuthCredentials, hasAuthCredentials } from './auth/authCredentials';
 import i18n from './i18n';
 import type { ApiResponse } from './types/api';
@@ -13,6 +14,13 @@ vi.mock('unfetch', () => ({
 vi.mock('./Notification');
 
 const mockedFetch = vi.mocked(fetch);
+
+const okMeAdmin = {
+  ok: true,
+  status: 200,
+  statusText: 'OK',
+  json: async () => ({ username: 'dev', role: 'ADMIN' }),
+} as ApiResponse;
 
 const okEmptyList = {
   ok: true,
@@ -27,6 +35,18 @@ const unauthorized = {
   statusText: 'Unauthorized',
   json: async () => ({}),
 } as ApiResponse;
+
+function mockAuthedSession() {
+  mockedFetch.mockImplementation(async (url: string) => {
+    if (url === meApi.current) {
+      return okMeAdmin as never;
+    }
+    if (url === studentsApi.collection) {
+      return okEmptyList as never;
+    }
+    return unauthorized as never;
+  });
+}
 
 async function signIn(user: ReturnType<typeof userEvent.setup>) {
   await user.type(screen.getByLabelText(i18n.t('login.username.label')), 'dev');
@@ -50,7 +70,7 @@ describe('App auth flow', () => {
 
   it('enters the students UI after a successful login', async () => {
     const user = userEvent.setup();
-    mockedFetch.mockResolvedValue(okEmptyList as never);
+    mockAuthedSession();
 
     render(<App />);
     await signIn(user);
@@ -61,14 +81,14 @@ describe('App auth flow', () => {
     expect(
       mockedFetch.mock.calls.some((call) => {
         const init = call[1] as { headers?: Record<string, string> } | undefined;
-        return init?.headers?.Authorization?.startsWith('Basic ') === true;
+        return call[0] === meApi.current && init?.headers?.Authorization?.startsWith('Basic ') === true;
       })
     ).toBe(true);
   });
 
   it('returns to login after logout and clears credentials', async () => {
     const user = userEvent.setup();
-    mockedFetch.mockResolvedValue(okEmptyList as never);
+    mockAuthedSession();
 
     render(<App />);
     await signIn(user);
@@ -84,7 +104,7 @@ describe('App auth flow', () => {
   it('returns to login when a later API call returns 401', async () => {
     const user = userEvent.setup();
     mockedFetch
-      .mockResolvedValueOnce(okEmptyList as never)
+      .mockResolvedValueOnce(okMeAdmin as never)
       .mockResolvedValueOnce(unauthorized as never);
 
     render(<App />);

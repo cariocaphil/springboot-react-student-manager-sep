@@ -8,8 +8,10 @@ import * as client from '../client';
 import { createQueryClient } from '../queryClient';
 
 vi.mock('../client', () => ({
-  getAllStudents: vi.fn(),
+  getCurrentUser: vi.fn(),
 }));
+
+const adminUser = { username: 'dev', role: 'ADMIN' as const };
 
 function wrapper({ children }: { children: ReactNode }) {
   const queryClient = createQueryClient();
@@ -26,8 +28,8 @@ describe('AuthContext', () => {
     vi.clearAllMocks();
   });
 
-  it('login stores credentials and marks authenticated when the probe succeeds', async () => {
-    vi.mocked(client.getAllStudents).mockResolvedValue([]);
+  it('login stores credentials and current user when the probe succeeds', async () => {
+    vi.mocked(client.getCurrentUser).mockResolvedValue(adminUser);
 
     const { result } = renderHook(() => useAuth(), { wrapper });
 
@@ -36,11 +38,27 @@ describe('AuthContext', () => {
     await waitFor(() => {
       expect(result.current.isAuthenticated).toBe(true);
     });
+    expect(result.current.user).toEqual(adminUser);
+    expect(result.current.canManageStudents).toBe(true);
     expect(getAuthCredentials()).toEqual({ username: 'dev', password: 'changeme' });
   });
 
+  it('login stores a USER without manage permission', async () => {
+    vi.mocked(client.getCurrentUser).mockResolvedValue({ username: 'user', role: 'USER' });
+
+    const { result } = renderHook(() => useAuth(), { wrapper });
+
+    await expect(result.current.login('user', 'user')).resolves.toBe(true);
+
+    await waitFor(() => {
+      expect(result.current.isAuthenticated).toBe(true);
+    });
+    expect(result.current.user?.role).toBe('USER');
+    expect(result.current.canManageStudents).toBe(false);
+  });
+
   it('login clears credentials and stays unauthenticated on 401', async () => {
-    vi.mocked(client.getAllStudents).mockRejectedValue({
+    vi.mocked(client.getCurrentUser).mockRejectedValue({
       message: 'Unauthorized',
       response: { ok: false, status: 401, statusText: 'Unauthorized', json: async () => ({}) },
     });
@@ -52,11 +70,12 @@ describe('AuthContext', () => {
     await waitFor(() => {
       expect(result.current.isAuthenticated).toBe(false);
     });
+    expect(result.current.user).toBeNull();
     expect(hasAuthCredentials()).toBe(false);
   });
 
-  it('logout clears credentials and authentication state', async () => {
-    vi.mocked(client.getAllStudents).mockResolvedValue([]);
+  it('logout clears credentials, user, and authentication state', async () => {
+    vi.mocked(client.getCurrentUser).mockResolvedValue(adminUser);
     const { result } = renderHook(() => useAuth(), { wrapper });
     await result.current.login('dev', 'changeme');
 
@@ -69,6 +88,8 @@ describe('AuthContext', () => {
     await waitFor(() => {
       expect(result.current.isAuthenticated).toBe(false);
     });
+    expect(result.current.user).toBeNull();
+    expect(result.current.canManageStudents).toBe(false);
     expect(hasAuthCredentials()).toBe(false);
   });
 });

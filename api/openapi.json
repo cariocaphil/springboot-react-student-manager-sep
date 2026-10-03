@@ -10,10 +10,42 @@
     "description" : "Same origin as the bundled UI"
   } ],
   "tags" : [ {
+    "description" : "Authenticated caller identity",
+    "name" : "Current user"
+  }, {
     "description" : "Student collection operations",
     "name" : "Students"
   } ],
   "paths" : {
+    "/api/v1/me" : {
+      "get" : {
+        "operationId" : "getCurrentUser",
+        "responses" : {
+          "200" : {
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/CurrentUserResponse"
+                }
+              }
+            },
+            "description" : "Current user"
+          },
+          "401" : {
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/CurrentUserResponse"
+                }
+              }
+            },
+            "description" : "Unauthenticated"
+          }
+        },
+        "summary" : "Get the authenticated user",
+        "tags" : [ "Current user" ]
+      }
+    },
     "/api/v1/students" : {
       "get" : {
         "operationId" : "getAllStudents",
@@ -127,6 +159,24 @@
           }
         },
         "required" : [ "code", "error", "message", "status" ]
+      },
+      "CurrentUserResponse" : {
+        "type" : "object",
+        "description" : "Currently authenticated user",
+        "properties" : {
+          "role" : {
+            "type" : "string",
+            "description" : "Application role",
+            "enum" : [ "ADMIN", "USER" ]
+          },
+          "username" : {
+            "type" : "string",
+            "description" : "Username",
+            "example" : "dev",
+            "minLength" : 1
+          }
+        },
+        "required" : [ "role", "username" ]
       },
       "StudentRequest" : {
         "type" : "object",
