@@ -2,6 +2,8 @@ package com.example.demo.user.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -40,14 +42,23 @@ public class AppUser {
     @Column(name = "password_hash", nullable = false)
     private String passwordHash;
 
-    public AppUser(Long id, String username, String passwordHash) {
+    /**
+     * Application role. SQL default keeps {@code ddl-auto=update} safe for existing
+     * {@code app_user} rows that predate this column.
+     */
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, columnDefinition = "varchar(16) not null default 'ADMIN'")
+    private Role role;
+
+    public AppUser(Long id, String username, String passwordHash, Role role) {
         this.id = id;
         this.username = username;
         this.passwordHash = passwordHash;
+        this.role = role;
     }
 
     /** New user before persistence; id is assigned by the database. */
-    public static AppUser createNew(String username, String passwordHash) {
-        return new AppUser(null, username, passwordHash);
+    public static AppUser createNew(String username, String passwordHash, Role role) {
+        return new AppUser(null, username, passwordHash, role);
     }
 }

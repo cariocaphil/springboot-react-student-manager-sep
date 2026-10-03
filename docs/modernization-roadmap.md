@@ -2,7 +2,7 @@
 
 Build history for the Student Manager modernization.
 
-PR numbers match merged GitHub pull requests. Future work continues from PR 42.
+PR numbers match merged GitHub pull requests. Future work continues from PR 43.
 
 The README keeps a short Status summary; this file holds the full checklist.
 
@@ -256,3 +256,10 @@ PR 42 — Database-backed users ✅
 - [x] Bootstrap first user via `APP_ADMIN_USERNAME` / `APP_ADMIN_PASSWORD` (create-if-absent; required on `dev`)
 - [x] Tests: DB auth success/fail, BCrypt storage, protected endpoints; bootstrap unit coverage
 - [x] Docs: README + architecture + AGENTS; ops note to set `APP_ADMIN_*` and drop `SECURITY_USER_*` on EB
+
+PR 43 — Role-based authorization ✅
+- [x] `Role` enum (`ADMIN` / `USER`) persisted on `AppUser`; map to Spring `ROLE_*` authorities
+- [x] Bootstrap admin receives `ADMIN`; keep HTTP Basic (no JWT)
+- [x] `@EnableMethodSecurity` + `@PreAuthorize`: both roles read students; only `ADMIN` creates/deletes
+- [x] Authorization integration tests: 401 / USER read / USER write 403 / ADMIN full access
+- [x] Docs: authn vs authz, permission matrix; SPA role UI left as debt

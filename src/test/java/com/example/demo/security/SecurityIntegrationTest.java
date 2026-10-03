@@ -2,6 +2,7 @@ package com.example.demo.security;
 
 import com.example.demo.student.api.StudentApiPaths;
 import com.example.demo.user.domain.AppUser;
+import com.example.demo.user.domain.Role;
 import com.example.demo.user.persistence.AppUserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -69,6 +70,7 @@ class SecurityIntegrationTest {
     void databaseUser_passwordIsStoredAsBcryptHash() {
         AppUser user = appUserRepository.findByUsername(TEST_USERNAME).orElseThrow();
 
+        assertThat(user.getRole()).isEqualTo(Role.ADMIN);
         assertThat(user.getPasswordHash()).startsWith("$2");
         assertThat(user.getPasswordHash()).isNotEqualTo(TEST_PASSWORD);
         assertThat(passwordEncoder.matches(TEST_PASSWORD, user.getPasswordHash())).isTrue();

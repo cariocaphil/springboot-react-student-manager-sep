@@ -7,8 +7,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-
 @Service
 public class DatabaseUserDetailsService implements UserDetailsService {
 
@@ -24,8 +22,7 @@ public class DatabaseUserDetailsService implements UserDetailsService {
                 .map(appUser -> User.builder()
                         .username(appUser.getUsername())
                         .password(appUser.getPasswordHash())
-                        // No roles yet — authorization rules stay authenticated()-only until a later PR.
-                        .authorities(List.of())
+                        .roles(appUser.getRole().name())
                         .build())
                 .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
     }

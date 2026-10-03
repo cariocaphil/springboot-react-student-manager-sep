@@ -7,12 +7,12 @@ Full-stack student CRUD demo: a Spring Boot API and a Vite React UI packaged int
 
 ## Status
 
-**Modernization:** PR 42 stores HTTP Basic users in PostgreSQL (`AppUser` + BCrypt). Future work continues from PR 42.
+**Modernization:** PR 43 adds `ADMIN` / `USER` roles and method-level student authorization. Future work continues from PR 43.
 
 | | |
 | --- | --- |
-| Current | **Java 17** / Spring Boot **3.4.5** + **springdoc** + **Spring Security** (HTTP Basic against DB users); Vite + TypeScript **React 19.3** with login + in-memory Basic auth; EB **LoadBalanced** with public **HTTPS** at `sep.learning-projects.dev`; POST **201** / DELETE **204** |
-| Next | Roles / richer identity (JWT/OAuth or similar), optional Swagger UI; further platform work per roadmap |
+| Current | **Java 17** / Spring Boot **3.4.5** + **springdoc** + **Spring Security** (HTTP Basic + DB roles); Vite + TypeScript **React 19.3** with login + in-memory Basic auth; EB **LoadBalanced** with public **HTTPS** at `sep.learning-projects.dev`; POST **201** / DELETE **204** |
+| Next | Richer identity (JWT/OAuth or similar), optional Swagger UI / SPA role-aware UI; further platform work per roadmap |
 | Full checklist | [docs/modernization-roadmap.md](docs/modernization-roadmap.md) |
 | Architecture | [docs/architecture.md](docs/architecture.md) |
 
@@ -20,7 +20,7 @@ Full-stack student CRUD demo: a Spring Boot API and a Vite React UI packaged int
 
 | Layer | Technology |
 | --- | --- |
-| Backend | Java **17**, Spring Boot **3.4.5**, Spring Web, Spring Security (HTTP Basic), Spring Data JPA, Bean Validation, Lombok, **springdoc-openapi** |
+| Backend | Java **17**, Spring Boot **3.4.5**, Spring Web, Spring Security (HTTP Basic + `ADMIN`/`USER` roles), Spring Data JPA, Bean Validation, Lombok, **springdoc-openapi** |
 | Database | PostgreSQL (local `localhost:5432`; AWS RDS via `dev` profile) |
 | Frontend | React **19.3** + **TypeScript**, **Vite 5**, Ant Design **5.29**, **i18next** / **react-i18next** (en/de), **TanStack Query 5**, **React Hook Form 7**, **Zod**, `unfetch`, **openapi-typescript** (generated wire types), Vitest, **ESLint 9**, **Prettier** |
 | Build | Maven Wrapper, `frontend-maven-plugin` (Node **20** / npm **10**), Jib **3.5.2** |
@@ -115,19 +115,27 @@ java -jar target/demo-0.0.1-SNAPSHOT.jar
 
 The API listens on **http://localhost:8080**. In production-style packaging, the React build is served as static content from the same origin.
 
-### API authentication (development)
+### API authentication and authorization (development)
 
-`/api/**` requires **HTTP Basic**. Users live in PostgreSQL (`app_user`) with **BCrypt** password hashes; Spring Security loads them via `DatabaseUserDetailsService`. Auth is still HTTP Basic — only the credential store changed.
+**Authentication** is still **HTTP Basic**. Users live in PostgreSQL (`app_user`) with **BCrypt** password hashes; Spring Security loads them via `DatabaseUserDetailsService`.
 
-The React app shows a **login screen** that keeps credentials **in memory only** (not `localStorage` / `sessionStorage`) and attaches an `Authorization` header on API calls. A page refresh requires signing in again. **JWT, cookie sessions, OAuth, and roles** remain out of scope for now.
+**Authorization** uses a single role per user (`ADMIN` or `USER`), enforced with `@PreAuthorize` on the student API:
+
+| Role | `GET /api/v1/students` | `POST` / `DELETE` students |
+| --- | --- | --- |
+| `ADMIN` | allowed | allowed |
+| `USER` | allowed | **403 Forbidden** |
+| (none) | **401 Unauthorized** | **401 Unauthorized** |
+
+The React app shows a **login screen** that keeps credentials **in memory only** (not `localStorage` / `sessionStorage`) and attaches an `Authorization` header on API calls. A page refresh requires signing in again. The SPA does **not** yet hide create/delete for `USER` (backend returns 403). **JWT, cookie sessions, and OAuth** remain out of scope for now.
 
 On the deployed site, use **HTTPS** (`https://sep.learning-projects.dev`): Basic Auth is only Base64-encoded, so TLS protects credentials **in transit** to the ALB — not from DevTools or the server. See [architecture §5.4](docs/architecture.md#54-production-https--tls).
 
-The first user is bootstrapped on startup from `APP_ADMIN_*` when that username is missing (create-if-absent; never updates an existing row). Never commit real passwords to Git.
+The first user is bootstrapped on startup from `APP_ADMIN_*` when that username is missing (create-if-absent; **role `ADMIN`**; never updates an existing row). Never commit real passwords to Git.
 
 | | |
 | --- | --- |
-| Default local bootstrap | `dev` / `changeme` (`app.admin.*` via `APP_ADMIN_*` defaults in `application.properties`) |
+| Default local bootstrap | `dev` / `changeme` as **ADMIN** (`app.admin.*` via `APP_ADMIN_*` defaults in `application.properties`) |
 | Override locally | `APP_ADMIN_USERNAME` / `APP_ADMIN_PASSWORD` |
 | EB (`dev` profile) | **Required** — no `dev`/`changeme` fallback (see [Database](#database)) |
 | Public without auth | OpenAPI JSON at `/v3/api-docs` (and the packaged SPA static assets) |
