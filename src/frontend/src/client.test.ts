@@ -1,13 +1,13 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import fetch from 'unfetch';
-import { studentsApi } from './apiRoutes';
+import { meApi, studentsApi } from './apiRoutes';
 import {
   clearAuthCredentials,
   encodeBasicAuthorizationHeader,
   setAuthCredentials,
   setUnauthorizedHandler,
 } from './auth/authCredentials';
-import { addNewStudent, deleteStudent, getAllStudents } from './client';
+import { addNewStudent, deleteStudent, getAllStudents, getCurrentUser } from './client';
 import type { ApiResponse } from './types/api';
 import type { Student } from './types/student';
 
@@ -29,6 +29,22 @@ describe('client', () => {
     mockedFetch.mockReset();
     clearAuthCredentials();
     setUnauthorizedHandler(null);
+  });
+
+  it('getCurrentUser GETs /api/v1/me and returns parsed JSON', async () => {
+    const me = { username: 'dev', role: 'ADMIN' as const };
+    const response = {
+      ok: true,
+      status: 200,
+      statusText: 'OK',
+      json: async () => me,
+    } as ApiResponse;
+    mockedFetch.mockResolvedValue(response as never);
+
+    await expect(getCurrentUser()).resolves.toEqual(me);
+    expect(mockedFetch).toHaveBeenCalledWith(meApi.current, {
+      headers: {},
+    });
   });
 
   it('getAllStudents GETs the students collection and returns parsed JSON', async () => {

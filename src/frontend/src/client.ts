@@ -1,8 +1,9 @@
 import fetch from 'unfetch';
-import { studentsApi } from './apiRoutes';
+import { meApi, studentsApi } from './apiRoutes';
 import { getAuthorizationHeader, notifyUnauthorized } from './auth/authCredentials';
 import type { ApiResponse, HttpError } from './types/api';
 import type { NewStudent, Student } from './types/student';
+import type { CurrentUser } from './types/user';
 
 type RequestInitLike = {
   method?: string;
@@ -36,6 +37,9 @@ function apiFetch(url: string, init: RequestInitLike = {}): Promise<ApiResponse>
     headers: withAuthHeaders(init.headers),
   }).then(checkStatus);
 }
+
+export const getCurrentUser = (): Promise<CurrentUser> =>
+  apiFetch(meApi.current).then((response) => response.json<CurrentUser>());
 
 export const getAllStudents = (): Promise<Student[]> =>
   apiFetch(studentsApi.collection).then((response) => response.json<Student[]>());
