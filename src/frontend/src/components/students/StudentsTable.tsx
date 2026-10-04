@@ -11,12 +11,7 @@ interface StudentsTableProps {
   onAddClick: () => void;
 }
 
-function StudentsTable({
-  students,
-  canManageStudents,
-  onDelete,
-  onAddClick,
-}: StudentsTableProps) {
+function StudentsTable({ students, canManageStudents, onDelete, onAddClick }: StudentsTableProps) {
   const { t } = useTranslation();
   const columns = useStudentColumns({ canManageStudents, onDelete });
 

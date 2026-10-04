@@ -67,9 +67,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const canManageStudents = user?.role === 'ADMIN';
 
   return (
-    <AuthContext.Provider
-      value={{ isAuthenticated, user, canManageStudents, login, logout }}
-    >
+    <AuthContext.Provider value={{ isAuthenticated, user, canManageStudents, login, logout }}>
       {children}
     </AuthContext.Provider>
   );

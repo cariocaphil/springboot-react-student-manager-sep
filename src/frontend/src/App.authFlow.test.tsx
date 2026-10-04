@@ -81,7 +81,9 @@ describe('App auth flow', () => {
     expect(
       mockedFetch.mock.calls.some((call) => {
         const init = call[1] as { headers?: Record<string, string> } | undefined;
-        return call[0] === meApi.current && init?.headers?.Authorization?.startsWith('Basic ') === true;
+        return (
+          call[0] === meApi.current && init?.headers?.Authorization?.startsWith('Basic ') === true
+        );
       })
     ).toBe(true);
   });
