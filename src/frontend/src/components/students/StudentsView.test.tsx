@@ -1,11 +1,12 @@
 import { render, screen } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { Student } from '../../types/student';
+import type { CurrentUser } from '../../types/user';
 import StudentsView from './StudentsView';
 
 const authState = {
   isAuthenticated: true,
-  user: { username: 'dev', role: 'ADMIN' as const },
+  user: { username: 'dev', role: 'ADMIN' } as CurrentUser,
   canManageStudents: true,
   login: vi.fn(),
   logout: vi.fn(),
