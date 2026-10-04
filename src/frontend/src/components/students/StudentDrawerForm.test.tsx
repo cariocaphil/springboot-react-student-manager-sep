@@ -37,12 +37,7 @@ describe('StudentDrawerForm', () => {
 
   it('prefills fields and uses edit copy when editing', () => {
     render(
-      <StudentDrawerForm
-        open
-        editingStudent={editingStudent}
-        onClose={onClose}
-        onSave={onSave}
-      />
+      <StudentDrawerForm open editingStudent={editingStudent} onClose={onClose} onSave={onSave} />
     );
 
     expect(screen.getByText('Edit student')).toBeInTheDocument();
