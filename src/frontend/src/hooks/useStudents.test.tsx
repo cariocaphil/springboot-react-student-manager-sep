@@ -210,6 +210,44 @@ describe('useStudents', () => {
     });
   });
 
+  it('updateStudentById notifies on failure and returns false', async () => {
+    vi.mocked(client.getAllStudents).mockResolvedValue([ada]);
+    vi.mocked(client.updateStudent).mockRejectedValue({
+      response: {
+        json: async () => ({
+          code: 'EMAIL_TAKEN',
+          message: 'Email taken',
+          status: 400,
+          error: 'Bad Request',
+        }),
+      },
+    });
+
+    const { result } = renderHook(() => useStudents(), {
+      wrapper: createWrapper(),
+    });
+    await waitFor(() => {
+      expect(result.current.isLoading).toBe(false);
+    });
+
+    let saved = true;
+    await act(async () => {
+      saved = await result.current.updateStudentById(1, {
+        name: 'Ada',
+        email: 'taken@example.com',
+        gender: 'FEMALE',
+      });
+    });
+
+    expect(saved).toBe(false);
+    expect(notify.errorNotification).toHaveBeenCalledWith(
+      i18n.t('errors.issueTitle'),
+      i18n.t('errors.codes.emailTaken'),
+      'bottomLeft'
+    );
+    expect(result.current.students).toEqual([ada]);
+  });
+
   it('removeStudentById deletes, notifies, and refreshes', async () => {
     vi.mocked(client.getAllStudents).mockResolvedValueOnce([ada]).mockResolvedValueOnce([]);
 

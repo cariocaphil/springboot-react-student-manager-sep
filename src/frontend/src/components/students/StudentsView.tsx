@@ -27,17 +27,11 @@ function StudentsView() {
   const [editingStudent, setEditingStudent] = useState<Student | null>(null);
 
   const openCreateDrawer = () => {
-    if (!canManageStudents) {
-      return;
-    }
     setEditingStudent(null);
     setDrawerOpen(true);
   };
 
   const openEditDrawer = (student: Student) => {
-    if (!canManageStudents) {
-      return;
-    }
     setEditingStudent(student);
     setDrawerOpen(true);
   };
