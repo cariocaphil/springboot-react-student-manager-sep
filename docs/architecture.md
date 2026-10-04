@@ -42,7 +42,7 @@ Student feature packages under `com.example.demo.student`:
 | User | `user.domain` / `user.persistence` / `user.application` / `user.api` | `AppUser`, `Role`, `AppUserRepository`, `AdminUserBootstrap`, `MeController`, `CurrentUserResponse` | DB-backed Basic-auth users (BCrypt + role); env bootstrap as `ADMIN`; `GET /api/v1/me` |
 | API | `student.api` | `StudentController`, DTOs, `StudentMapper`, `StudentApiPaths`, `ApiExceptionHandler`, `ApiErrorCode`, `OpenApiConfig` | HTTP boundary + stable error JSON + OpenAPI |
 | Domain | `student.domain` | `Student` (`@Entity`), `Gender` | Persistence model (not the frontend wire types) |
-| Application | `student.application` | `StudentService` | List, add (email uniqueness), delete; class `@Transactional(readOnly = true)`, writes override with `@Transactional` |
+| Application | `student.application` | `StudentService` | List, add, update (email uniqueness excluding self), delete; class `@Transactional(readOnly = true)`, writes override with `@Transactional` |
 | Persistence | `student.persistence` | `StudentRepository` | CRUD + derived `existsByEmail` |
 | Exceptions | `student.exception` | `DuplicateEmailException`, `StudentNotFoundException`, `BadRequestException` (generic fallback) | Domain/API failure types |
 
@@ -52,17 +52,19 @@ Student feature packages under `com.example.demo.student`:
 2. Map to `Student` entity → service checks email via repository → `DuplicateEmailException` if taken  
 3. `save` via JPA → **201 Created** (empty body)
 
-**Other success statuses:** `GET` → **200 OK**; `DELETE` → **204 No Content**.
+**Other success statuses:** `GET` → **200 OK**; `PUT` / `DELETE` → **204 No Content**.
 
 **OpenAPI:** springdoc exposes `/v3/api-docs`. A normalized copy is committed at `api/openapi.json` and drift-checked by `OpenApiContractTest`. Schemas include `StudentRequest`, `StudentResponse`, `CurrentUserResponse`, and `ApiErrorResponse` (required `code` + diagnostic `message` + HTTP `status`/`error`). The JPA `Student` entity is not part of the published contract.
 
-**Security (PR 39–43):** `SecurityConfig` configures a **stateless** API with **HTTP Basic**. `/api/**` requires authentication (`authenticated()`). Role checks use `@EnableMethodSecurity` + `@PreAuthorize` on `StudentController`: `ADMIN` and `USER` may `GET` students; only `ADMIN` may `POST`/`DELETE` (otherwise **403**). `/v3/api-docs` is public for contract tests and tooling. Packaged SPA/static assets remain public. CSRF is **disabled** because there are no cookie sessions or form-login flows (CSRF tokens do not apply to this Basic-auth REST shape). Form login / logout redirects are disabled so unauthenticated API calls receive **401** (not an HTML login page). Users are stored in PostgreSQL (`AppUser` / `app_user`) with **BCrypt** hashes and a single `Role` (`ADMIN` \| `USER`), loaded by `DatabaseUserDetailsService` as `ROLE_*` authorities. The first user is created on startup by `AdminUserBootstrap` from `APP_ADMIN_USERNAME` / `APP_ADMIN_PASSWORD` when that username is missing (create-if-absent as **`ADMIN`**; existing rows are not updated). Local/CI defaults are `dev` / `changeme` via `app.admin.*` in `application.properties`. Profile **`dev`** (Elastic Beanstalk) requires `APP_ADMIN_*` with no fallback in `application-dev.properties` (same fail-closed pattern as RDS). Obsolete `SECURITY_USER_*` / `spring.security.user.*` are removed.
+**Security (PR 39–43):** `SecurityConfig` configures a **stateless** API with **HTTP Basic**. `/api/**` requires authentication (`authenticated()`). Role checks use `@EnableMethodSecurity` + `@PreAuthorize` on `StudentController`: `ADMIN` and `USER` may `GET` students; only `ADMIN` may `POST`/`PUT`/`DELETE` (otherwise **403**). `/v3/api-docs` is public for contract tests and tooling. Packaged SPA/static assets remain public. CSRF is **disabled** because there are no cookie sessions or form-login flows (CSRF tokens do not apply to this Basic-auth REST shape). Form login / logout redirects are disabled so unauthenticated API calls receive **401** (not an HTML login page). Users are stored in PostgreSQL (`AppUser` / `app_user`) with **BCrypt** hashes and a single `Role` (`ADMIN` \| `USER`), loaded by `DatabaseUserDetailsService` as `ROLE_*` authorities. The first user is created on startup by `AdminUserBootstrap` from `APP_ADMIN_USERNAME` / `APP_ADMIN_PASSWORD` when that username is missing (create-if-absent as **`ADMIN`**; existing rows are not updated). Local/CI defaults are `dev` / `changeme` via `app.admin.*` in `application.properties`. Profile **`dev`** (Elastic Beanstalk) requires `APP_ADMIN_*` with no fallback in `application-dev.properties` (same fail-closed pattern as RDS). Obsolete `SECURITY_USER_*` / `spring.security.user.*` are removed.
 
 **Current user (PR 44):** `GET /api/v1/me` (`MeController`) returns `CurrentUserResponse` (`username`, `role` as `ADMIN` \| `USER`) derived from the authenticated `UserDetails` principal (no second repository lookup). Covered by the existing `/api/**` authenticated rule.
 
-**Frontend auth (PR 40 + 44):** The SPA shows a login screen; credentials live **in memory only** and are sent as `Authorization: Basic …` via the shared API client. Login probes `GET /api/v1/me`, stores `{ username, role }` in `AuthContext`, and exposes `canManageStudents` (`role === 'ADMIN'`). Students UI hides Add/Delete (and the create drawer) when `canManageStudents` is false. Hiding controls is UX only — backend `@PreAuthorize` remains the security boundary. Logout and mid-session **401** responses clear credentials/user and return to login. **JWT, session cookies, and OAuth/OIDC remain out of scope**.
+**Frontend auth (PR 40 + 44):** The SPA shows a login screen; credentials live **in memory only** and are sent as `Authorization: Basic …` via the shared API client. Login probes `GET /api/v1/me`, stores `{ username, role }` in `AuthContext`, and exposes `canManageStudents` (`role === 'ADMIN'`). Students UI hides Add/Edit/Delete (and the student drawer) when `canManageStudents` is false. Hiding controls is UX only — backend `@PreAuthorize` remains the security boundary. Logout and mid-session **401** responses clear credentials/user and return to login. **JWT, session cookies, and OAuth/OIDC remain out of scope**.
 
-**Gaps vs a full CRUD product (recorded, not fixed):** no update endpoint; no JWT/OAuth; no Flyway/Liquibase (DDL via Hibernate `update`).
+**Student update (PR 45):** `PUT /api/v1/students/{studentId}` accepts `@Valid StudentRequest` (full replacement), returns **204**, and is ADMIN-only. Email uniqueness ignores the current row (`existsByEmailAndIdNot`). The SPA reuses `StudentDrawerForm` for create and edit; Edit opens the drawer prefilled and saves via `updateStudent` / TanStack mutation.
+
+**Gaps vs a full CRUD product (recorded, not fixed):** no JWT/OAuth; no Flyway/Liquibase (DDL via Hibernate `update`).
 
 ### 2.3 Frontend
 
@@ -314,7 +316,7 @@ These items are intentional backlog for modernization; this branch does not fix 
 ### Quality
 
 - Frontend Vitest coverage expanded in PRs 18–21; backend service/repo/API tests from PR 14 — still no broad E2E
-- Codecov reports overall coverage (PR 38); some frontend entry/boot files remain uncovered (`index.tsx`, `reportWebVitals`, legacy `components/StudentsTable.tsx`) without failing the 80% gates
+- Codecov reports overall coverage (PR 38); some frontend entry/boot files remain uncovered (`index.tsx`, `reportWebVitals`) without failing the 80% gates
 - Unused imports in `StudentService` (HttpStatus / ResponseStatus)
 
 ## 8. What “done” looks like for this baseline

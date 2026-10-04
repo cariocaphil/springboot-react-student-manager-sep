@@ -7,12 +7,12 @@ Full-stack student CRUD demo: a Spring Boot API and a Vite React UI packaged int
 
 ## Status
 
-**Modernization:** PR 44 makes the SPA role-aware via `GET /api/v1/me`. Future work continues from PR 44.
+**Modernization:** PR 45 adds student update (`PUT`) and wires the Edit UI. Future work continues from PR 45.
 
 | | |
 | --- | --- |
-| Current | **Java 17** / Spring Boot **3.4.5** + **springdoc** + **Spring Security** (HTTP Basic + DB roles); Vite + TypeScript **React 19.3** with login + in-memory Basic auth + role-aware UI; EB **LoadBalanced** with public **HTTPS** at `sep.learning-projects.dev`; POST **201** / DELETE **204** |
-| Next | Richer identity (JWT/OAuth or similar), optional Swagger UI; further platform work per roadmap |
+| Current | **Java 17** / Spring Boot **3.4.5** + **springdoc** + **Spring Security** (HTTP Basic + DB roles); Vite + TypeScript **React 19.3** with login + in-memory Basic auth + role-aware UI; EB **LoadBalanced** with public **HTTPS** at `sep.learning-projects.dev`; POST **201** / PUT & DELETE **204** |
+| Next | Richer identity (JWT/OAuth or similar), optional Swagger UI / Flyway; further platform work per roadmap |
 | Full checklist | [docs/modernization-roadmap.md](docs/modernization-roadmap.md) |
 | Architecture | [docs/architecture.md](docs/architecture.md) |
 
@@ -121,13 +121,13 @@ The API listens on **http://localhost:8080**. In production-style packaging, the
 
 **Authorization** uses a single role per user (`ADMIN` or `USER`), enforced with `@PreAuthorize` on the student API:
 
-| Role | `GET /api/v1/students` | `POST` / `DELETE` students |
+| Role | `GET /api/v1/students` | `POST` / `PUT` / `DELETE` students |
 | --- | --- | --- |
 | `ADMIN` | allowed | allowed |
 | `USER` | allowed | **403 Forbidden** |
 | (none) | **401 Unauthorized** | **401 Unauthorized** |
 
-The React app shows a **login screen** that keeps credentials **in memory only** (not `localStorage` / `sessionStorage`) and attaches an `Authorization` header on API calls. Login probes **`GET /api/v1/me`** (username + role) and stores that in auth state. The SPA hides Add/Delete for `USER` so the UI matches backend rules; **backend `@PreAuthorize` remains authoritative** (bypassing the UI still yields 403). A page refresh requires signing in again. **JWT, cookie sessions, and OAuth** remain out of scope for now.
+The React app shows a **login screen** that keeps credentials **in memory only** (not `localStorage` / `sessionStorage`) and attaches an `Authorization` header on API calls. Login probes **`GET /api/v1/me`** (username + role) and stores that in auth state. The SPA hides Add/Edit/Delete for `USER` so the UI matches backend rules; **backend `@PreAuthorize` remains authoritative** (bypassing the UI still yields 403). A page refresh requires signing in again. **JWT, cookie sessions, and OAuth** remain out of scope for now.
 
 On the deployed site, use **HTTPS** (`https://sep.learning-projects.dev`): Basic Auth is only Base64-encoded, so TLS protects credentials **in transit** to the ALB — not from DevTools or the server. See [architecture §5.4](docs/architecture.md#54-production-https--tls).
 
@@ -140,7 +140,7 @@ The first user is bootstrapped on startup from `APP_ADMIN_*` when that username 
 | EB (`dev` profile) | **Required** — no `dev`/`changeme` fallback (see [Database](#database)) |
 | Public without auth | OpenAPI JSON at `/v3/api-docs` (and the packaged SPA static assets) |
 | Current user | `GET /api/v1/me` → `{ username, role }` (`ADMIN` \| `USER`) |
-| SPA | Login → `/me` → Students UI (`ADMIN` sees Add/Delete; `USER` read-only); **Log out** clears credentials; HTTP **401** returns to login |
+| SPA | Login → `/me` → Students UI (`ADMIN` sees Add/Edit/Delete; `USER` read-only); **Log out** clears credentials; HTTP **401** returns to login |
 
 Example (API without the UI):
 
@@ -207,9 +207,8 @@ Base path: `/api/v1/students`
 | --- | --- | --- |
 | `GET` | `/api/v1/students` | List all students |
 | `POST` | `/api/v1/students` | Create student (validated; rejects duplicate email) |
+| `PUT` | `/api/v1/students/{studentId}` | Full update (validated; rejects email taken by another student; 404 if missing) |
 | `DELETE` | `/api/v1/students/{studentId}` | Delete by id (404 if missing) |
-
-There is **no** update/PUT endpoint. The UI shows an Edit control that is not wired to the API.
 
 ## CI/CD overview
 

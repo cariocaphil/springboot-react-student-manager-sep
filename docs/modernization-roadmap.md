@@ -2,7 +2,7 @@
 
 Build history for the Student Manager modernization.
 
-PR numbers match merged GitHub pull requests. Future work continues from PR 44.
+PR numbers match merged GitHub pull requests. Future work continues from PR 45.
 
 The README keeps a short Status summary; this file holds the full checklist.
 
@@ -270,3 +270,10 @@ PR 44 — Role-aware SPA ✅
 - [x] Hide Add/Delete (and create drawer) for non-admins; backend `@PreAuthorize` remains authoritative
 - [x] Frontend Vitest for ADMIN/USER UI; `/me` auth flow coverage
 - [x] Docs: README + architecture + roadmap + AGENTS
+
+PR 45 — Student update (PUT + Edit UI) ✅
+- [x] `PUT /api/v1/students/{id}` with `StudentRequest`, **204**, `@PreAuthorize("hasRole('ADMIN')")`
+- [x] Email uniqueness excludes the current student; 404 / `EMAIL_TAKEN` via existing error codes
+- [x] OpenAPI export + generated frontend types
+- [x] SPA Edit opens shared drawer; TanStack `updateStudent` mutation + i18n
+- [x] Backend + frontend tests; docs
