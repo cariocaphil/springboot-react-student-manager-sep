@@ -50,7 +50,9 @@
     },
     "drawer": {
       "title": "Neuen Studenten erstellen",
+      "editTitle": "Studenten bearbeiten",
       "submit": "Absenden",
+      "editSubmit": "Änderungen speichern",
       "cancel": "Abbrechen"
     },
     "form": {
@@ -76,9 +78,12 @@
     "notifications": {
       "addedTitle": "Student erfolgreich hinzugefügt",
       "addedDescription": "{{name}} wurde dem System hinzugefügt",
+      "updatedTitle": "Student aktualisiert",
+      "updatedDescription": "{{name}} wurde aktualisiert",
       "deletedTitle": "Student gelöscht",
       "deletedDescription": "Student mit {{id}} wurde gelöscht"
     },
+
     "empty": {
       "description": "Noch keine Studenten. Fügen Sie einen hinzu, um zu starten."
     },

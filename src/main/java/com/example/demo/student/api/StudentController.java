@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -64,6 +65,31 @@ public class StudentController {
     })
     public void addStudent(@Valid @RequestBody StudentRequest request) {
         studentService.addStudent(StudentMapper.toEntity(request));
+    }
+
+    @PutMapping(path = "{studentId}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Update a student by id")
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "Updated"),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Validation or business rule failure",
+                    content = @Content(
+                            mediaType = MediaType.APPLICATION_JSON_VALUE,
+                            schema = @Schema(implementation = ApiErrorResponse.class))),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "Student not found",
+                    content = @Content(
+                            mediaType = MediaType.APPLICATION_JSON_VALUE,
+                            schema = @Schema(implementation = ApiErrorResponse.class)))
+    })
+    public void updateStudent(
+            @PathVariable("studentId") Long studentId,
+            @Valid @RequestBody StudentRequest request) {
+        studentService.updateStudent(studentId, request.name(), request.email(), request.gender());
     }
 
     @DeleteMapping(path = "{studentId}")

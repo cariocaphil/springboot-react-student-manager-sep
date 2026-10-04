@@ -7,11 +7,13 @@ import type { Student } from '../../types/student';
 type UseStudentColumnsOptions = {
   canManageStudents: boolean;
   onDelete: (studentId: number) => void;
+  onEdit: (student: Student) => void;
 };
 
 export function useStudentColumns({
   canManageStudents,
   onDelete,
+  onEdit,
 }: UseStudentColumnsOptions): ColumnsType<Student> {
   const { t } = useTranslation();
 
@@ -49,7 +51,7 @@ export function useStudentColumns({
       title: t('students.columns.actions'),
       key: 'actions',
       render: (_text, student) => (
-        <StudentActions studentName={student.name} studentId={student.id} onDelete={onDelete} />
+        <StudentActions student={student} onDelete={onDelete} onEdit={onEdit} />
       ),
     });
   }

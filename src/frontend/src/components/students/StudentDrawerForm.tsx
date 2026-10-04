@@ -4,11 +4,12 @@ import { useEffect, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useTranslation } from 'react-i18next';
-import type { NewStudent } from '../../types/student';
+import type { NewStudent, Student } from '../../types/student';
 import {
   createNewStudentFromForm,
   createStudentFormSchema,
   defaultValues,
+  studentToFormValues,
   type StudentFormValues,
 } from './studentForm';
 import { groupStudentFormFieldsIntoRows, studentFormFields } from './studentFormFields';
@@ -21,13 +22,20 @@ const studentFormRows = groupStudentFormFieldsIntoRows(studentFormFields);
 
 interface StudentDrawerFormProps {
   open: boolean;
+  editingStudent?: Student | null;
   onClose: () => void;
-  onCreate: (student: NewStudent) => Promise<boolean>;
+  onSave: (student: NewStudent) => Promise<boolean>;
 }
 
-function StudentDrawerForm({ open, onClose, onCreate }: StudentDrawerFormProps) {
+function StudentDrawerForm({
+  open,
+  editingStudent = null,
+  onClose,
+  onSave,
+}: StudentDrawerFormProps) {
   const { t, i18n } = useTranslation();
   const schema = useMemo(() => createStudentFormSchema(i18n.language), [i18n.language]);
+  const isEditing = editingStudent !== null;
 
   const {
     control,
@@ -42,13 +50,19 @@ function StudentDrawerForm({ open, onClose, onCreate }: StudentDrawerFormProps) 
   useEffect(() => {
     if (!open) {
       reset(defaultValues);
+      return;
     }
-  }, [open, reset]);
+    if (editingStudent !== null) {
+      reset(studentToFormValues(editingStudent));
+    } else {
+      reset(defaultValues);
+    }
+  }, [open, editingStudent, reset]);
 
   const onSubmit = async (values: StudentFormValues) => {
     const student = createNewStudentFromForm(values);
-    const created = await onCreate(student);
-    if (created) {
+    const saved = await onSave(student);
+    if (saved) {
       reset(defaultValues);
       onClose();
     }
@@ -56,7 +70,7 @@ function StudentDrawerForm({ open, onClose, onCreate }: StudentDrawerFormProps) 
 
   return (
     <Drawer
-      title={t('students.drawer.title')}
+      title={isEditing ? t('students.drawer.editTitle') : t('students.drawer.title')}
       width={720}
       onClose={onClose}
       open={open}
@@ -77,7 +91,7 @@ function StudentDrawerForm({ open, onClose, onCreate }: StudentDrawerFormProps) 
           <Col span={12}>
             <Form.Item>
               <Button type="primary" htmlType="submit" loading={isSubmitting}>
-                {t('students.drawer.submit')}
+                {isEditing ? t('students.drawer.editSubmit') : t('students.drawer.submit')}
               </Button>
             </Form.Item>
           </Col>

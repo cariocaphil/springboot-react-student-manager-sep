@@ -23,6 +23,7 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -87,7 +88,20 @@ class AuthorizationIntegrationTest {
     }
 
     @Test
-    void admin_canReadCreateAndDeleteStudent() throws Exception {
+    void user_cannotUpdateStudent() throws Exception {
+        Student saved = studentRepository.save(
+                Student.createNew("Alex", "alex-update-user@example.com", Gender.MALE));
+        StudentRequest payload = new StudentRequest("Alexandra", "alex-update-user@example.com", Gender.FEMALE);
+
+        mockMvc.perform(put(STUDENT_BY_ID_URI, saved.getId())
+                        .with(USER_AUTH)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(payload)))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void admin_canReadCreateUpdateAndDeleteStudent() throws Exception {
         mockMvc.perform(get(STUDENTS_URI).with(ADMIN_AUTH))
                 .andExpect(status().isOk());
 
@@ -102,6 +116,13 @@ class AuthorizationIntegrationTest {
                 .filter(s -> "admin-kid@example.com".equals(s.getEmail()))
                 .findFirst()
                 .orElseThrow();
+
+        StudentRequest update = new StudentRequest("AdminKid2", "admin-kid@example.com", Gender.MALE);
+        mockMvc.perform(put(STUDENT_BY_ID_URI, saved.getId())
+                        .with(ADMIN_AUTH)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(update)))
+                .andExpect(status().isNoContent());
 
         mockMvc.perform(delete(STUDENT_BY_ID_URI, saved.getId()).with(ADMIN_AUTH))
                 .andExpect(status().isNoContent());

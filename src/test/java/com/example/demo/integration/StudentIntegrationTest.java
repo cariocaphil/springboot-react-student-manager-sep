@@ -24,6 +24,7 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -113,6 +114,51 @@ class StudentIntegrationTest {
                 .andExpect(jsonPath("$.status").value(400))
                 .andExpect(jsonPath("$.error").value("Bad Request"))
                 .andExpect(jsonPath("$.message").isNotEmpty());
+    }
+
+    @Test
+    void updateStudent_updatesExistingStudent() throws Exception {
+        Student saved = studentRepository.save(
+                Student.createNew("Alex", "alex@example.com", Gender.MALE));
+        StudentRequest payload = new StudentRequest("Alexandra", "alexandra@example.com", Gender.FEMALE);
+
+        mockMvc.perform(put(STUDENT_BY_ID_URI, saved.getId())
+                        .with(BASIC_AUTH)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(payload)))
+                .andExpect(status().isNoContent());
+
+        Student updated = studentRepository.findById(saved.getId()).orElseThrow();
+        assertThat(updated.getName()).isEqualTo("Alexandra");
+        assertThat(updated.getEmail()).isEqualTo("alexandra@example.com");
+        assertThat(updated.getGender()).isEqualTo(Gender.FEMALE);
+    }
+
+    @Test
+    void updateStudent_rejectsDuplicateEmail() throws Exception {
+        studentRepository.save(Student.createNew("Jamila", "jamila@example.com", Gender.FEMALE));
+        Student saved = studentRepository.save(
+                Student.createNew("Alex", "alex@example.com", Gender.MALE));
+        StudentRequest payload = new StudentRequest("Alex", "jamila@example.com", Gender.MALE);
+
+        mockMvc.perform(put(STUDENT_BY_ID_URI, saved.getId())
+                        .with(BASIC_AUTH)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(payload)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("EMAIL_TAKEN"));
+    }
+
+    @Test
+    void updateStudent_returnsNotFoundWhenMissing() throws Exception {
+        StudentRequest payload = new StudentRequest("Ghost", "ghost@example.com", Gender.OTHER);
+
+        mockMvc.perform(put(STUDENT_BY_ID_URI, 12345L)
+                        .with(BASIC_AUTH)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(payload)))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.code").value("STUDENT_NOT_FOUND"));
     }
 
     @Test

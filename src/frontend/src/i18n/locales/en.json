@@ -50,7 +50,9 @@
     },
     "drawer": {
       "title": "Create new student",
+      "editTitle": "Edit student",
       "submit": "Submit",
+      "editSubmit": "Save changes",
       "cancel": "Cancel"
     },
     "form": {
@@ -76,9 +78,12 @@
     "notifications": {
       "addedTitle": "Student successfully added",
       "addedDescription": "{{name}} was added to the system",
+      "updatedTitle": "Student updated",
+      "updatedDescription": "{{name}} was updated",
       "deletedTitle": "Student deleted",
       "deletedDescription": "Student with {{id}} was deleted"
     },
+
     "empty": {
       "description": "No students yet. Add one to get started."
     },

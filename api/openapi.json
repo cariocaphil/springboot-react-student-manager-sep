@@ -127,6 +127,55 @@
         },
         "summary" : "Delete a student by id",
         "tags" : [ "Students" ]
+      },
+      "put" : {
+        "operationId" : "updateStudent",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "studentId",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/StudentRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "204" : {
+            "description" : "Updated"
+          },
+          "400" : {
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description" : "Validation or business rule failure"
+          },
+          "404" : {
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description" : "Student not found"
+          }
+        },
+        "summary" : "Update a student by id",
+        "tags" : [ "Students" ]
       }
     }
   },
@@ -180,7 +229,7 @@
       },
       "StudentRequest" : {
         "type" : "object",
-        "description" : "Payload to create a student",
+        "description" : "Payload to create or update a student",
         "properties" : {
           "email" : {
             "type" : "string",
