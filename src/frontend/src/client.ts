@@ -57,3 +57,12 @@ export const addNewStudent = (student: NewStudent): Promise<void> =>
     method: 'POST',
     body: JSON.stringify(student),
   }).then(() => undefined);
+
+export const updateStudent = (studentId: number, student: NewStudent): Promise<void> =>
+  apiFetch(studentsApi.byId(studentId), {
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    method: 'PUT',
+    body: JSON.stringify(student),
+  }).then(() => undefined);

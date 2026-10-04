@@ -7,7 +7,13 @@ import {
   setAuthCredentials,
   setUnauthorizedHandler,
 } from './auth/authCredentials';
-import { addNewStudent, deleteStudent, getAllStudents, getCurrentUser } from './client';
+import {
+  addNewStudent,
+  deleteStudent,
+  getAllStudents,
+  getCurrentUser,
+  updateStudent,
+} from './client';
 import type { ApiResponse } from './types/api';
 import type { Student } from './types/student';
 
@@ -142,6 +148,24 @@ describe('client', () => {
     expect(mockedFetch).toHaveBeenCalledWith(studentsApi.collection, {
       headers: { 'Content-Type': 'application/json' },
       method: 'POST',
+      body: JSON.stringify(student),
+    });
+  });
+
+  it('updateStudent PUTs JSON body by id', async () => {
+    const response = {
+      ok: true,
+      status: 204,
+      statusText: 'No Content',
+      json: async () => undefined,
+    } as ApiResponse;
+    const student = { name: 'Ada', email: 'ada@example.com', gender: 'FEMALE' as const };
+    mockedFetch.mockResolvedValue(response as never);
+
+    await expect(updateStudent(42, student)).resolves.toBeUndefined();
+    expect(mockedFetch).toHaveBeenCalledWith(studentsApi.byId(42), {
+      headers: { 'Content-Type': 'application/json' },
+      method: 'PUT',
       body: JSON.stringify(student),
     });
   });

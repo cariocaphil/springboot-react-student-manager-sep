@@ -1,4 +1,5 @@
 import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { Student } from '../../types/student';
 import type { CurrentUser } from '../../types/user';
@@ -23,6 +24,7 @@ const studentsHook = {
   isFetching: false,
   retryLoad: vi.fn(),
   createStudent: vi.fn(),
+  updateStudentById: vi.fn(),
   removeStudentById: vi.fn(),
 };
 
@@ -79,5 +81,16 @@ describe('StudentsView', () => {
     expect(screen.getByText('Ada Lovelace')).toBeInTheDocument();
     expect(screen.queryByText('Delete')).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /Add New Student/i })).not.toBeInTheDocument();
+  });
+
+  it('opens the edit drawer when Edit is clicked', async () => {
+    const user = userEvent.setup();
+    studentsHook.students = students;
+
+    render(<StudentsView />);
+
+    await user.click(screen.getByText('Edit'));
+    expect(await screen.findByText('Edit student')).toBeInTheDocument();
+    expect(screen.getByDisplayValue('Ada Lovelace')).toBeInTheDocument();
   });
 });

@@ -145,4 +145,19 @@ describe('App', () => {
     await user.click(await screen.findByText(/Add New Student/i));
     expect(await screen.findByText('Create new student')).toBeInTheDocument();
   });
+
+  it('opens the edit drawer from a student row', async () => {
+    const user = userEvent.setup();
+    vi.mocked(client.getAllStudents).mockResolvedValue(students);
+
+    render(<App />);
+
+    expect(await screen.findByText('Ada Lovelace')).toBeInTheDocument();
+    const adaRow = screen.getByText('Ada Lovelace').closest('tr');
+    expect(adaRow).not.toBeNull();
+    await user.click(within(adaRow as HTMLElement).getByText('Edit'));
+
+    expect(await screen.findByText('Edit student')).toBeInTheDocument();
+    expect(screen.getByDisplayValue('Ada Lovelace')).toBeInTheDocument();
+  });
 });

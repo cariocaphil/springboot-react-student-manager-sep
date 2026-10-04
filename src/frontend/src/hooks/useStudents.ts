@@ -1,7 +1,7 @@
 import { useCallback } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
-import { addNewStudent, deleteStudent, getAllStudents } from '../client';
+import { addNewStudent, deleteStudent, getAllStudents, updateStudent } from '../client';
 import { notifyHttpError } from '../apiError';
 import { successNotification } from '../Notification';
 import { studentKeys } from '../studentKeys';
@@ -33,6 +33,18 @@ export function useStudents() {
     },
   });
 
+  const { mutateAsync: updateStudentMutation } = useMutation({
+    mutationFn: ({ studentId, student }: { studentId: number; student: NewStudent }) =>
+      updateStudent(studentId, student),
+    onSuccess: async (_result, { student }) => {
+      successNotification(
+        t('students.notifications.updatedTitle'),
+        t('students.notifications.updatedDescription', { name: student.name })
+      );
+      await queryClient.invalidateQueries({ queryKey: studentKeys.all });
+    },
+  });
+
   const { mutateAsync: deleteStudentMutation } = useMutation({
     mutationFn: (studentId: number) => deleteStudent(studentId),
     onSuccess: async (_result, studentId) => {
@@ -55,6 +67,19 @@ export function useStudents() {
       }
     },
     [createStudentMutation]
+  );
+
+  const updateStudentById = useCallback(
+    async (studentId: number, student: NewStudent): Promise<boolean> => {
+      try {
+        await updateStudentMutation({ studentId, student });
+        return true;
+      } catch (err: unknown) {
+        await notifyHttpError(err, { placement: 'bottomLeft' });
+        return false;
+      }
+    },
+    [updateStudentMutation]
   );
 
   const removeStudentById = useCallback(
@@ -80,6 +105,7 @@ export function useStudents() {
     isFetching,
     retryLoad,
     createStudent,
+    updateStudentById,
     removeStudentById,
   };
 }

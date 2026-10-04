@@ -31,6 +31,7 @@ describe('useStudents', () => {
     vi.clearAllMocks();
     vi.mocked(client.getAllStudents).mockResolvedValue([]);
     vi.mocked(client.addNewStudent).mockResolvedValue(undefined);
+    vi.mocked(client.updateStudent).mockResolvedValue(undefined);
     vi.mocked(client.deleteStudent).mockResolvedValue(undefined);
   });
 
@@ -172,6 +173,41 @@ describe('useStudents', () => {
       'bottomLeft'
     );
     expect(result.current.students).toEqual([]);
+  });
+
+  it('updateStudentById puts, notifies, refreshes, and returns true', async () => {
+    const updated = { ...ada, name: 'Ada Updated' };
+    vi.mocked(client.getAllStudents).mockResolvedValueOnce([ada]).mockResolvedValueOnce([updated]);
+
+    const { result } = renderHook(() => useStudents(), {
+      wrapper: createWrapper(),
+    });
+    await waitFor(() => {
+      expect(result.current.isLoading).toBe(false);
+    });
+
+    let saved = false;
+    await act(async () => {
+      saved = await result.current.updateStudentById(1, {
+        name: 'Ada Updated',
+        email: 'ada@example.com',
+        gender: 'FEMALE',
+      });
+    });
+
+    expect(saved).toBe(true);
+    expect(client.updateStudent).toHaveBeenCalledWith(1, {
+      name: 'Ada Updated',
+      email: 'ada@example.com',
+      gender: 'FEMALE',
+    });
+    expect(notify.successNotification).toHaveBeenCalledWith(
+      'Student updated',
+      'Ada Updated was updated'
+    );
+    await waitFor(() => {
+      expect(result.current.students).toEqual([updated]);
+    });
   });
 
   it('removeStudentById deletes, notifies, and refreshes', async () => {

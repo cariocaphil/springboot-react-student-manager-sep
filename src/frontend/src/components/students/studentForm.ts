@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import type { DefaultValues } from 'react-hook-form';
 import i18n from '../../i18n';
-import { GENDERS, type NewStudent } from '../../types/student';
+import { GENDERS, type NewStudent, type Student } from '../../types/student';
 import { EMAIL_PATTERN } from '../../validation/email';
 
 /** Build schema with messages for the active i18n language (pass `i18n.language` so callers rebuild on change). */
@@ -33,5 +33,13 @@ export function createNewStudentFromForm(values: StudentFormValues): NewStudent 
     name: values.name,
     email: values.email,
     gender: values.gender,
+  };
+}
+
+export function studentToFormValues(student: Student): StudentFormValues {
+  return {
+    name: student.name,
+    email: student.email,
+    gender: student.gender,
   };
 }

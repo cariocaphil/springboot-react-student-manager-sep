@@ -30,6 +30,7 @@ describe('StudentsTable', () => {
         students={students}
         canManageStudents
         onDelete={onDelete}
+        onEdit={vi.fn()}
         onAddClick={onAddClick}
       />
     );
@@ -52,6 +53,7 @@ describe('StudentsTable', () => {
         students={students}
         canManageStudents
         onDelete={onDelete}
+        onEdit={vi.fn()}
         onAddClick={vi.fn()}
       />
     );
@@ -64,12 +66,33 @@ describe('StudentsTable', () => {
     expect(onDelete).toHaveBeenCalledWith(1);
   });
 
+  it('calls onEdit when Edit is clicked', async () => {
+    const user = userEvent.setup();
+    const onEdit = vi.fn();
+
+    render(
+      <StudentsTable
+        students={students}
+        canManageStudents
+        onDelete={vi.fn()}
+        onEdit={onEdit}
+        onAddClick={vi.fn()}
+      />
+    );
+
+    const adaRow = screen.getByText('Ada Lovelace').closest('tr');
+    expect(adaRow).not.toBeNull();
+    await user.click(within(adaRow as HTMLElement).getByText('Edit'));
+    expect(onEdit).toHaveBeenCalledWith(students[0]);
+  });
+
   it('hides add and delete controls when the caller cannot manage students', () => {
     render(
       <StudentsTable
         students={students}
         canManageStudents={false}
         onDelete={vi.fn()}
+        onEdit={vi.fn()}
         onAddClick={vi.fn()}
       />
     );
