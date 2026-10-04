@@ -7,7 +7,7 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
-@Schema(name = "StudentRequest", description = "Payload to create a student")
+@Schema(name = "StudentRequest", description = "Payload to create or update a student")
 public record StudentRequest(
         @NotBlank
         @Schema(description = "Full name", example = "Ada Lovelace", requiredMode = Schema.RequiredMode.REQUIRED)

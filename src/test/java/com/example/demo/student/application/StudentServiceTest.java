@@ -13,10 +13,12 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -71,6 +73,61 @@ class StudentServiceTest {
                 .hasMessageContaining("taken");
 
         verify(studentRepository, never()).save(any());
+    }
+
+    @Test
+    void updateStudent_updatesWhenStudentExistsAndEmailIsFree() {
+        long id = 42L;
+        Student existing = new Student(id, "Jamila", "jamila@gmail.com", Gender.FEMALE);
+        given(studentRepository.findById(id)).willReturn(Optional.of(existing));
+        given(studentRepository.existsByEmailAndIdNot("jamila@updated.com", id)).willReturn(false);
+
+        underTest.updateStudent(id, "Jamila Updated", "jamila@updated.com", Gender.OTHER);
+
+        assertThat(existing.getName()).isEqualTo("Jamila Updated");
+        assertThat(existing.getEmail()).isEqualTo("jamila@updated.com");
+        assertThat(existing.getGender()).isEqualTo(Gender.OTHER);
+        verify(studentRepository).save(existing);
+    }
+
+    @Test
+    void updateStudent_allowsKeepingSameEmail() {
+        long id = 42L;
+        Student existing = new Student(id, "Jamila", "jamila@gmail.com", Gender.FEMALE);
+        given(studentRepository.findById(id)).willReturn(Optional.of(existing));
+        given(studentRepository.existsByEmailAndIdNot("jamila@gmail.com", id)).willReturn(false);
+
+        underTest.updateStudent(id, "Jamila II", "jamila@gmail.com", Gender.FEMALE);
+
+        assertThat(existing.getName()).isEqualTo("Jamila II");
+        verify(studentRepository).save(existing);
+    }
+
+    @Test
+    void updateStudent_throwsWhenStudentMissing() {
+        long id = 99L;
+        given(studentRepository.findById(id)).willReturn(Optional.empty());
+
+        assertThatThrownBy(() -> underTest.updateStudent(id, "A", "a@example.com", Gender.MALE))
+                .isInstanceOf(StudentNotFoundException.class)
+                .hasMessageContaining(String.valueOf(id));
+
+        verify(studentRepository, never()).save(any());
+    }
+
+    @Test
+    void updateStudent_throwsWhenEmailTakenByOther() {
+        long id = 42L;
+        Student existing = new Student(id, "Jamila", "jamila@gmail.com", Gender.FEMALE);
+        given(studentRepository.findById(id)).willReturn(Optional.of(existing));
+        given(studentRepository.existsByEmailAndIdNot("taken@example.com", id)).willReturn(true);
+
+        assertThatThrownBy(() -> underTest.updateStudent(id, "Jamila", "taken@example.com", Gender.FEMALE))
+                .isInstanceOf(DuplicateEmailException.class)
+                .hasMessageContaining("taken@example.com");
+
+        verify(studentRepository, never()).save(any());
+        verify(studentRepository).existsByEmailAndIdNot(eq("taken@example.com"), eq(id));
     }
 
     @Test

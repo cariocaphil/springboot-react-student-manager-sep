@@ -47,7 +47,8 @@ export interface paths {
             cookie?: never;
         };
         get?: never;
-        put?: never;
+        /** Update a student by id */
+        put: operations["updateStudent"];
         post?: never;
         /** Delete a student by id */
         delete: operations["deleteStudent"];
@@ -97,7 +98,7 @@ export interface components {
              */
             username: string;
         };
-        /** @description Payload to create a student */
+        /** @description Payload to create or update a student */
         StudentRequest: {
             /**
              * Format: email
@@ -220,6 +221,48 @@ export interface operations {
             };
             /** @description Validation or business rule failure */
             400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponse"];
+                };
+            };
+        };
+    };
+    updateStudent: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                studentId: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["StudentRequest"];
+            };
+        };
+        responses: {
+            /** @description Updated */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation or business rule failure */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponse"];
+                };
+            };
+            /** @description Student not found */
+            404: {
                 headers: {
                     [name: string]: unknown;
                 };
