@@ -6,11 +6,14 @@ import {
   setAuthCredentials,
   setUnauthorizedHandler,
 } from './authCredentials';
-import { getAllStudents } from '../client';
+import { getCurrentUser } from '../client';
 import { isHttpError } from '../types/api';
+import type { CurrentUser } from '../types/user';
 
 type AuthContextValue = {
   isAuthenticated: boolean;
+  user: CurrentUser | null;
+  canManageStudents: boolean;
   login: (username: string, password: string) => Promise<boolean>;
   logout: () => void;
 };
@@ -23,10 +26,12 @@ type AuthProviderProps = {
 
 export function AuthProvider({ children }: AuthProviderProps) {
   const queryClient = useQueryClient();
+  const [user, setUser] = useState<CurrentUser | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(() => hasAuthCredentials());
 
   const logout = () => {
     clearAuthCredentials();
+    setUser(null);
     setIsAuthenticated(false);
     queryClient.clear();
   };
@@ -34,6 +39,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   useEffect(() => {
     setUnauthorizedHandler(() => {
       clearAuthCredentials();
+      setUser(null);
       setIsAuthenticated(false);
       queryClient.clear();
     });
@@ -43,11 +49,13 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const login = async (username: string, password: string): Promise<boolean> => {
     setAuthCredentials({ username, password });
     try {
-      await getAllStudents();
+      const currentUser = await getCurrentUser();
+      setUser(currentUser);
       setIsAuthenticated(true);
       return true;
     } catch (error: unknown) {
       clearAuthCredentials();
+      setUser(null);
       setIsAuthenticated(false);
       if (isHttpError(error) && error.response.status === 401) {
         return false;
@@ -56,8 +64,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
     }
   };
 
+  const canManageStudents = user?.role === 'ADMIN';
+
   return (
-    <AuthContext.Provider value={{ isAuthenticated, login, logout }}>
+    <AuthContext.Provider value={{ isAuthenticated, user, canManageStudents, login, logout }}>
       {children}
     </AuthContext.Provider>
   );

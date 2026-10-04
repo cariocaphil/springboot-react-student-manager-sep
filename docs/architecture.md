@@ -39,7 +39,7 @@ Student feature packages under `com.example.demo.student`:
 | --- | --- | --- | --- |
 | Bootstrap | `com.example.demo` | `DemoApplication` | Spring Boot entrypoint |
 | Security | `com.example.demo.security` | `SecurityConfig`, `DatabaseUserDetailsService` | Stateless `SecurityFilterChain`; HTTP Basic; `/api/**` authenticated; `@EnableMethodSecurity` |
-| User | `user.domain` / `user.persistence` / `user.application` | `AppUser`, `Role`, `AppUserRepository`, `AdminUserBootstrap` | DB-backed Basic-auth users (BCrypt + role); env bootstrap as `ADMIN` |
+| User | `user.domain` / `user.persistence` / `user.application` / `user.api` | `AppUser`, `Role`, `AppUserRepository`, `AdminUserBootstrap`, `MeController`, `CurrentUserResponse` | DB-backed Basic-auth users (BCrypt + role); env bootstrap as `ADMIN`; `GET /api/v1/me` |
 | API | `student.api` | `StudentController`, DTOs, `StudentMapper`, `StudentApiPaths`, `ApiExceptionHandler`, `ApiErrorCode`, `OpenApiConfig` | HTTP boundary + stable error JSON + OpenAPI |
 | Domain | `student.domain` | `Student` (`@Entity`), `Gender` | Persistence model (not the frontend wire types) |
 | Application | `student.application` | `StudentService` | List, add (email uniqueness), delete; class `@Transactional(readOnly = true)`, writes override with `@Transactional` |
@@ -54,13 +54,15 @@ Student feature packages under `com.example.demo.student`:
 
 **Other success statuses:** `GET` → **200 OK**; `DELETE` → **204 No Content**.
 
-**OpenAPI:** springdoc exposes `/v3/api-docs`. A normalized copy is committed at `api/openapi.json` and drift-checked by `OpenApiContractTest`. Schemas include `StudentRequest`, `StudentResponse`, and `ApiErrorResponse` (required `code` + diagnostic `message` + HTTP `status`/`error`). The JPA `Student` entity is not part of the published contract.
+**OpenAPI:** springdoc exposes `/v3/api-docs`. A normalized copy is committed at `api/openapi.json` and drift-checked by `OpenApiContractTest`. Schemas include `StudentRequest`, `StudentResponse`, `CurrentUserResponse`, and `ApiErrorResponse` (required `code` + diagnostic `message` + HTTP `status`/`error`). The JPA `Student` entity is not part of the published contract.
 
 **Security (PR 39–43):** `SecurityConfig` configures a **stateless** API with **HTTP Basic**. `/api/**` requires authentication (`authenticated()`). Role checks use `@EnableMethodSecurity` + `@PreAuthorize` on `StudentController`: `ADMIN` and `USER` may `GET` students; only `ADMIN` may `POST`/`DELETE` (otherwise **403**). `/v3/api-docs` is public for contract tests and tooling. Packaged SPA/static assets remain public. CSRF is **disabled** because there are no cookie sessions or form-login flows (CSRF tokens do not apply to this Basic-auth REST shape). Form login / logout redirects are disabled so unauthenticated API calls receive **401** (not an HTML login page). Users are stored in PostgreSQL (`AppUser` / `app_user`) with **BCrypt** hashes and a single `Role` (`ADMIN` \| `USER`), loaded by `DatabaseUserDetailsService` as `ROLE_*` authorities. The first user is created on startup by `AdminUserBootstrap` from `APP_ADMIN_USERNAME` / `APP_ADMIN_PASSWORD` when that username is missing (create-if-absent as **`ADMIN`**; existing rows are not updated). Local/CI defaults are `dev` / `changeme` via `app.admin.*` in `application.properties`. Profile **`dev`** (Elastic Beanstalk) requires `APP_ADMIN_*` with no fallback in `application-dev.properties` (same fail-closed pattern as RDS). Obsolete `SECURITY_USER_*` / `spring.security.user.*` are removed.
 
-**Frontend auth (PR 40):** The SPA shows a login screen; credentials live **in memory only** and are sent as `Authorization: Basic …` via the shared API client. Login probes `GET /api/v1/students` (allowed for both roles). Logout and mid-session **401** responses clear credentials and return to login. Backend users and roles are durable; the browser still does not persist credentials and does **not** hide create/delete for `USER` — **JWT, session cookies, and OAuth/OIDC remain out of scope**.
+**Current user (PR 44):** `GET /api/v1/me` (`MeController`) returns `CurrentUserResponse` (`username`, `role` as `ADMIN` \| `USER`) derived from the authenticated `UserDetails` principal (no second repository lookup). Covered by the existing `/api/**` authenticated rule.
 
-**Gaps vs a full CRUD product (recorded, not fixed):** no update endpoint; no JWT/OAuth; no SPA role-aware UI; no Flyway/Liquibase (DDL via Hibernate `update`).
+**Frontend auth (PR 40 + 44):** The SPA shows a login screen; credentials live **in memory only** and are sent as `Authorization: Basic …` via the shared API client. Login probes `GET /api/v1/me`, stores `{ username, role }` in `AuthContext`, and exposes `canManageStudents` (`role === 'ADMIN'`). Students UI hides Add/Delete (and the create drawer) when `canManageStudents` is false. Hiding controls is UX only — backend `@PreAuthorize` remains the security boundary. Logout and mid-session **401** responses clear credentials/user and return to login. **JWT, session cookies, and OAuth/OIDC remain out of scope**.
+
+**Gaps vs a full CRUD product (recorded, not fixed):** no update endpoint; no JWT/OAuth; no Flyway/Liquibase (DDL via Hibernate `update`).
 
 ### 2.3 Frontend
 
@@ -69,7 +71,7 @@ Student feature packages under `com.example.demo.student`:
 | Framework | React 19 + TypeScript function components + hooks (Vite 5) |
 | UI kit | Ant Design 5 (Layout, Table, Drawer, Form layout, notifications; CSS-in-JS) |
 | i18n | `i18next` + `react-i18next`; default `en`, resources also for `de`; Ant Design `ConfigProvider` locale follows language; header `LanguageSwitcher` (EN/DE) |
-| HTTP | Typed `client` helpers + `apiRoutes` (`studentsApi`) against relative `api/v1/students` (`unfetch`); in-memory Basic `Authorization` via `auth/authCredentials`; TanStack Query (`useQuery` / `useMutation`) via `useStudents` |
+| HTTP | Typed `client` helpers + `apiRoutes` (`studentsApi`, `meApi`) against relative `api/v1/…` (`unfetch`); in-memory Basic `Authorization` via `auth/authCredentials`; login via `getCurrentUser()`; TanStack Query (`useQuery` / `useMutation`) via `useStudents` |
 | Forms | React Hook Form + Zod (`createStudentFormSchema` / `createLoginFormSchema` via `i18n.t`); declarative `studentFormFields` with `labelKey` / `placeholderKey` + `StudentFormField` (`useTranslation` at render); table columns via `useStudentColumns` |
 | Errors | `apiError` maps known OpenAPI `ApiErrorCode` values to i18n (`errors.codes.*`); unknown codes / unexpected failures → generic i18n; `message` is diagnostic only for known codes; list load failures render in-page error + Retry; login invalid credentials → in-page alert |
 | Wire types | Generated by `openapi-typescript` from `api/openapi.json` into `types/generated/schema.d.ts` (**do not edit**). `types/student` / `types/api` alias generated schemas for app use; UI-only types (e.g. form values, notifications) stay separate |
@@ -267,8 +269,8 @@ Spring Boot / SEP container
 
 | Area | Present today |
 | --- | --- |
-| Backend | `DemoApplicationTests`; `StudentServiceTest` (Mockito); `StudentRepositoryTest` (`@DataJpaTest`); `StudentIntegrationTest` (MockMvc API + Basic auth as ADMIN); `SecurityIntegrationTest` (401 / authenticated / public OpenAPI); `AuthorizationIntegrationTest` (USER/ADMIN matrix); `OpenApiContractTest`; JaCoCo report on `test` |
-| Frontend | Vitest for `client`, `apiRoutes`, `apiError`, notifications, `useStudents`, student/layout leaves, drawer, and App flows; ESLint + Prettier; Maven `build-frontend` runs `format:check`, `check:api-types`, `lint`, and `npm run test:coverage` before `vite build` |
+| Backend | `DemoApplicationTests`; `StudentServiceTest` (Mockito); `StudentRepositoryTest` (`@DataJpaTest`); `StudentIntegrationTest` (MockMvc API + Basic auth as ADMIN); `SecurityIntegrationTest` (401 / authenticated / public OpenAPI); `AuthorizationIntegrationTest` (USER/ADMIN matrix); `MeIntegrationTest` (`GET /api/v1/me`); `OpenApiContractTest`; JaCoCo report on `test` |
+| Frontend | Vitest for `client`, `apiRoutes`, `apiError`, auth/`/me` login, role-aware students UI, notifications, `useStudents`, student/layout leaves, drawer, and App flows; ESLint + Prettier; Maven `build-frontend` runs `format:check`, `check:api-types`, `lint`, and `npm run test:coverage` before `vite build` |
 | OpenAPI | `OpenApiContractTest` asserts committed `api/openapi.json` matches `/v3/api-docs`; frontend `check:api-types` asserts generated TS matches that JSON |
 | Integration / repository / service tests | Present for student create/list/delete and email uniqueness (PR 14) |
 | Coverage | CI uploads JaCoCo XML + Vitest Cobertura to Codecov; `codecov.yml` enforces 80% project and patch (PR 38) |
@@ -287,7 +289,8 @@ These items are intentional backlog for modernization; this branch does not fix 
 - ~~No Spring Security~~ — PR 39 adds HTTP Basic + `/api/**` protection; still no JWT/OAuth
 - ~~SPA had no login~~ — PR 40 adds in-memory Basic login/logout; still no JWT/session persistence (refresh requires re-login)
 - ~~In-memory Spring Security user (`SECURITY_USER_*`)~~ — PR 42 moves users to PostgreSQL (`AppUser` + BCrypt); bootstrap via `APP_ADMIN_*`
-- ~~No roles beyond `authenticated()`~~ — PR 43 adds `ADMIN`/`USER` + `@PreAuthorize` on student endpoints; SPA does not yet hide write actions for `USER`
+- ~~No roles beyond `authenticated()`~~ — PR 43 adds `ADMIN`/`USER` + `@PreAuthorize` on student endpoints
+- ~~SPA showed write controls to `USER`~~ — PR 44 probes `/me` and hides Add/Delete for non-admins (backend still authoritative)
 - Basic defaults (`dev`/`changeme`) apply only when profile `dev` is **not** active; EB `dev` profile requires `APP_ADMIN_*` (no fallback); bootstrap user is `ADMIN`
 - After deploying PR 42+, remove obsolete `SECURITY_USER_*` from the EB environment and set `APP_ADMIN_*` once so the first admin row is created
 - API and error payloads expose binding/message details (`server.error.include-message=always`)

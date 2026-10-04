@@ -2,7 +2,7 @@
 
 Build history for the Student Manager modernization.
 
-PR numbers match merged GitHub pull requests. Future work continues from PR 43.
+PR numbers match merged GitHub pull requests. Future work continues from PR 44.
 
 The README keeps a short Status summary; this file holds the full checklist.
 
@@ -263,3 +263,10 @@ PR 43 — Role-based authorization ✅
 - [x] `@EnableMethodSecurity` + `@PreAuthorize`: both roles read students; only `ADMIN` creates/deletes
 - [x] Authorization integration tests: 401 / USER read / USER write 403 / ADMIN full access
 - [x] Docs: authn vs authz, permission matrix; SPA role UI left as debt
+
+PR 44 — Role-aware SPA ✅
+- [x] `GET /api/v1/me` returns `{ username, role }` from the security principal; OpenAPI + generated TS types
+- [x] Login probe switches to `/me`; `AuthContext` exposes `user` + `canManageStudents`
+- [x] Hide Add/Delete (and create drawer) for non-admins; backend `@PreAuthorize` remains authoritative
+- [x] Frontend Vitest for ADMIN/USER UI; `/me` auth flow coverage
+- [x] Docs: README + architecture + roadmap + AGENTS

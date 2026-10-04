@@ -4,6 +4,23 @@
  */
 
 export interface paths {
+    "/api/v1/me": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get the authenticated user */
+        get: operations["getCurrentUser"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/students": {
         parameters: {
             query?: never;
@@ -67,6 +84,19 @@ export interface components {
              */
             status: number;
         };
+        /** @description Currently authenticated user */
+        CurrentUserResponse: {
+            /**
+             * @description Application role
+             * @enum {string}
+             */
+            role: "ADMIN" | "USER";
+            /**
+             * @description Username
+             * @example dev
+             */
+            username: string;
+        };
         /** @description Payload to create a student */
         StudentRequest: {
             /**
@@ -119,6 +149,35 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
+    getCurrentUser: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Current user */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CurrentUserResponse"];
+                };
+            };
+            /** @description Unauthenticated */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CurrentUserResponse"];
+                };
+            };
+        };
+    };
     getAllStudents: {
         parameters: {
             query?: never;

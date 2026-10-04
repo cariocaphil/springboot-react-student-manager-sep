@@ -11,7 +11,7 @@ import AppProviders from '../layout/AppProviders';
 import LoginPage from './LoginPage';
 
 vi.mock('../../client', () => ({
-  getAllStudents: vi.fn(),
+  getCurrentUser: vi.fn(),
 }));
 
 function renderLogin() {
@@ -47,7 +47,7 @@ describe('LoginPage', () => {
 
   it('shows an invalid-credentials error when login fails with 401', async () => {
     const user = userEvent.setup();
-    vi.mocked(client.getAllStudents).mockRejectedValue({
+    vi.mocked(client.getCurrentUser).mockRejectedValue({
       message: 'Unauthorized',
       response: { ok: false, status: 401, statusText: 'Unauthorized', json: async () => ({}) },
     });
@@ -61,9 +61,9 @@ describe('LoginPage', () => {
     expect(await screen.findByText(i18n.t('login.invalidCredentials'))).toBeInTheDocument();
   });
 
-  it('calls getAllStudents with credentials on successful submit', async () => {
+  it('calls getCurrentUser with credentials on successful submit', async () => {
     const user = userEvent.setup();
-    vi.mocked(client.getAllStudents).mockResolvedValue([]);
+    vi.mocked(client.getCurrentUser).mockResolvedValue({ username: 'dev', role: 'ADMIN' });
 
     renderLogin();
 
@@ -72,7 +72,7 @@ describe('LoginPage', () => {
     await user.click(screen.getByRole('button', { name: i18n.t('login.submit') }));
 
     await waitFor(() => {
-      expect(client.getAllStudents).toHaveBeenCalled();
+      expect(client.getCurrentUser).toHaveBeenCalled();
     });
     expect(screen.queryByText(i18n.t('login.invalidCredentials'))).not.toBeInTheDocument();
   });

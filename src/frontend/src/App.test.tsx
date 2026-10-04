@@ -16,6 +16,8 @@ vi.mock('./auth/AuthContext', async () => {
     ...actual,
     useAuth: () => ({
       isAuthenticated: true,
+      user: { username: 'dev', role: 'ADMIN' as const },
+      canManageStudents: true,
       login: vi.fn(),
       logout: vi.fn(),
     }),

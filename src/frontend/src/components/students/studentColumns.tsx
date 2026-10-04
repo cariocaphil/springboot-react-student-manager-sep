@@ -4,10 +4,18 @@ import StudentActions from './StudentActions';
 import StudentAvatar from './StudentAvatar';
 import type { Student } from '../../types/student';
 
-export function useStudentColumns(onDelete: (studentId: number) => void): ColumnsType<Student> {
+type UseStudentColumnsOptions = {
+  canManageStudents: boolean;
+  onDelete: (studentId: number) => void;
+};
+
+export function useStudentColumns({
+  canManageStudents,
+  onDelete,
+}: UseStudentColumnsOptions): ColumnsType<Student> {
   const { t } = useTranslation();
 
-  return [
+  const columns: ColumnsType<Student> = [
     {
       title: '',
       dataIndex: 'avatar',
@@ -34,12 +42,17 @@ export function useStudentColumns(onDelete: (studentId: number) => void): Column
       dataIndex: 'gender',
       key: 'gender',
     },
-    {
+  ];
+
+  if (canManageStudents) {
+    columns.push({
       title: t('students.columns.actions'),
       key: 'actions',
       render: (_text, student) => (
         <StudentActions studentName={student.name} studentId={student.id} onDelete={onDelete} />
       ),
-    },
-  ];
+    });
+  }
+
+  return columns;
 }
