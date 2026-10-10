@@ -8,7 +8,7 @@ This document describes the **as-is** architecture of the student manager applic
 ┌─────────────┐     HTTP      ┌──────────────────────────────────────┐
 │  Browser    │──────────────▶│  Spring Boot process (port 8080)     │
 │  (React UI) │◀──────────────│  • Static SPA (production package)   │
-└─────────────┘               │  • REST API /api/v1/students         │
+└─────────────┘               │  • REST /api/v1/students|courses|/me │
                               └──────────────────┬───────────────────┘
                                                  │ JDBC
                                                  ▼
@@ -33,18 +33,23 @@ This document describes the **as-is** architecture of the student manager applic
 
 Package root: `com.example.demo`
 
-Student feature packages under `com.example.demo.student`:
+Feature packages under `com.example.demo`:
 
 | Layer | Package | Types | Role |
 | --- | --- | --- | --- |
 | Bootstrap | `com.example.demo` | `DemoApplication` | Spring Boot entrypoint |
 | Security | `com.example.demo.security` | `SecurityConfig`, `DatabaseUserDetailsService` | Stateless `SecurityFilterChain`; HTTP Basic; `/api/**` authenticated; `@EnableMethodSecurity` |
 | User | `user.domain` / `user.persistence` / `user.application` / `user.api` | `AppUser`, `Role`, `AppUserRepository`, `AdminUserBootstrap`, `MeController`, `CurrentUserResponse` | DB-backed Basic-auth users (BCrypt + role); env bootstrap as `ADMIN`; `GET /api/v1/me` |
-| API | `student.api` | `StudentController`, DTOs, `StudentMapper`, `StudentApiPaths`, `ApiExceptionHandler`, `ApiErrorCode`, `OpenApiConfig` | HTTP boundary + stable error JSON + OpenAPI |
+| API | `student.api` | `StudentController`, DTOs, `StudentMapper`, `StudentApiPaths`, `ApiExceptionHandler`, `ApiErrorCode`, `OpenApiConfig` | Student HTTP boundary + shared error JSON / OpenAPI config (still home of `ApiErrorCode`) |
 | Domain | `student.domain` | `Student` (`@Entity`), `Gender` | Persistence model (not the frontend wire types) |
 | Application | `student.application` | `StudentService` | List, add, update (email uniqueness excluding self), delete; class `@Transactional(readOnly = true)`, writes override with `@Transactional` |
 | Persistence | `student.persistence` | `StudentRepository` | CRUD + derived `existsByEmail` |
 | Exceptions | `student.exception` | `DuplicateEmailException`, `StudentNotFoundException`, `BadRequestException` (generic fallback) | Domain/API failure types |
+| API | `course.api` | `CourseController`, DTOs, `CourseMapper`, `CourseApiPaths` | Course HTTP boundary (`/api/v1/courses`) |
+| Domain | `course.domain` | `Course` (`@Entity`) | Persistence model; no dependency on `student.*` |
+| Application | `course.application` | `CourseService` | List, add, update, delete; same transactional pattern as students |
+| Persistence | `course.persistence` | `CourseRepository` | `JpaRepository<Course, Long>` |
+| Exceptions | `course.exception` | `CourseNotFoundException` | Mapped to `COURSE_NOT_FOUND` via shared handler |
 
 **Request flow (create):**
 
@@ -54,9 +59,9 @@ Student feature packages under `com.example.demo.student`:
 
 **Other success statuses:** `GET` → **200 OK**; `PUT` / `DELETE` → **204 No Content**.
 
-**OpenAPI:** springdoc exposes `/v3/api-docs`. A normalized copy is committed at `api/openapi.json` and drift-checked by `OpenApiContractTest`. Schemas include `StudentRequest`, `StudentResponse`, `CurrentUserResponse`, and `ApiErrorResponse` (required `code` + diagnostic `message` + HTTP `status`/`error`). The JPA `Student` entity is not part of the published contract.
+**OpenAPI:** springdoc exposes `/v3/api-docs`. A normalized copy is committed at `api/openapi.json` and drift-checked by `OpenApiContractTest`. Schemas include `StudentRequest` / `StudentResponse`, `CourseRequest` / `CourseResponse`, `CurrentUserResponse`, and `ApiErrorResponse` (required `code` + diagnostic `message` + HTTP `status`/`error`). JPA entities are not part of the published contract.
 
-**Security (PR 39–43):** `SecurityConfig` configures a **stateless** API with **HTTP Basic**. `/api/**` requires authentication (`authenticated()`). Role checks use `@EnableMethodSecurity` + `@PreAuthorize` on `StudentController`: `ADMIN` and `USER` may `GET` students; only `ADMIN` may `POST`/`PUT`/`DELETE` (otherwise **403**). `/v3/api-docs` is public for contract tests and tooling. Packaged SPA/static assets remain public. CSRF is **disabled** because there are no cookie sessions or form-login flows (CSRF tokens do not apply to this Basic-auth REST shape). Form login / logout redirects are disabled so unauthenticated API calls receive **401** (not an HTML login page). Users are stored in PostgreSQL (`AppUser` / `app_user`) with **BCrypt** hashes and a single `Role` (`ADMIN` \| `USER`), loaded by `DatabaseUserDetailsService` as `ROLE_*` authorities. The first user is created on startup by `AdminUserBootstrap` from `APP_ADMIN_USERNAME` / `APP_ADMIN_PASSWORD` when that username is missing (create-if-absent as **`ADMIN`**; existing rows are not updated). Local/CI defaults are `dev` / `changeme` via `app.admin.*` in `application.properties`. Profile **`dev`** (Elastic Beanstalk) requires `APP_ADMIN_*` with no fallback in `application-dev.properties` (same fail-closed pattern as RDS). Obsolete `SECURITY_USER_*` / `spring.security.user.*` are removed.
+**Security (PR 39–43):** `SecurityConfig` configures a **stateless** API with **HTTP Basic**. `/api/**` requires authentication (`authenticated()`). Role checks use `@EnableMethodSecurity` + `@PreAuthorize` on `StudentController` and `CourseController`: `ADMIN` and `USER` may `GET`; only `ADMIN` may `POST`/`PUT`/`DELETE` (otherwise **403**). `/v3/api-docs` is public for contract tests and tooling. Packaged SPA/static assets remain public. CSRF is **disabled** because there are no cookie sessions or form-login flows (CSRF tokens do not apply to this Basic-auth REST shape). Form login / logout redirects are disabled so unauthenticated API calls receive **401** (not an HTML login page). Users are stored in PostgreSQL (`AppUser` / `app_user`) with **BCrypt** hashes and a single `Role` (`ADMIN` \| `USER`), loaded by `DatabaseUserDetailsService` as `ROLE_*` authorities. The first user is created on startup by `AdminUserBootstrap` from `APP_ADMIN_USERNAME` / `APP_ADMIN_PASSWORD` when that username is missing (create-if-absent as **`ADMIN`**; existing rows are not updated). Local/CI defaults are `dev` / `changeme` via `app.admin.*` in `application.properties`. Profile **`dev`** (Elastic Beanstalk) requires `APP_ADMIN_*` with no fallback in `application-dev.properties` (same fail-closed pattern as RDS). Obsolete `SECURITY_USER_*` / `spring.security.user.*` are removed.
 
 **Current user (PR 44):** `GET /api/v1/me` (`MeController`) returns `CurrentUserResponse` (`username`, `role` as `ADMIN` \| `USER`) derived from the authenticated `UserDetails` principal (no second repository lookup). Covered by the existing `/api/**` authenticated rule.
 
@@ -64,7 +69,11 @@ Student feature packages under `com.example.demo.student`:
 
 **Student update (PR 45):** `PUT /api/v1/students/{studentId}` accepts `@Valid StudentRequest` (full replacement), returns **204**, and is ADMIN-only. Email uniqueness ignores the current row (`existsByEmailAndIdNot`). The SPA reuses `StudentDrawerForm` for create and edit; Edit opens the drawer prefilled and saves via `updateStudent` / TanStack mutation.
 
-**Gaps vs a full CRUD product (recorded, not fixed):** no JWT/OAuth; no Flyway/Liquibase (DDL via Hibernate `update`).
+**Course domain (PR 46):** Independent `course.*` packages (no imports from `student.*` domain types). `CourseController` exposes list/create/update/delete at `/api/v1/courses` with the same status and auth matrix as students. Missing ids map to `COURSE_NOT_FOUND` via the shared `ApiExceptionHandler`. Titles may duplicate (no natural unique key). Hibernate `ddl-auto` creates the `course` table. The SPA has **no Course UI** yet — only OpenAPI typegen and `apiError` / i18n for the new code.
+
+**Future Enrollment seam (not implemented):** linking students to courses should be a separate join (e.g. `Enrollment` with `studentId` + `courseId`) rather than merging the two aggregates. That keeps Course/Student extractable later and avoids cross-package entity FKs until a dedicated PR.
+
+**Gaps vs a full CRUD product (recorded, not fixed):** no Course SPA; no Enrollment; no JWT/OAuth; no Flyway/Liquibase (DDL via Hibernate `update`); shared `ApiErrorCode` still lives under `student.api` (optional extract later).
 
 ### 2.3 Frontend
 
@@ -128,6 +137,15 @@ Elastic Beanstalk compose sets `SPRING_PROFILES_ACTIVE: dev` and passes through 
 | `name` | Non-blank, non-null column |
 | `email` | Valid email, unique, non-null |
 | `gender` | Enum `MALE` \| `FEMALE` \| `OTHER`, stored as string |
+
+**Course** (independent of Student; no join table yet)
+
+| Field | Constraints |
+| --- | --- |
+| `id` | Sequence-generated `Long` (`course_sequence`) |
+| `title` | Non-blank, non-null (not unique) |
+| `description` | Nullable / optional on create and update |
+| `capacity` | Non-null integer, minimum 1 |
 
 **AppUser** (table `app_user`)
 
@@ -271,7 +289,7 @@ Spring Boot / SEP container
 
 | Area | Present today |
 | --- | --- |
-| Backend | `DemoApplicationTests`; `StudentServiceTest` (Mockito); `StudentRepositoryTest` (`@DataJpaTest`); `StudentIntegrationTest` (MockMvc API + Basic auth as ADMIN); `SecurityIntegrationTest` (401 / authenticated / public OpenAPI); `AuthorizationIntegrationTest` (USER/ADMIN matrix); `MeIntegrationTest` (`GET /api/v1/me`); `OpenApiContractTest`; JaCoCo report on `test` |
+| Backend | `DemoApplicationTests`; `StudentServiceTest` / `CourseServiceTest` (Mockito); `StudentRepositoryTest` / `CourseRepositoryTest` (`@DataJpaTest`); `StudentIntegrationTest` / `CourseIntegrationTest` (MockMvc + Basic as ADMIN); `SecurityIntegrationTest` (401 / authenticated / public OpenAPI); `AuthorizationIntegrationTest` (USER/ADMIN matrix for students + courses); `MeIntegrationTest` (`GET /api/v1/me`); `OpenApiContractTest`; JaCoCo report on `test` |
 | Frontend | Vitest for `client`, `apiRoutes`, `apiError`, auth/`/me` login, role-aware students UI, notifications, `useStudents`, student/layout leaves, drawer, and App flows; ESLint + Prettier; Maven `build-frontend` runs `format:check`, `check:api-types`, `lint`, and `npm run test:coverage` before `vite build` |
 | OpenAPI | `OpenApiContractTest` asserts committed `api/openapi.json` matches `/v3/api-docs`; frontend `check:api-types` asserts generated TS matches that JSON |
 | Integration / repository / service tests | Present for student create/list/delete and email uniqueness (PR 14) |
@@ -310,8 +328,11 @@ These items are intentional backlog for modernization; this branch does not fix 
 
 ### Product / design
 
-- Edit UI without backend update API
+- ~~Edit UI without backend update API~~ — PR 45 adds `PUT` + Edit drawer
+- Course API without SPA screens (PR 46 backend foundation)
+- No Enrollment join between Student and Course yet (documented seam only)
 - Hibernate `ddl-auto=update` used for deployed `dev` profile (no migration history)
+- Shared `ApiErrorCode` / `ApiExceptionHandler` still under `student.api` (optional extract)
 
 ### Quality
 

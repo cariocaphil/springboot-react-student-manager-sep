@@ -7,12 +7,12 @@ Full-stack student CRUD demo: a Spring Boot API and a Vite React UI packaged int
 
 ## Status
 
-**Modernization:** PR 45 adds student update (`PUT`) and wires the Edit UI. Future work continues from PR 45.
+**Modernization:** PR 46 adds a backend Course domain (`/api/v1/courses`). Future work continues from PR 46.
 
 | | |
 | --- | --- |
-| Current | **Java 17** / Spring Boot **3.4.5** + **springdoc** + **Spring Security** (HTTP Basic + DB roles); Vite + TypeScript **React 19.3** with login + in-memory Basic auth + role-aware UI; EB **LoadBalanced** with public **HTTPS** at `sep.learning-projects.dev`; POST **201** / PUT & DELETE **204** |
-| Next | Richer identity (JWT/OAuth or similar), optional Swagger UI / Flyway; further platform work per roadmap |
+| Current | **Java 17** / Spring Boot **3.4.5** + **springdoc** + **Spring Security** (HTTP Basic + DB roles); Student + Course CRUD APIs; Vite + TypeScript **React 19.3** with login + in-memory Basic auth + role-aware students UI; EB **LoadBalanced** with public **HTTPS** at `sep.learning-projects.dev`; POST **201** / PUT & DELETE **204** |
+| Next | Course SPA (or Enrollment), richer identity (JWT/OAuth or similar), optional Swagger UI / Flyway; further platform work per roadmap |
 | Full checklist | [docs/modernization-roadmap.md](docs/modernization-roadmap.md) |
 | Architecture | [docs/architecture.md](docs/architecture.md) |
 
@@ -119,9 +119,9 @@ The API listens on **http://localhost:8080**. In production-style packaging, the
 
 **Authentication** is still **HTTP Basic**. Users live in PostgreSQL (`app_user`) with **BCrypt** password hashes; Spring Security loads them via `DatabaseUserDetailsService`.
 
-**Authorization** uses a single role per user (`ADMIN` or `USER`), enforced with `@PreAuthorize` on the student API:
+**Authorization** uses a single role per user (`ADMIN` or `USER`), enforced with `@PreAuthorize` on the student and course APIs:
 
-| Role | `GET /api/v1/students` | `POST` / `PUT` / `DELETE` students |
+| Role | `GET` students / courses | `POST` / `PUT` / `DELETE` students / courses |
 | --- | --- | --- |
 | `ADMIN` | allowed | allowed |
 | `USER` | allowed | **403 Forbidden** |
@@ -201,7 +201,7 @@ CI fails if the committed OpenAPI JSON drifts from the running app (`OpenApiCont
 
 ## API surface (current)
 
-Base path: `/api/v1/students`
+### Students
 
 | Method | Path | Behavior |
 | --- | --- | --- |
@@ -209,6 +209,17 @@ Base path: `/api/v1/students`
 | `POST` | `/api/v1/students` | Create student (validated; rejects duplicate email) |
 | `PUT` | `/api/v1/students/{studentId}` | Full update (validated; rejects email taken by another student; 404 if missing) |
 | `DELETE` | `/api/v1/students/{studentId}` | Delete by id (404 if missing) |
+
+### Courses
+
+Backend-only for now (no SPA screens). Titles are not unique.
+
+| Method | Path | Behavior |
+| --- | --- | --- |
+| `GET` | `/api/v1/courses` | List all courses |
+| `POST` | `/api/v1/courses` | Create course (validated: non-blank title, capacity ≥ 1; description optional) |
+| `PUT` | `/api/v1/courses/{courseId}` | Full update (same request body as create; 404 if missing) |
+| `DELETE` | `/api/v1/courses/{courseId}` | Delete by id (404 if missing) |
 
 ## CI/CD overview
 
