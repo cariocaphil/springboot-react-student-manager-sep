@@ -49,8 +49,13 @@ Feature packages under `com.example.demo`:
 | API | `course.api` | `CourseController`, DTOs, `CourseMapper`, `CourseApiPaths` | Course HTTP boundary (`/api/v1/courses`) |
 | Domain | `course.domain` | `Course` (`@Entity`) | Persistence model; no dependency on `student.*` |
 | Application | `course.application` | `CourseService` | List, add, update, delete; same transactional pattern as students |
-| Persistence | `course.persistence` | `CourseRepository` | `JpaRepository<Course, Long>` |
+| Persistence | `course.persistence` | `CourseRepository` | `JpaRepository<Course, Long>` + `findByIdForUpdate` (pessimistic lock for enrollment) |
 | Exceptions | `course.exception` | `CourseNotFoundException` | Mapped to `COURSE_NOT_FOUND` via shared handler |
+| API | `enrollment.api` | `EnrollmentController`, DTOs, `EnrollmentMapper`, `EnrollmentApiPaths` | Enrollment HTTP boundary (`/api/v1/enrollments`) |
+| Domain | `enrollment.domain` | `Enrollment` (`@Entity`) | Join of plain `studentId` + `courseId` + `enrolledAt` (no `@ManyToOne`) |
+| Application | `enrollment.application` | `EnrollmentService` | List / enroll / delete; locks course row before capacity check |
+| Persistence | `enrollment.persistence` | `EnrollmentRepository` | Unique `(student_id, course_id)`; `exists` / `countByCourseId` |
+| Exceptions | `enrollment.exception` | `DuplicateEnrollmentException`, `CourseFullException`, `EnrollmentNotFoundException` | Mapped via `common.api` handler |
 
 **Request flow (create):**
 
@@ -60,9 +65,9 @@ Feature packages under `com.example.demo`:
 
 **Other success statuses:** `GET` → **200 OK**; `PUT` / `DELETE` → **204 No Content**.
 
-**OpenAPI:** springdoc exposes `/v3/api-docs`. A normalized copy is committed at `api/openapi.json` and drift-checked by `OpenApiContractTest`. Schemas include `StudentRequest` / `StudentResponse`, `CourseRequest` / `CourseResponse`, `CurrentUserResponse`, and `ApiErrorResponse` (required `code` + diagnostic `message` + HTTP `status`/`error`). JPA entities are not part of the published contract.
+**OpenAPI:** springdoc exposes `/v3/api-docs`. A normalized copy is committed at `api/openapi.json` and drift-checked by `OpenApiContractTest`. Schemas include `StudentRequest` / `StudentResponse`, `CourseRequest` / `CourseResponse`, `EnrollmentRequest` / `EnrollmentResponse`, `CurrentUserResponse`, and `ApiErrorResponse` (required `code` + diagnostic `message` + HTTP `status`/`error`). JPA entities are not part of the published contract.
 
-**Security (PR 39–43):** `SecurityConfig` configures a **stateless** API with **HTTP Basic**. `/api/**` requires authentication (`authenticated()`). Role checks use `@EnableMethodSecurity` + `@PreAuthorize` on `StudentController` and `CourseController`: `ADMIN` and `USER` may `GET`; only `ADMIN` may `POST`/`PUT`/`DELETE` (otherwise **403**). `/v3/api-docs` is public for contract tests and tooling. Packaged SPA/static assets remain public. CSRF is **disabled** because there are no cookie sessions or form-login flows (CSRF tokens do not apply to this Basic-auth REST shape). Form login / logout redirects are disabled so unauthenticated API calls receive **401** (not an HTML login page). Users are stored in PostgreSQL (`AppUser` / `app_user`) with **BCrypt** hashes and a single `Role` (`ADMIN` \| `USER`), loaded by `DatabaseUserDetailsService` as `ROLE_*` authorities. The first user is created on startup by `AdminUserBootstrap` from `APP_ADMIN_USERNAME` / `APP_ADMIN_PASSWORD` when that username is missing (create-if-absent as **`ADMIN`**; existing rows are not updated). Local/CI defaults are `dev` / `changeme` via `app.admin.*` in `application.properties`. Profile **`dev`** (Elastic Beanstalk) requires `APP_ADMIN_*` with no fallback in `application-dev.properties` (same fail-closed pattern as RDS). Obsolete `SECURITY_USER_*` / `spring.security.user.*` are removed.
+**Security (PR 39–43):** `SecurityConfig` configures a **stateless** API with **HTTP Basic**. `/api/**` requires authentication (`authenticated()`). Role checks use `@EnableMethodSecurity` + `@PreAuthorize` on `StudentController`, `CourseController`, and `EnrollmentController`: `ADMIN` and `USER` may `GET`; only `ADMIN` may writes (otherwise **403**). `/v3/api-docs` is public for contract tests and tooling. Packaged SPA/static assets remain public. CSRF is **disabled** because there are no cookie sessions or form-login flows (CSRF tokens do not apply to this Basic-auth REST shape). Form login / logout redirects are disabled so unauthenticated API calls receive **401** (not an HTML login page). Users are stored in PostgreSQL (`AppUser` / `app_user`) with **BCrypt** hashes and a single `Role` (`ADMIN` \| `USER`), loaded by `DatabaseUserDetailsService` as `ROLE_*` authorities. The first user is created on startup by `AdminUserBootstrap` from `APP_ADMIN_USERNAME` / `APP_ADMIN_PASSWORD` when that username is missing (create-if-absent as **`ADMIN`**; existing rows are not updated). Local/CI defaults are `dev` / `changeme` via `app.admin.*` in `application.properties`. Profile **`dev`** (Elastic Beanstalk) requires `APP_ADMIN_*` with no fallback in `application-dev.properties` (same fail-closed pattern as RDS). Obsolete `SECURITY_USER_*` / `spring.security.user.*` are removed.
 
 **Current user (PR 44):** `GET /api/v1/me` (`MeController`) returns `CurrentUserResponse` (`username`, `role` as `ADMIN` \| `USER`) derived from the authenticated `UserDetails` principal (no second repository lookup). Covered by the existing `/api/**` authenticated rule.
 
@@ -74,9 +79,9 @@ Feature packages under `com.example.demo`:
 
 **Shared API errors (PR 47):** `ApiErrorCode`, `ApiErrorResponse`, and `ApiExceptionHandler` live under `common.api` (no longer under `student.api`). Exception-to-status/code mappings and the JSON contract are unchanged.
 
-**Future Enrollment seam (not implemented):** linking students to courses should be a separate join (e.g. `Enrollment` with `studentId` + `courseId`) rather than merging the two aggregates. That keeps Course/Student extractable later and avoids cross-package entity FKs until a dedicated PR.
+**Enrollment domain (PR 48):** `enrollment.*` stores plain `studentId` / `courseId` (no JPA association to Student/Course). `EnrollmentService.enroll` is the only insert path: verify student exists → `CourseRepository.findByIdForUpdate` → reject duplicate → reject when `countByCourseId >= capacity` → `saveAndFlush`. Unique `(student_id, course_id)` backstops races; constraint violations map to `DUPLICATE_ENROLLMENT`. Auth matches other collections (read for ADMIN/USER; create/delete ADMIN-only). No Enrollment SPA yet.
 
-**Gaps vs a full CRUD product (recorded, not fixed):** no Course SPA; no Enrollment; no JWT/OAuth; no Flyway/Liquibase (DDL via Hibernate `update`).
+**Gaps vs a full CRUD product (recorded, not fixed):** no Course/Enrollment SPA; no JWT/OAuth; no Flyway/Liquibase (DDL via Hibernate `update`); no DB foreign keys from enrollment to student/course (deleting a student or course can leave orphan enrollment rows).
 
 ### 2.3 Frontend
 
@@ -141,7 +146,7 @@ Elastic Beanstalk compose sets `SPRING_PROFILES_ACTIVE: dev` and passes through 
 | `email` | Valid email, unique, non-null |
 | `gender` | Enum `MALE` \| `FEMALE` \| `OTHER`, stored as string |
 
-**Course** (independent of Student; no join table yet)
+**Course** (independent of Student)
 
 | Field | Constraints |
 | --- | --- |
@@ -149,6 +154,16 @@ Elastic Beanstalk compose sets `SPRING_PROFILES_ACTIVE: dev` and passes through 
 | `title` | Non-blank, non-null (not unique) |
 | `description` | Nullable / optional on create and update |
 | `capacity` | Non-null integer, minimum 1 |
+
+**Enrollment** (join table; plain IDs, no JPA/`@ManyToOne` FKs)
+
+| Field | Constraints |
+| --- | --- |
+| `id` | Sequence-generated `Long` (`enrollment_sequence`) |
+| `student_id` | Non-null `Long` (no DB FK) |
+| `course_id` | Non-null `Long` (no DB FK) |
+| `enrolled_at` | Non-null `Instant` (set on create) |
+| uniqueness | Unique `(student_id, course_id)` |
 
 **AppUser** (table `app_user`)
 
@@ -292,7 +307,7 @@ Spring Boot / SEP container
 
 | Area | Present today |
 | --- | --- |
-| Backend | `DemoApplicationTests`; `StudentServiceTest` / `CourseServiceTest` (Mockito); `StudentRepositoryTest` / `CourseRepositoryTest` (`@DataJpaTest`); `StudentIntegrationTest` / `CourseIntegrationTest` (MockMvc + Basic as ADMIN); `SecurityIntegrationTest` (401 / authenticated / public OpenAPI); `AuthorizationIntegrationTest` (USER/ADMIN matrix for students + courses); `MeIntegrationTest` (`GET /api/v1/me`); `OpenApiContractTest`; JaCoCo report on `test` |
+| Backend | `DemoApplicationTests`; `StudentServiceTest` / `CourseServiceTest` / `EnrollmentServiceTest` (Mockito); repository `@DataJpaTest`s; `StudentIntegrationTest` / `CourseIntegrationTest` / `EnrollmentIntegrationTest` + `EnrollmentConcurrencyIntegrationTest` (capacity race); `SecurityIntegrationTest`; `AuthorizationIntegrationTest` (students + courses + enrollments); `MeIntegrationTest`; `OpenApiContractTest`; JaCoCo report on `test` |
 | Frontend | Vitest for `client`, `apiRoutes`, `apiError`, auth/`/me` login, role-aware students UI, notifications, `useStudents`, student/layout leaves, drawer, and App flows; ESLint + Prettier; Maven `build-frontend` runs `format:check`, `check:api-types`, `lint`, and `npm run test:coverage` before `vite build` |
 | OpenAPI | `OpenApiContractTest` asserts committed `api/openapi.json` matches `/v3/api-docs`; frontend `check:api-types` asserts generated TS matches that JSON |
 | Integration / repository / service tests | Present for student create/list/delete and email uniqueness (PR 14) |
@@ -332,8 +347,8 @@ These items are intentional backlog for modernization; this branch does not fix 
 ### Product / design
 
 - ~~Edit UI without backend update API~~ — PR 45 adds `PUT` + Edit drawer
-- Course API without SPA screens (PR 46 backend foundation)
-- No Enrollment join between Student and Course yet (documented seam only)
+- Course / Enrollment APIs without SPA screens
+- Enrollment uses plain IDs with no DB foreign keys — deleting a Student or Course can orphan enrollment rows
 - Hibernate `ddl-auto=update` used for deployed `dev` profile (no migration history)
 - ~~Shared `ApiErrorCode` / `ApiExceptionHandler` still under `student.api`~~ — moved to `common.api` in PR 47
 
