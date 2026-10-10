@@ -179,6 +179,6 @@ class StudentIntegrationTest {
                 .andExpect(jsonPath("$.code").value("STUDENT_NOT_FOUND"))
                 .andExpect(jsonPath("$.status").value(404))
                 .andExpect(jsonPath("$.error").value("Not Found"))
-                .andExpect(jsonPath("$.message").value("Student with id 12345 does not exists"));
+                .andExpect(jsonPath("$.message").value("Student with id 12345 does not exist"));
     }
 }

@@ -34,7 +34,7 @@ public class StudentService {
     public void updateStudent(Long studentId, String name, String email, Gender gender) {
         Student student = studentRepository.findById(studentId)
                 .orElseThrow(() -> new StudentNotFoundException(
-                        "Student with id " + studentId + " does not exists"));
+                        "Student with id " + studentId + " does not exist"));
         if (studentRepository.existsByEmailAndIdNot(email, studentId)) {
             throw new DuplicateEmailException(email);
         }
@@ -48,7 +48,7 @@ public class StudentService {
     public void deleteStudent(Long studentId) {
         if (!studentRepository.existsById(studentId)) {
             throw new StudentNotFoundException(
-                    "Student with id " + studentId + " does not exists");
+                    "Student with id " + studentId + " does not exist");
         }
         studentRepository.deleteById(studentId);
     }

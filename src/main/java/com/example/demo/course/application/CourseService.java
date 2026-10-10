@@ -29,7 +29,7 @@ public class CourseService {
     public void updateCourse(Long courseId, String title, String description, Integer capacity) {
         Course course = courseRepository.findById(courseId)
                 .orElseThrow(() -> new CourseNotFoundException(
-                        "Course with id " + courseId + " does not exists"));
+                        "Course with id " + courseId + " does not exist"));
         course.setTitle(title);
         course.setDescription(description);
         course.setCapacity(capacity);
@@ -40,7 +40,7 @@ public class CourseService {
     public void deleteCourse(Long courseId) {
         if (!courseRepository.existsById(courseId)) {
             throw new CourseNotFoundException(
-                    "Course with id " + courseId + " does not exists");
+                    "Course with id " + courseId + " does not exist");
         }
         courseRepository.deleteById(courseId);
     }

@@ -1,6 +1,9 @@
 package com.example.demo.common.api;
 
 import com.example.demo.course.exception.CourseNotFoundException;
+import com.example.demo.enrollment.exception.CourseFullException;
+import com.example.demo.enrollment.exception.DuplicateEnrollmentException;
+import com.example.demo.enrollment.exception.EnrollmentNotFoundException;
 import com.example.demo.student.exception.BadRequestException;
 import com.example.demo.student.exception.DuplicateEmailException;
 import com.example.demo.student.exception.StudentNotFoundException;
@@ -44,13 +47,13 @@ class ApiExceptionHandlerTest {
     @Test
     void handleNotFound_returnsStudentNotFoundCode() {
         ResponseEntity<ApiErrorResponse> response =
-                handler.handleNotFound(new StudentNotFoundException("Student with id 99 does not exists"));
+                handler.handleNotFound(new StudentNotFoundException("Student with id 99 does not exist"));
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
         assertThat(response.getBody()).isEqualTo(
                 new ApiErrorResponse(
                         ApiErrorCode.STUDENT_NOT_FOUND,
-                        "Student with id 99 does not exists",
+                        "Student with id 99 does not exist",
                         404,
                         "Not Found"));
     }
@@ -58,15 +61,54 @@ class ApiExceptionHandlerTest {
     @Test
     void handleCourseNotFound_returnsCourseNotFoundCode() {
         ResponseEntity<ApiErrorResponse> response =
-                handler.handleCourseNotFound(new CourseNotFoundException("Course with id 99 does not exists"));
+                handler.handleCourseNotFound(new CourseNotFoundException("Course with id 99 does not exist"));
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
         assertThat(response.getBody()).isEqualTo(
                 new ApiErrorResponse(
                         ApiErrorCode.COURSE_NOT_FOUND,
-                        "Course with id 99 does not exists",
+                        "Course with id 99 does not exist",
                         404,
                         "Not Found"));
+    }
+
+    @Test
+    void handleEnrollmentNotFound_returnsEnrollmentNotFoundCode() {
+        ResponseEntity<ApiErrorResponse> response =
+                handler.handleEnrollmentNotFound(
+                        new EnrollmentNotFoundException("Enrollment with id 99 does not exist"));
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+        assertThat(response.getBody()).isEqualTo(
+                new ApiErrorResponse(
+                        ApiErrorCode.ENROLLMENT_NOT_FOUND,
+                        "Enrollment with id 99 does not exist",
+                        404,
+                        "Not Found"));
+    }
+
+    @Test
+    void handleDuplicateEnrollment_returnsDuplicateEnrollmentCode() {
+        ResponseEntity<ApiErrorResponse> response =
+                handler.handleDuplicateEnrollment(new DuplicateEnrollmentException(1L, 2L));
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(response.getBody()).isEqualTo(
+                new ApiErrorResponse(
+                        ApiErrorCode.DUPLICATE_ENROLLMENT,
+                        "Student 1 already enrolled in course 2",
+                        400,
+                        "Bad Request"));
+    }
+
+    @Test
+    void handleCourseFull_returnsCourseFullCode() {
+        ResponseEntity<ApiErrorResponse> response =
+                handler.handleCourseFull(new CourseFullException(10L));
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(response.getBody()).isEqualTo(
+                new ApiErrorResponse(ApiErrorCode.COURSE_FULL, "Course 10 is full", 400, "Bad Request"));
     }
 
     @Test

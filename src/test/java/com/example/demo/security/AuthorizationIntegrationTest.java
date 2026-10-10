@@ -4,6 +4,10 @@ import com.example.demo.course.api.CourseApiPaths;
 import com.example.demo.course.api.CourseRequest;
 import com.example.demo.course.domain.Course;
 import com.example.demo.course.persistence.CourseRepository;
+import com.example.demo.enrollment.api.EnrollmentApiPaths;
+import com.example.demo.enrollment.api.EnrollmentRequest;
+import com.example.demo.enrollment.domain.Enrollment;
+import com.example.demo.enrollment.persistence.EnrollmentRepository;
 import com.example.demo.student.api.StudentApiPaths;
 import com.example.demo.student.api.StudentRequest;
 import com.example.demo.student.domain.Gender;
@@ -38,6 +42,8 @@ class AuthorizationIntegrationTest {
     private static final String STUDENT_BY_ID_URI = STUDENTS_URI + "/{id}";
     private static final String COURSES_URI = "/" + CourseApiPaths.BASE;
     private static final String COURSE_BY_ID_URI = COURSES_URI + "/{id}";
+    private static final String ENROLLMENTS_URI = "/" + EnrollmentApiPaths.BASE;
+    private static final String ENROLLMENT_BY_ID_URI = ENROLLMENTS_URI + "/{id}";
 
     private static final RequestPostProcessor ADMIN_AUTH = httpBasic(ADMIN_USERNAME, ADMIN_PASSWORD);
     private static final RequestPostProcessor USER_AUTH = httpBasic(USER_USERNAME, USER_PASSWORD);
@@ -55,10 +61,14 @@ class AuthorizationIntegrationTest {
     private CourseRepository courseRepository;
 
     @Autowired
+    private EnrollmentRepository enrollmentRepository;
+
+    @Autowired
     private TestAppUserFactory testAppUserFactory;
 
     @BeforeEach
     void setUp() {
+        enrollmentRepository.deleteAllInBatch();
         studentRepository.deleteAllInBatch();
         courseRepository.deleteAllInBatch();
         testAppUserFactory.ensureAdminUser();
@@ -195,6 +205,57 @@ class AuthorizationIntegrationTest {
                 .andExpect(status().isNoContent());
 
         mockMvc.perform(delete(COURSE_BY_ID_URI, saved.getId()).with(ADMIN_AUTH))
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
+    void user_canReadEnrollments() throws Exception {
+        mockMvc.perform(get(ENROLLMENTS_URI).with(USER_AUTH))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void user_cannotCreateOrDeleteEnrollment() throws Exception {
+        Student student = studentRepository.save(
+                Student.createNew("EnrollUser", "enroll-user@example.com", Gender.OTHER));
+        Course course = courseRepository.save(Course.createNew("AuthCourse", null, 5));
+        Enrollment saved = enrollmentRepository.save(
+                Enrollment.createNew(student.getId(), course.getId()));
+        EnrollmentRequest payload = new EnrollmentRequest(student.getId(), course.getId());
+
+        mockMvc.perform(post(ENROLLMENTS_URI)
+                        .with(USER_AUTH)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(payload)))
+                .andExpect(status().isForbidden());
+
+        mockMvc.perform(delete(ENROLLMENT_BY_ID_URI, saved.getId()).with(USER_AUTH))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void admin_canCreateAndDeleteEnrollment() throws Exception {
+        Student student = studentRepository.save(
+                Student.createNew("EnrollAdmin", "enroll-admin@example.com", Gender.MALE));
+        Course course = courseRepository.save(Course.createNew("AdminEnrollCourse", null, 5));
+        EnrollmentRequest payload = new EnrollmentRequest(student.getId(), course.getId());
+
+        mockMvc.perform(get(ENROLLMENTS_URI).with(ADMIN_AUTH))
+                .andExpect(status().isOk());
+
+        mockMvc.perform(post(ENROLLMENTS_URI)
+                        .with(ADMIN_AUTH)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(payload)))
+                .andExpect(status().isCreated());
+
+        Enrollment saved = enrollmentRepository.findAll().stream()
+                .filter(e -> student.getId().equals(e.getStudentId())
+                        && course.getId().equals(e.getCourseId()))
+                .findFirst()
+                .orElseThrow();
+
+        mockMvc.perform(delete(ENROLLMENT_BY_ID_URI, saved.getId()).with(ADMIN_AUTH))
                 .andExpect(status().isNoContent());
     }
 }

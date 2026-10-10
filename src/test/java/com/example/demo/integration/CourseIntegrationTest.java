@@ -152,6 +152,6 @@ class CourseIntegrationTest {
         mockMvc.perform(delete(COURSE_BY_ID_URI, 12345L).with(BASIC_AUTH))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.code").value("COURSE_NOT_FOUND"))
-                .andExpect(jsonPath("$.message").value("Course with id 12345 does not exists"));
+                .andExpect(jsonPath("$.message").value("Course with id 12345 does not exist"));
     }
 }
