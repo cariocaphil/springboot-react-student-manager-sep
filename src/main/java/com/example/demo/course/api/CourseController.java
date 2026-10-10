@@ -1,7 +1,7 @@
 package com.example.demo.course.api;
 
 import com.example.demo.course.application.CourseService;
-import com.example.demo.student.api.ApiErrorResponse;
+import com.example.demo.common.api.ApiErrorResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;

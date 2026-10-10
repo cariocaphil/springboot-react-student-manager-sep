@@ -1,5 +1,6 @@
 package com.example.demo.student.api;
 
+import com.example.demo.common.api.ApiErrorResponse;
 import com.example.demo.student.application.StudentService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;

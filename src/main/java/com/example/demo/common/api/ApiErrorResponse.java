@@ -1,4 +1,4 @@
-package com.example.demo.student.api;
+package com.example.demo.common.api;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
