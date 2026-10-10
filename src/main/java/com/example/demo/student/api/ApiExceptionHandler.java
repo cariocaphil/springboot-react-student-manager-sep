@@ -1,5 +1,6 @@
 package com.example.demo.student.api;
 
+import com.example.demo.course.exception.CourseNotFoundException;
 import com.example.demo.student.exception.BadRequestException;
 import com.example.demo.student.exception.DuplicateEmailException;
 import com.example.demo.student.exception.StudentNotFoundException;
@@ -28,6 +29,11 @@ public class ApiExceptionHandler {
     @ExceptionHandler(StudentNotFoundException.class)
     public ResponseEntity<ApiErrorResponse> handleNotFound(StudentNotFoundException ex) {
         return error(HttpStatus.NOT_FOUND, ApiErrorCode.STUDENT_NOT_FOUND, ex.getMessage());
+    }
+
+    @ExceptionHandler(CourseNotFoundException.class)
+    public ResponseEntity<ApiErrorResponse> handleCourseNotFound(CourseNotFoundException ex) {
+        return error(HttpStatus.NOT_FOUND, ApiErrorCode.COURSE_NOT_FOUND, ex.getMessage());
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)

@@ -2,7 +2,7 @@
 
 Build history for the Student Manager modernization.
 
-PR numbers match merged GitHub pull requests. Future work continues from PR 45.
+PR numbers match merged GitHub pull requests. Future work continues from PR 46.
 
 The README keeps a short Status summary; this file holds the full checklist.
 
@@ -277,3 +277,10 @@ PR 45 — Student update (PUT + Edit UI) ✅
 - [x] OpenAPI export + generated frontend types
 - [x] SPA Edit opens shared drawer; TanStack `updateStudent` mutation + i18n
 - [x] Backend + frontend tests; docs
+
+PR 46 — Course domain (backend foundation) ✅
+- [x] `course.{api,application,domain,persistence,exception}` packages independent of `student.*`
+- [x] Course CRUD at `/api/v1/courses` (GET 200 / POST 201 / PUT+DELETE 204); fields `title`, optional `description`, `capacity` ≥ 1
+- [x] Same auth matrix as students (`ADMIN`/`USER` read; `ADMIN` writes); `COURSE_NOT_FOUND` on shared `ApiErrorCode`
+- [x] OpenAPI export + generated types; frontend `apiError` + en/de i18n only (no Course UI)
+- [x] Service / mapper / repository / integration / authorization tests; docs (incl. future Enrollment seam)

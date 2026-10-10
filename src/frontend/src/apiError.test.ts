@@ -23,6 +23,17 @@ describe('apiError', () => {
     expect(toUserFacingApiErrorMessage(body)).not.toBe(body.message);
   });
 
+  it('toUserFacingApiErrorMessage maps COURSE_NOT_FOUND to i18n', () => {
+    const body: ApiErrorBody = {
+      code: 'COURSE_NOT_FOUND',
+      message: 'Course with id 99 was not found',
+      status: 404,
+      error: 'Not Found',
+    };
+
+    expect(toUserFacingApiErrorMessage(body)).toBe(i18n.t('errors.codes.courseNotFound'));
+  });
+
   it('toUserFacingApiErrorMessage falls back for unknown codes', () => {
     const body = {
       code: 'SOME_FUTURE_CODE',

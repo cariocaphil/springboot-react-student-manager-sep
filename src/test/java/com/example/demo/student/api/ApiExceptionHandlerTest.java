@@ -1,5 +1,6 @@
 package com.example.demo.student.api;
 
+import com.example.demo.course.exception.CourseNotFoundException;
 import com.example.demo.student.exception.BadRequestException;
 import com.example.demo.student.exception.DuplicateEmailException;
 import com.example.demo.student.exception.StudentNotFoundException;
@@ -50,6 +51,20 @@ class ApiExceptionHandlerTest {
                 new ApiErrorResponse(
                         ApiErrorCode.STUDENT_NOT_FOUND,
                         "Student with id 99 does not exists",
+                        404,
+                        "Not Found"));
+    }
+
+    @Test
+    void handleCourseNotFound_returnsCourseNotFoundCode() {
+        ResponseEntity<ApiErrorResponse> response =
+                handler.handleCourseNotFound(new CourseNotFoundException("Course with id 99 does not exists"));
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+        assertThat(response.getBody()).isEqualTo(
+                new ApiErrorResponse(
+                        ApiErrorCode.COURSE_NOT_FOUND,
+                        "Course with id 99 does not exists",
                         404,
                         "Not Found"));
     }
