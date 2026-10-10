@@ -35,7 +35,7 @@ Before changing runtime behavior, read:
 
 | Path | Role |
 | --- | --- |
-| `src/main/java/com/example/demo/` | Spring Boot API (`student.*`, `course.*`, `user.*`, `security`) |
+| `src/main/java/com/example/demo/` | Spring Boot API (`student.*`, `course.*`, `common.api`, `user.*`, `security`) |
 | `src/main/resources/` | `application.properties`, `application-dev.properties` |
 | `src/frontend/` | Vite + TypeScript React app (`components/layout`, `components/students`, `hooks`, `types`) |
 | `elasticbeanstalk/docker-compose.yml` | EB deploy package |
@@ -46,7 +46,7 @@ Before changing runtime behavior, read:
 
 ## Stack constraints (until upgraded)
 
-- Backend: Java 17, Spring Boot 3.4.x, `jakarta.*`, Spring Security (stateless HTTP Basic on `/api/**` against PostgreSQL `AppUser` + BCrypt; roles `ADMIN`/`USER` via `@PreAuthorize` on student and course writes including PUT; `GET /api/v1/me` for current user; `/v3/api-docs` public), API DTOs (`StudentRequest` / `StudentResponse`, `CourseRequest` / `CourseResponse`) — not JPA entities as the HTTP contract; OpenAPI via springdoc → committed `api/openapi.json`; structured errors with `ApiErrorCode` (shared under `student.api` for now)
+- Backend: Java 17, Spring Boot 3.4.x, `jakarta.*`, Spring Security (stateless HTTP Basic on `/api/**` against PostgreSQL `AppUser` + BCrypt; roles `ADMIN`/`USER` via `@PreAuthorize` on student and course writes including PUT; `GET /api/v1/me` for current user; `/v3/api-docs` public), API DTOs (`StudentRequest` / `StudentResponse`, `CourseRequest` / `CourseResponse`) — not JPA entities as the HTTP contract; OpenAPI via springdoc → committed `api/openapi.json`; structured errors with `ApiErrorCode` / `ApiErrorResponse` / `ApiExceptionHandler` under `common.api`
 - Frontend: React 19 + TypeScript, Vite 5, Ant Design 5, i18next (en/de), TanStack Query 5, React Hook Form 7, Zod, ESLint 9, Prettier; in-memory HTTP Basic login (no JWT/session storage yet); login probes `/me` for role; SPA hides Add/Edit/Delete for `USER` (backend remains authoritative); student create/update share one drawer; `apiRoutes` + typed `client` (`unfetch`); wire DTOs from `openapi-typescript` (`types/generated`); `apiError` maps known codes to i18n; layout/students component split
 - Image: Jib → `cariocaphil/spring-react-fullstack` from `eclipse-temurin:17-jre`; compose may pin a numeric tag
 - Deploy profile: `SPRING_PROFILES_ACTIVE=dev` on EB; public HTTPS at `https://sep.learning-projects.dev` (TLS at ALB)

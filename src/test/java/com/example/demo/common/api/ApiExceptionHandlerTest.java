@@ -1,4 +1,4 @@
-package com.example.demo.student.api;
+package com.example.demo.common.api;
 
 import com.example.demo.course.exception.CourseNotFoundException;
 import com.example.demo.student.exception.BadRequestException;

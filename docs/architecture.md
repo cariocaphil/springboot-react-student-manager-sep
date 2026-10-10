@@ -40,7 +40,8 @@ Feature packages under `com.example.demo`:
 | Bootstrap | `com.example.demo` | `DemoApplication` | Spring Boot entrypoint |
 | Security | `com.example.demo.security` | `SecurityConfig`, `DatabaseUserDetailsService` | Stateless `SecurityFilterChain`; HTTP Basic; `/api/**` authenticated; `@EnableMethodSecurity` |
 | User | `user.domain` / `user.persistence` / `user.application` / `user.api` | `AppUser`, `Role`, `AppUserRepository`, `AdminUserBootstrap`, `MeController`, `CurrentUserResponse` | DB-backed Basic-auth users (BCrypt + role); env bootstrap as `ADMIN`; `GET /api/v1/me` |
-| API | `student.api` | `StudentController`, DTOs, `StudentMapper`, `StudentApiPaths`, `ApiExceptionHandler`, `ApiErrorCode`, `OpenApiConfig` | Student HTTP boundary + shared error JSON / OpenAPI config (still home of `ApiErrorCode`) |
+| Common API | `common.api` | `ApiErrorCode`, `ApiErrorResponse`, `ApiExceptionHandler` | Shared structured error JSON + `@RestControllerAdvice` mappings |
+| API | `student.api` | `StudentController`, DTOs, `StudentMapper`, `StudentApiPaths`, `OpenApiConfig` | Student HTTP boundary + OpenAPI config |
 | Domain | `student.domain` | `Student` (`@Entity`), `Gender` | Persistence model (not the frontend wire types) |
 | Application | `student.application` | `StudentService` | List, add, update (email uniqueness excluding self), delete; class `@Transactional(readOnly = true)`, writes override with `@Transactional` |
 | Persistence | `student.persistence` | `StudentRepository` | CRUD + derived `existsByEmail` |
@@ -71,9 +72,11 @@ Feature packages under `com.example.demo`:
 
 **Course domain (PR 46):** Independent `course.*` packages (no imports from `student.*` domain types). `CourseController` exposes list/create/update/delete at `/api/v1/courses` with the same status and auth matrix as students. Missing ids map to `COURSE_NOT_FOUND` via the shared `ApiExceptionHandler`. Titles may duplicate (no natural unique key). Hibernate `ddl-auto` creates the `course` table. The SPA has **no Course UI** yet — only OpenAPI typegen and `apiError` / i18n for the new code.
 
+**Shared API errors (PR 47):** `ApiErrorCode`, `ApiErrorResponse`, and `ApiExceptionHandler` live under `common.api` (no longer under `student.api`). Exception-to-status/code mappings and the JSON contract are unchanged.
+
 **Future Enrollment seam (not implemented):** linking students to courses should be a separate join (e.g. `Enrollment` with `studentId` + `courseId`) rather than merging the two aggregates. That keeps Course/Student extractable later and avoids cross-package entity FKs until a dedicated PR.
 
-**Gaps vs a full CRUD product (recorded, not fixed):** no Course SPA; no Enrollment; no JWT/OAuth; no Flyway/Liquibase (DDL via Hibernate `update`); shared `ApiErrorCode` still lives under `student.api` (optional extract later).
+**Gaps vs a full CRUD product (recorded, not fixed):** no Course SPA; no Enrollment; no JWT/OAuth; no Flyway/Liquibase (DDL via Hibernate `update`).
 
 ### 2.3 Frontend
 
@@ -332,7 +335,7 @@ These items are intentional backlog for modernization; this branch does not fix 
 - Course API without SPA screens (PR 46 backend foundation)
 - No Enrollment join between Student and Course yet (documented seam only)
 - Hibernate `ddl-auto=update` used for deployed `dev` profile (no migration history)
-- Shared `ApiErrorCode` / `ApiExceptionHandler` still under `student.api` (optional extract)
+- ~~Shared `ApiErrorCode` / `ApiExceptionHandler` still under `student.api`~~ — moved to `common.api` in PR 47
 
 ### Quality
 

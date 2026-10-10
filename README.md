@@ -7,11 +7,11 @@ Full-stack student CRUD demo: a Spring Boot API and a Vite React UI packaged int
 
 ## Status
 
-**Modernization:** PR 46 adds a backend Course domain (`/api/v1/courses`). Future work continues from PR 46.
+**Modernization:** PR 47 moves shared API error types into `common.api`. Future work continues from PR 47.
 
 | | |
 | --- | --- |
-| Current | **Java 17** / Spring Boot **3.4.5** + **springdoc** + **Spring Security** (HTTP Basic + DB roles); Student + Course CRUD APIs; Vite + TypeScript **React 19.3** with login + in-memory Basic auth + role-aware students UI; EB **LoadBalanced** with public **HTTPS** at `sep.learning-projects.dev`; POST **201** / PUT & DELETE **204** |
+| Current | **Java 17** / Spring Boot **3.4.5** + **springdoc** + **Spring Security** (HTTP Basic + DB roles); Student + Course CRUD APIs; shared errors in `common.api`; Vite + TypeScript **React 19.3** with login + in-memory Basic auth + role-aware students UI; EB **LoadBalanced** with public **HTTPS** at `sep.learning-projects.dev`; POST **201** / PUT & DELETE **204** |
 | Next | Course SPA (or Enrollment), richer identity (JWT/OAuth or similar), optional Swagger UI / Flyway; further platform work per roadmap |
 | Full checklist | [docs/modernization-roadmap.md](docs/modernization-roadmap.md) |
 | Architecture | [docs/architecture.md](docs/architecture.md) |
