@@ -4,6 +4,42 @@
  */
 
 export interface paths {
+    "/api/v1/courses": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List all courses */
+        get: operations["getAllCourses"];
+        put?: never;
+        /** Create a course */
+        post: operations["addCourse"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/courses/{courseId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Update a course by id */
+        put: operations["updateCourse"];
+        post?: never;
+        /** Delete a course by id */
+        delete: operations["deleteCourse"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/me": {
         parameters: {
             query?: never;
@@ -67,7 +103,7 @@ export interface components {
              * @description Stable error code for clients
              * @enum {string}
              */
-            code: "EMAIL_TAKEN" | "STUDENT_NOT_FOUND" | "VALIDATION_FAILED" | "BAD_REQUEST";
+            code: "EMAIL_TAKEN" | "STUDENT_NOT_FOUND" | "COURSE_NOT_FOUND" | "VALIDATION_FAILED" | "BAD_REQUEST";
             /**
              * @description HTTP reason phrase
              * @example Bad Request
@@ -84,6 +120,50 @@ export interface components {
              * @example 400
              */
             status: number;
+        };
+        /** @description Payload to create or update a course */
+        CourseRequest: {
+            /**
+             * Format: int32
+             * @description Maximum number of seats
+             * @example 30
+             */
+            capacity: number;
+            /**
+             * @description Optional course description
+             * @example Sorting, graphs, and complexity
+             */
+            description?: string;
+            /**
+             * @description Course title
+             * @example Intro to Algorithms
+             */
+            title: string;
+        };
+        /** @description Course as returned by the API */
+        CourseResponse: {
+            /**
+             * Format: int32
+             * @description Maximum number of seats
+             * @example 30
+             */
+            capacity: number;
+            /**
+             * @description Optional course description
+             * @example Sorting, graphs, and complexity
+             */
+            description?: string;
+            /**
+             * Format: int64
+             * @description Course id
+             * @example 1
+             */
+            id: number;
+            /**
+             * @description Course title
+             * @example Intro to Algorithms
+             */
+            title: string;
         };
         /** @description Currently authenticated user */
         CurrentUserResponse: {
@@ -150,6 +230,128 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
+    getAllCourses: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Courses */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CourseResponse"][];
+                };
+            };
+        };
+    };
+    addCourse: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CourseRequest"];
+            };
+        };
+        responses: {
+            /** @description Created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation or business rule failure */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponse"];
+                };
+            };
+        };
+    };
+    updateCourse: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                courseId: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CourseRequest"];
+            };
+        };
+        responses: {
+            /** @description Updated */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation or business rule failure */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponse"];
+                };
+            };
+            /** @description Course not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponse"];
+                };
+            };
+        };
+    };
+    deleteCourse: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                courseId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Deleted */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Course not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponse"];
+                };
+            };
+        };
+    };
     getCurrentUser: {
         parameters: {
             query?: never;

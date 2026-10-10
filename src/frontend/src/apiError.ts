@@ -8,6 +8,7 @@ import type { NotificationPlacement } from './types/notification';
 const ERROR_CODE_MESSAGE_KEYS = {
   EMAIL_TAKEN: 'errors.codes.emailTaken',
   STUDENT_NOT_FOUND: 'errors.codes.studentNotFound',
+  COURSE_NOT_FOUND: 'errors.codes.courseNotFound',
   VALIDATION_FAILED: 'errors.codes.validationFailed',
   BAD_REQUEST: 'errors.codes.badRequest',
 } as const satisfies Record<ApiErrorCode, string>;

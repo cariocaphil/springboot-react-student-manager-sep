@@ -13,10 +13,145 @@
     "description" : "Authenticated caller identity",
     "name" : "Current user"
   }, {
+    "description" : "Course collection operations",
+    "name" : "Courses"
+  }, {
     "description" : "Student collection operations",
     "name" : "Students"
   } ],
   "paths" : {
+    "/api/v1/courses" : {
+      "get" : {
+        "operationId" : "getAllCourses",
+        "responses" : {
+          "200" : {
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/CourseResponse"
+                  }
+                }
+              }
+            },
+            "description" : "Courses"
+          }
+        },
+        "summary" : "List all courses",
+        "tags" : [ "Courses" ]
+      },
+      "post" : {
+        "operationId" : "addCourse",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/CourseRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "201" : {
+            "description" : "Created"
+          },
+          "400" : {
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description" : "Validation or business rule failure"
+          }
+        },
+        "summary" : "Create a course",
+        "tags" : [ "Courses" ]
+      }
+    },
+    "/api/v1/courses/{courseId}" : {
+      "delete" : {
+        "operationId" : "deleteCourse",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "courseId",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        } ],
+        "responses" : {
+          "204" : {
+            "description" : "Deleted"
+          },
+          "404" : {
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description" : "Course not found"
+          }
+        },
+        "summary" : "Delete a course by id",
+        "tags" : [ "Courses" ]
+      },
+      "put" : {
+        "operationId" : "updateCourse",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "courseId",
+          "required" : true,
+          "schema" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/CourseRequest"
+              }
+            }
+          },
+          "required" : true
+        },
+        "responses" : {
+          "204" : {
+            "description" : "Updated"
+          },
+          "400" : {
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description" : "Validation or business rule failure"
+          },
+          "404" : {
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/ApiErrorResponse"
+                }
+              }
+            },
+            "description" : "Course not found"
+          }
+        },
+        "summary" : "Update a course by id",
+        "tags" : [ "Courses" ]
+      }
+    },
     "/api/v1/me" : {
       "get" : {
         "operationId" : "getCurrentUser",
@@ -188,7 +323,7 @@
           "code" : {
             "type" : "string",
             "description" : "Stable error code for clients",
-            "enum" : [ "EMAIL_TAKEN", "STUDENT_NOT_FOUND", "VALIDATION_FAILED", "BAD_REQUEST" ]
+            "enum" : [ "EMAIL_TAKEN", "STUDENT_NOT_FOUND", "COURSE_NOT_FOUND", "VALIDATION_FAILED", "BAD_REQUEST" ]
           },
           "error" : {
             "type" : "string",
@@ -208,6 +343,62 @@
           }
         },
         "required" : [ "code", "error", "message", "status" ]
+      },
+      "CourseRequest" : {
+        "type" : "object",
+        "description" : "Payload to create or update a course",
+        "properties" : {
+          "capacity" : {
+            "type" : "integer",
+            "format" : "int32",
+            "description" : "Maximum number of seats",
+            "example" : 30,
+            "minimum" : 1
+          },
+          "description" : {
+            "type" : "string",
+            "description" : "Optional course description",
+            "example" : "Sorting, graphs, and complexity"
+          },
+          "title" : {
+            "type" : "string",
+            "description" : "Course title",
+            "example" : "Intro to Algorithms",
+            "minLength" : 1
+          }
+        },
+        "required" : [ "capacity", "title" ]
+      },
+      "CourseResponse" : {
+        "type" : "object",
+        "description" : "Course as returned by the API",
+        "properties" : {
+          "capacity" : {
+            "type" : "integer",
+            "format" : "int32",
+            "description" : "Maximum number of seats",
+            "example" : 30,
+            "minimum" : 1
+          },
+          "description" : {
+            "type" : "string",
+            "description" : "Optional course description",
+            "example" : "Sorting, graphs, and complexity"
+          },
+          "id" : {
+            "type" : "integer",
+            "format" : "int64",
+            "description" : "Course id",
+            "example" : 1
+          },
+          "title" : {
+            "type" : "string",
+            "description" : "Course title",
+            "example" : "Intro to Algorithms",
+            "minLength" : 1
+          }
+        },
+        "required" : [ "capacity", "id", "title" ]
       },
       "CurrentUserResponse" : {
         "type" : "object",

@@ -1,5 +1,9 @@
 package com.example.demo.security;
 
+import com.example.demo.course.api.CourseApiPaths;
+import com.example.demo.course.api.CourseRequest;
+import com.example.demo.course.domain.Course;
+import com.example.demo.course.persistence.CourseRepository;
 import com.example.demo.student.api.StudentApiPaths;
 import com.example.demo.student.api.StudentRequest;
 import com.example.demo.student.domain.Gender;
@@ -32,6 +36,8 @@ class AuthorizationIntegrationTest {
 
     private static final String STUDENTS_URI = "/" + StudentApiPaths.BASE;
     private static final String STUDENT_BY_ID_URI = STUDENTS_URI + "/{id}";
+    private static final String COURSES_URI = "/" + CourseApiPaths.BASE;
+    private static final String COURSE_BY_ID_URI = COURSES_URI + "/{id}";
 
     private static final RequestPostProcessor ADMIN_AUTH = httpBasic(ADMIN_USERNAME, ADMIN_PASSWORD);
     private static final RequestPostProcessor USER_AUTH = httpBasic(USER_USERNAME, USER_PASSWORD);
@@ -46,11 +52,15 @@ class AuthorizationIntegrationTest {
     private StudentRepository studentRepository;
 
     @Autowired
+    private CourseRepository courseRepository;
+
+    @Autowired
     private TestAppUserFactory testAppUserFactory;
 
     @BeforeEach
     void setUp() {
         studentRepository.deleteAllInBatch();
+        courseRepository.deleteAllInBatch();
         testAppUserFactory.ensureAdminUser();
         testAppUserFactory.ensureRegularUser();
     }
@@ -125,6 +135,66 @@ class AuthorizationIntegrationTest {
                 .andExpect(status().isNoContent());
 
         mockMvc.perform(delete(STUDENT_BY_ID_URI, saved.getId()).with(ADMIN_AUTH))
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
+    void user_canReadCourses() throws Exception {
+        mockMvc.perform(get(COURSES_URI).with(USER_AUTH))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void user_cannotCreateCourse() throws Exception {
+        CourseRequest payload = new CourseRequest("Algorithms", "Intro", 30);
+
+        mockMvc.perform(post(COURSES_URI)
+                        .with(USER_AUTH)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(payload)))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void user_cannotUpdateOrDeleteCourse() throws Exception {
+        Course saved = courseRepository.save(Course.createNew("Temp", null, 10));
+        CourseRequest payload = new CourseRequest("Temp2", null, 12);
+
+        mockMvc.perform(put(COURSE_BY_ID_URI, saved.getId())
+                        .with(USER_AUTH)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(payload)))
+                .andExpect(status().isForbidden());
+
+        mockMvc.perform(delete(COURSE_BY_ID_URI, saved.getId()).with(USER_AUTH))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void admin_canReadCreateUpdateAndDeleteCourse() throws Exception {
+        mockMvc.perform(get(COURSES_URI).with(ADMIN_AUTH))
+                .andExpect(status().isOk());
+
+        CourseRequest payload = new CourseRequest("AdminCourse", "Desc", 20);
+        mockMvc.perform(post(COURSES_URI)
+                        .with(ADMIN_AUTH)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(payload)))
+                .andExpect(status().isCreated());
+
+        Course saved = courseRepository.findAll().stream()
+                .filter(c -> "AdminCourse".equals(c.getTitle()))
+                .findFirst()
+                .orElseThrow();
+
+        CourseRequest update = new CourseRequest("AdminCourse2", "Desc2", 25);
+        mockMvc.perform(put(COURSE_BY_ID_URI, saved.getId())
+                        .with(ADMIN_AUTH)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(update)))
+                .andExpect(status().isNoContent());
+
+        mockMvc.perform(delete(COURSE_BY_ID_URI, saved.getId()).with(ADMIN_AUTH))
                 .andExpect(status().isNoContent());
     }
 }

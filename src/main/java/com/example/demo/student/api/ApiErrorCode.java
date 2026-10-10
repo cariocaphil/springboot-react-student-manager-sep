@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 public enum ApiErrorCode {
     EMAIL_TAKEN,
     STUDENT_NOT_FOUND,
+    COURSE_NOT_FOUND,
     VALIDATION_FAILED,
     BAD_REQUEST
 }

@@ -99,6 +99,7 @@
     "codes": {
       "emailTaken": "That email is already in use.",
       "studentNotFound": "That student could not be found.",
+      "courseNotFound": "That course could not be found.",
       "validationFailed": "Please check the form and try again.",
       "badRequest": "The request could not be completed."
     }
