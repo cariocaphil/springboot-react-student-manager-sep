@@ -2,7 +2,7 @@
 
 Build history for the Student Manager modernization.
 
-PR numbers match merged GitHub pull requests. Future work continues from PR 46.
+PR numbers match merged GitHub pull requests. Future work continues from PR 47.
 
 The README keeps a short Status summary; this file holds the full checklist.
 
@@ -284,3 +284,8 @@ PR 46 — Course domain (backend foundation) ✅
 - [x] Same auth matrix as students (`ADMIN`/`USER` read; `ADMIN` writes); `COURSE_NOT_FOUND` on shared `ApiErrorCode`
 - [x] OpenAPI export + generated types; frontend `apiError` + en/de i18n only (no Course UI)
 - [x] Service / mapper / repository / integration / authorization tests; docs (incl. future Enrollment seam)
+
+PR 47 — Shared API error infrastructure ✅
+- [x] Move `ApiErrorCode`, `ApiErrorResponse`, `ApiExceptionHandler` from `student.api` to `common.api`
+- [x] Update controller / test imports; keep error JSON contract and mappings unchanged
+- [x] Backend tests; docs
