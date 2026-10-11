@@ -2,7 +2,7 @@
 
 Build history for the Student Manager modernization.
 
-PR numbers match merged GitHub pull requests. Future work continues from PR 47.
+PR numbers match merged GitHub pull requests. Future work continues from PR 48.
 
 The README keeps a short Status summary; this file holds the full checklist.
 
@@ -289,3 +289,9 @@ PR 47 — Shared API error infrastructure ✅
 - [x] Move `ApiErrorCode`, `ApiErrorResponse`, `ApiExceptionHandler` from `student.api` to `common.api`
 - [x] Update controller / test imports; keep error JSON contract and mappings unchanged
 - [x] Backend tests; docs
+
+PR 48 — Enrollment domain (backend) ✅
+- [x] `enrollment.*` packages with plain `studentId` / `courseId` / `enrolledAt` (no JPA `@ManyToOne`)
+- [x] CRUD-ish API at `/api/v1/enrollments` (GET/POST/DELETE); unique pair; capacity via `findByIdForUpdate`
+- [x] Error codes `DUPLICATE_ENROLLMENT`, `COURSE_FULL`, `ENROLLMENT_NOT_FOUND` (+ reuse student/course not-found)
+- [x] Concurrent capacity IT; OpenAPI + apiError/i18n; docs (orphan-ID limitation)

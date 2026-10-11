@@ -40,6 +40,41 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/enrollments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List all enrollments */
+        get: operations["getAllEnrollments"];
+        put?: never;
+        /** Enroll a student in a course */
+        post: operations["enroll"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/enrollments/{enrollmentId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Cancel an enrollment by id */
+        delete: operations["deleteEnrollment"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/me": {
         parameters: {
             query?: never;
@@ -103,7 +138,7 @@ export interface components {
              * @description Stable error code for clients
              * @enum {string}
              */
-            code: "EMAIL_TAKEN" | "STUDENT_NOT_FOUND" | "COURSE_NOT_FOUND" | "VALIDATION_FAILED" | "BAD_REQUEST";
+            code: "EMAIL_TAKEN" | "STUDENT_NOT_FOUND" | "COURSE_NOT_FOUND" | "ENROLLMENT_NOT_FOUND" | "DUPLICATE_ENROLLMENT" | "COURSE_FULL" | "VALIDATION_FAILED" | "BAD_REQUEST";
             /**
              * @description HTTP reason phrase
              * @example Bad Request
@@ -177,6 +212,48 @@ export interface components {
              * @example dev
              */
             username: string;
+        };
+        /** @description Payload to enroll a student in a course */
+        EnrollmentRequest: {
+            /**
+             * Format: int64
+             * @description Course id
+             * @example 1
+             */
+            courseId: number;
+            /**
+             * Format: int64
+             * @description Student id
+             * @example 1
+             */
+            studentId: number;
+        };
+        /** @description Enrollment as returned by the API */
+        EnrollmentResponse: {
+            /**
+             * Format: int64
+             * @description Course id
+             * @example 1
+             */
+            courseId: number;
+            /**
+             * Format: date-time
+             * @description Enrollment timestamp (UTC)
+             * @example 2026-01-15T10:30:00Z
+             */
+            enrolledAt: string;
+            /**
+             * Format: int64
+             * @description Enrollment id
+             * @example 1
+             */
+            id: number;
+            /**
+             * Format: int64
+             * @description Student id
+             * @example 1
+             */
+            studentId: number;
         };
         /** @description Payload to create or update a student */
         StudentRequest: {
@@ -342,6 +419,95 @@ export interface operations {
                 content?: never;
             };
             /** @description Course not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponse"];
+                };
+            };
+        };
+    };
+    getAllEnrollments: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Enrollments */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EnrollmentResponse"][];
+                };
+            };
+        };
+    };
+    enroll: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["EnrollmentRequest"];
+            };
+        };
+        responses: {
+            /** @description Created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation, duplicate, or capacity failure */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponse"];
+                };
+            };
+            /** @description Student or course not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponse"];
+                };
+            };
+        };
+    };
+    deleteEnrollment: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                enrollmentId: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Deleted */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Enrollment not found */
             404: {
                 headers: {
                     [name: string]: unknown;

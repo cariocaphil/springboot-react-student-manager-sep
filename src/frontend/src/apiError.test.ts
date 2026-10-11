@@ -34,6 +34,35 @@ describe('apiError', () => {
     expect(toUserFacingApiErrorMessage(body)).toBe(i18n.t('errors.codes.courseNotFound'));
   });
 
+  it('toUserFacingApiErrorMessage maps enrollment error codes to i18n', () => {
+    expect(
+      toUserFacingApiErrorMessage({
+        code: 'DUPLICATE_ENROLLMENT',
+        message: 'Student 1 already enrolled in course 2',
+        status: 400,
+        error: 'Bad Request',
+      })
+    ).toBe(i18n.t('errors.codes.duplicateEnrollment'));
+
+    expect(
+      toUserFacingApiErrorMessage({
+        code: 'COURSE_FULL',
+        message: 'Course 10 is full',
+        status: 400,
+        error: 'Bad Request',
+      })
+    ).toBe(i18n.t('errors.codes.courseFull'));
+
+    expect(
+      toUserFacingApiErrorMessage({
+        code: 'ENROLLMENT_NOT_FOUND',
+        message: 'Enrollment with id 99 does not exist',
+        status: 404,
+        error: 'Not Found',
+      })
+    ).toBe(i18n.t('errors.codes.enrollmentNotFound'));
+  });
+
   it('toUserFacingApiErrorMessage falls back for unknown codes', () => {
     const body = {
       code: 'SOME_FUTURE_CODE',

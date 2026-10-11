@@ -1,6 +1,9 @@
 package com.example.demo.common.api;
 
 import com.example.demo.course.exception.CourseNotFoundException;
+import com.example.demo.enrollment.exception.CourseFullException;
+import com.example.demo.enrollment.exception.DuplicateEnrollmentException;
+import com.example.demo.enrollment.exception.EnrollmentNotFoundException;
 import com.example.demo.student.exception.BadRequestException;
 import com.example.demo.student.exception.DuplicateEmailException;
 import com.example.demo.student.exception.StudentNotFoundException;
@@ -34,6 +37,21 @@ public class ApiExceptionHandler {
     @ExceptionHandler(CourseNotFoundException.class)
     public ResponseEntity<ApiErrorResponse> handleCourseNotFound(CourseNotFoundException ex) {
         return error(HttpStatus.NOT_FOUND, ApiErrorCode.COURSE_NOT_FOUND, ex.getMessage());
+    }
+
+    @ExceptionHandler(EnrollmentNotFoundException.class)
+    public ResponseEntity<ApiErrorResponse> handleEnrollmentNotFound(EnrollmentNotFoundException ex) {
+        return error(HttpStatus.NOT_FOUND, ApiErrorCode.ENROLLMENT_NOT_FOUND, ex.getMessage());
+    }
+
+    @ExceptionHandler(DuplicateEnrollmentException.class)
+    public ResponseEntity<ApiErrorResponse> handleDuplicateEnrollment(DuplicateEnrollmentException ex) {
+        return error(HttpStatus.BAD_REQUEST, ApiErrorCode.DUPLICATE_ENROLLMENT, ex.getMessage());
+    }
+
+    @ExceptionHandler(CourseFullException.class)
+    public ResponseEntity<ApiErrorResponse> handleCourseFull(CourseFullException ex) {
+        return error(HttpStatus.BAD_REQUEST, ApiErrorCode.COURSE_FULL, ex.getMessage());
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)

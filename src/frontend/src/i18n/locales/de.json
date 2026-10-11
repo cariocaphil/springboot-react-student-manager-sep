@@ -100,6 +100,9 @@
       "emailTaken": "Diese E-Mail-Adresse wird bereits verwendet.",
       "studentNotFound": "Dieser Student konnte nicht gefunden werden.",
       "courseNotFound": "Dieser Kurs konnte nicht gefunden werden.",
+      "enrollmentNotFound": "Diese Einschreibung konnte nicht gefunden werden.",
+      "duplicateEnrollment": "Dieser Student ist bereits für diesen Kurs eingeschrieben.",
+      "courseFull": "Dieser Kurs ist voll.",
       "validationFailed": "Bitte prüfen Sie das Formular und versuchen Sie es erneut.",
       "badRequest": "Die Anfrage konnte nicht ausgeführt werden."
     }
