@@ -3,6 +3,7 @@ package com.example.demo.integration;
 import com.example.demo.course.domain.Course;
 import com.example.demo.course.persistence.CourseRepository;
 import com.example.demo.enrollment.application.EnrollmentService;
+import com.example.demo.enrollment.domain.Enrollment;
 import com.example.demo.enrollment.exception.CourseFullException;
 import com.example.demo.enrollment.persistence.EnrollmentRepository;
 import com.example.demo.student.domain.Gender;
@@ -12,6 +13,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,8 +24,10 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @SpringBootTest
 class EnrollmentConcurrencyIntegrationTest {
@@ -39,6 +44,9 @@ class EnrollmentConcurrencyIntegrationTest {
     @Autowired
     private CourseRepository courseRepository;
 
+    @Autowired
+    private PlatformTransactionManager transactionManager;
+
     @BeforeEach
     void setUp() {
         enrollmentRepository.deleteAllInBatch();
@@ -46,6 +54,7 @@ class EnrollmentConcurrencyIntegrationTest {
         courseRepository.deleteAllInBatch();
     }
 
+    /** Outcome test: concurrent enrolls end with one seat taken and one COURSE_FULL. */
     @Test
     void concurrentEnroll_respectsCapacityOfOne() throws Exception {
         Course course = courseRepository.save(Course.createNew("SoloSeat", null, 1));
@@ -88,5 +97,76 @@ class EnrollmentConcurrencyIntegrationTest {
         assertThat(successes.get()).isEqualTo(1);
         assertThat(courseFull.get()).isEqualTo(1);
         assertThat(enrollmentRepository.countByCourseId(course.getId())).isEqualTo(1L);
+    }
+
+    /**
+     * Lock-ordering test: while one transaction holds {@code findByIdForUpdate} on the course
+     * (and has already taken the only seat), a concurrent {@code enroll} cannot finish until
+     * that transaction commits — then it fails with {@link CourseFullException}.
+     */
+    @Test
+    void enroll_blocksOnCourseLockUntilHolderCommits() throws Exception {
+        Course course = courseRepository.save(Course.createNew("LockedSeat", null, 1));
+        Student holder = studentRepository.save(
+                Student.createNew("LockHolder", "lock-holder@example.com", Gender.FEMALE));
+        Student waiter = studentRepository.save(
+                Student.createNew("LockWaiter", "lock-waiter@example.com", Gender.MALE));
+
+        CountDownLatch lockHeld = new CountDownLatch(1);
+        CountDownLatch releaseLock = new CountDownLatch(1);
+        AtomicReference<Throwable> holderError = new AtomicReference<>();
+        TransactionTemplate tx = new TransactionTemplate(transactionManager);
+
+        ExecutorService pool = Executors.newFixedThreadPool(2);
+        try {
+            Future<?> holderFuture = pool.submit(() -> {
+                try {
+                    tx.executeWithoutResult(status -> {
+                        courseRepository.findByIdForUpdate(course.getId()).orElseThrow();
+                        enrollmentRepository.saveAndFlush(
+                                Enrollment.createNew(holder.getId(), course.getId()));
+                        lockHeld.countDown();
+                        try {
+                            if (!releaseLock.await(10, TimeUnit.SECONDS)) {
+                                throw new IllegalStateException("timed out holding course lock");
+                            }
+                        } catch (InterruptedException ex) {
+                            Thread.currentThread().interrupt();
+                            throw new IllegalStateException(ex);
+                        }
+                    });
+                } catch (Throwable ex) {
+                    holderError.set(ex);
+                    lockHeld.countDown();
+                }
+            });
+
+            assertThat(lockHeld.await(10, TimeUnit.SECONDS))
+                    .as("holder should acquire course lock")
+                    .isTrue();
+            assertThat(holderError.get()).isNull();
+
+            Future<?> waiterFuture = pool.submit(() ->
+                    enrollmentService.enroll(waiter.getId(), course.getId()));
+
+            // enroll must block on the same row lock; it must not finish while the lock is held
+            Thread.sleep(500);
+            assertThat(waiterFuture.isDone())
+                    .as("enroll should still be blocked while the course lock is held")
+                    .isFalse();
+
+            releaseLock.countDown();
+            holderFuture.get(10, TimeUnit.SECONDS);
+            assertThat(holderError.get()).isNull();
+
+            assertThatThrownBy(() -> waiterFuture.get(10, TimeUnit.SECONDS))
+                    .cause()
+                    .isInstanceOf(CourseFullException.class);
+
+            assertThat(enrollmentRepository.countByCourseId(course.getId())).isEqualTo(1L);
+        } finally {
+            releaseLock.countDown();
+            pool.shutdownNow();
+        }
     }
 }
