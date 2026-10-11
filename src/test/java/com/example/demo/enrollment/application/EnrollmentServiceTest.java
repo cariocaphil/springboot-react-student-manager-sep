@@ -161,6 +161,20 @@ class EnrollmentServiceTest {
     }
 
     @Test
+    void enroll_rethrowsDataIntegrityViolationWhenConstraintNameIsNull() {
+        Course course = new Course(10L, "Algorithms", null, 2);
+        given(studentRepository.existsById(1L)).willReturn(true);
+        given(courseRepository.findByIdForUpdate(10L)).willReturn(Optional.of(course));
+        given(enrollmentRepository.existsByStudentIdAndCourseId(1L, 10L)).willReturn(false);
+        given(enrollmentRepository.countByCourseId(10L)).willReturn(0L);
+        DataIntegrityViolationException nullConstraintName = dataIntegrityViolation(null);
+        given(enrollmentRepository.saveAndFlush(any(Enrollment.class)))
+                .willThrow(nullConstraintName);
+
+        assertThatThrownBy(() -> underTest.enroll(1L, 10L)).isSameAs(nullConstraintName);
+    }
+
+    @Test
     void enroll_rethrowsDataIntegrityViolationWithoutConstraintCause() {
         Course course = new Course(10L, "Algorithms", null, 2);
         given(studentRepository.existsById(1L)).willReturn(true);
