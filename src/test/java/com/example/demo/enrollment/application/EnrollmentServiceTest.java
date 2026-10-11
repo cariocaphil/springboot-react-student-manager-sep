@@ -13,11 +13,13 @@ import com.example.demo.student.persistence.StudentRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.hibernate.exception.ConstraintViolationException;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.dao.DataIntegrityViolationException;
 
+import java.sql.SQLException;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
@@ -129,18 +131,55 @@ class EnrollmentServiceTest {
     }
 
     @Test
-    void enroll_mapsUniqueConstraintViolationToDuplicateEnrollment() {
+    void enroll_mapsStudentCourseUniqueViolationToDuplicateEnrollment() {
         Course course = new Course(10L, "Algorithms", null, 2);
         given(studentRepository.existsById(1L)).willReturn(true);
         given(courseRepository.findByIdForUpdate(10L)).willReturn(Optional.of(course));
         given(enrollmentRepository.existsByStudentIdAndCourseId(1L, 10L)).willReturn(false);
         given(enrollmentRepository.countByCourseId(10L)).willReturn(0L);
         given(enrollmentRepository.saveAndFlush(any(Enrollment.class)))
-                .willThrow(new DataIntegrityViolationException("unique"));
+                .willThrow(dataIntegrityViolation(
+                        EnrollmentService.STUDENT_COURSE_UNIQUE_CONSTRAINT));
 
         assertThatThrownBy(() -> underTest.enroll(1L, 10L))
                 .isInstanceOf(DuplicateEnrollmentException.class)
                 .hasMessage("Student 1 already enrolled in course 10");
+    }
+
+    @Test
+    void enroll_rethrowsDataIntegrityViolationForOtherConstraints() {
+        Course course = new Course(10L, "Algorithms", null, 2);
+        given(studentRepository.existsById(1L)).willReturn(true);
+        given(courseRepository.findByIdForUpdate(10L)).willReturn(Optional.of(course));
+        given(enrollmentRepository.existsByStudentIdAndCourseId(1L, 10L)).willReturn(false);
+        given(enrollmentRepository.countByCourseId(10L)).willReturn(0L);
+        DataIntegrityViolationException otherConstraint =
+                dataIntegrityViolation("some_other_constraint");
+        given(enrollmentRepository.saveAndFlush(any(Enrollment.class))).willThrow(otherConstraint);
+
+        assertThatThrownBy(() -> underTest.enroll(1L, 10L)).isSameAs(otherConstraint);
+    }
+
+    @Test
+    void enroll_rethrowsDataIntegrityViolationWithoutConstraintCause() {
+        Course course = new Course(10L, "Algorithms", null, 2);
+        given(studentRepository.existsById(1L)).willReturn(true);
+        given(courseRepository.findByIdForUpdate(10L)).willReturn(Optional.of(course));
+        given(enrollmentRepository.existsByStudentIdAndCourseId(1L, 10L)).willReturn(false);
+        given(enrollmentRepository.countByCourseId(10L)).willReturn(0L);
+        DataIntegrityViolationException unknown =
+                new DataIntegrityViolationException("unrelated integrity failure");
+        given(enrollmentRepository.saveAndFlush(any(Enrollment.class))).willThrow(unknown);
+
+        assertThatThrownBy(() -> underTest.enroll(1L, 10L)).isSameAs(unknown);
+    }
+
+    private static DataIntegrityViolationException dataIntegrityViolation(String constraintName) {
+        ConstraintViolationException hibernateViolation = new ConstraintViolationException(
+                "constraint violated",
+                new SQLException("unique violation"),
+                constraintName);
+        return new DataIntegrityViolationException("could not execute statement", hibernateViolation);
     }
 
     @Test

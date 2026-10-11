@@ -11,6 +11,7 @@ import com.example.demo.enrollment.persistence.EnrollmentRepository;
 import com.example.demo.student.exception.StudentNotFoundException;
 import com.example.demo.student.persistence.StudentRepository;
 import lombok.AllArgsConstructor;
+import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,6 +22,8 @@ import java.util.List;
 @Service
 @Transactional(readOnly = true)
 public class EnrollmentService {
+
+    static final String STUDENT_COURSE_UNIQUE_CONSTRAINT = "uk_enrollment_student_course";
 
     private final EnrollmentRepository enrollmentRepository;
     private final StudentRepository studentRepository;
@@ -56,7 +59,10 @@ public class EnrollmentService {
         try {
             enrollmentRepository.saveAndFlush(Enrollment.createNew(studentId, courseId));
         } catch (DataIntegrityViolationException ex) {
-            throw new DuplicateEnrollmentException(studentId, courseId);
+            if (isStudentCourseUniqueViolation(ex)) {
+                throw new DuplicateEnrollmentException(studentId, courseId);
+            }
+            throw ex;
         }
     }
 
@@ -67,5 +73,16 @@ public class EnrollmentService {
                     "Enrollment with id " + enrollmentId + " does not exist");
         }
         enrollmentRepository.deleteById(enrollmentId);
+    }
+
+    private static boolean isStudentCourseUniqueViolation(DataIntegrityViolationException ex) {
+        for (Throwable cause = ex; cause != null; cause = cause.getCause()) {
+            if (cause instanceof ConstraintViolationException constraintViolation) {
+                String constraintName = constraintViolation.getConstraintName();
+                return constraintName != null
+                        && constraintName.equalsIgnoreCase(STUDENT_COURSE_UNIQUE_CONSTRAINT);
+            }
+        }
+        return false;
     }
 }
