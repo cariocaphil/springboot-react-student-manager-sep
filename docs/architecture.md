@@ -79,9 +79,9 @@ Feature packages under `com.example.demo`:
 
 **Shared API errors (PR 47):** `ApiErrorCode`, `ApiErrorResponse`, and `ApiExceptionHandler` live under `common.api` (no longer under `student.api`). Exception-to-status/code mappings and the JSON contract are unchanged.
 
-**Enrollment domain (PR 48):** `enrollment.*` stores plain `studentId` / `courseId` (no JPA association to Student/Course). `EnrollmentService.enroll` is the only insert path: verify student exists → `CourseRepository.findByIdForUpdate` → reject duplicate → reject when `countByCourseId >= capacity` → `saveAndFlush`. Unique `(student_id, course_id)` backstops races; constraint violations map to `DUPLICATE_ENROLLMENT`. Auth matches other collections (read for ADMIN/USER; create/delete ADMIN-only). No Enrollment SPA yet.
+**Enrollment domain (PR 48):** `enrollment.*` stores plain `studentId` / `courseId` (no JPA association to Student/Course). `EnrollmentService.enroll` is the only insert path: verify student exists → `CourseRepository.findByIdForUpdate` → reject duplicate → reject when `countByCourseId >= capacity` → `saveAndFlush`. Unique `(student_id, course_id)` backstops races; constraint violations map to `DUPLICATE_ENROLLMENT`. Auth matches other collections (read for ADMIN/USER; create/delete ADMIN-only). No Enrollment SPA yet. Course capacity updates do **not** check current enrollment count (ADMIN can lower capacity below seats already taken; enroll still enforces capacity).
 
-**Gaps vs a full CRUD product (recorded, not fixed):** no Course/Enrollment SPA; no JWT/OAuth; no Flyway/Liquibase (DDL via Hibernate `update`); no DB foreign keys from enrollment to student/course (deleting a student or course can leave orphan enrollment rows).
+**Gaps vs a full CRUD product (recorded, not fixed):** no Course/Enrollment SPA; no JWT/OAuth; no Flyway/Liquibase (DDL via Hibernate `update`); no DB foreign keys from enrollment to student/course (deleting a student or course can leave orphan enrollment rows); course capacity updates ignore existing enrollment counts.
 
 ### 2.3 Frontend
 
@@ -349,6 +349,7 @@ These items are intentional backlog for modernization; this branch does not fix 
 - ~~Edit UI without backend update API~~ — PR 45 adds `PUT` + Edit drawer
 - Course / Enrollment APIs without SPA screens
 - Enrollment uses plain IDs with no DB foreign keys — deleting a Student or Course can orphan enrollment rows
+- Course capacity updates do not check current enrollment count — ADMIN can set capacity below seats already taken (enroll still enforces capacity; fixing update is a follow-up)
 - Hibernate `ddl-auto=update` used for deployed `dev` profile (no migration history)
 - ~~Shared `ApiErrorCode` / `ApiExceptionHandler` still under `student.api`~~ — moved to `common.api` in PR 47
 
