@@ -12,7 +12,7 @@ interface CourseFormFieldProps {
   errors: FieldErrors<CourseFormValues>;
 }
 
-function renderFieldControl(
+export function renderFieldControl(
   field: CourseFormFieldConfig,
   rhfField: ControllerRenderProps<CourseFormValues, keyof CourseFormValues>,
   placeholder: string
