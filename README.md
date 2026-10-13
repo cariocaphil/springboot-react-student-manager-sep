@@ -7,12 +7,12 @@ Full-stack student CRUD demo: a Spring Boot API and a Vite React UI packaged int
 
 ## Status
 
-**Modernization:** PR 48 adds a backend Enrollment domain (`/api/v1/enrollments`) with capacity-safe enroll. Future work continues from PR 48.
+**Modernization:** PR 49 adds Course Management UI (Students|Courses shell nav). Future work continues from PR 49.
 
 | | |
 | --- | --- |
-| Current | **Java 17** / Spring Boot **3.4.5** + **springdoc** + **Spring Security** (HTTP Basic + DB roles); Student + Course + Enrollment APIs; shared errors in `common.api`; Vite + TypeScript **React 19.3** with login + in-memory Basic auth + role-aware students UI; EB **LoadBalanced** with public **HTTPS** at `sep.learning-projects.dev`; POST **201** / PUT & DELETE **204** |
-| Next | Course/Enrollment SPA, richer identity (JWT/OAuth or similar), optional Swagger UI / Flyway; further platform work per roadmap |
+| Current | **Java 17** / Spring Boot **3.4.5** + **springdoc** + **Spring Security** (HTTP Basic + DB roles); Student + Course + Enrollment APIs; shared errors in `common.api`; Vite + TypeScript **React 19.3** with login + in-memory Basic auth + role-aware Students **and Courses** UI; EB **LoadBalanced** with public **HTTPS** at `sep.learning-projects.dev`; POST **201** / PUT & DELETE **204** |
+| Next | Enrollment SPA, richer identity (JWT/OAuth or similar), optional Swagger UI / Flyway; further platform work per roadmap |
 | Full checklist | [docs/modernization-roadmap.md](docs/modernization-roadmap.md) |
 | Architecture | [docs/architecture.md](docs/architecture.md) |
 

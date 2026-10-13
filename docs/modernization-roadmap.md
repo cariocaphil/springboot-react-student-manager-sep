@@ -2,7 +2,7 @@
 
 Build history for the Student Manager modernization.
 
-PR numbers match merged GitHub pull requests. Future work continues from PR 48.
+PR numbers match merged GitHub pull requests. Future work continues from PR 49.
 
 The README keeps a short Status summary; this file holds the full checklist.
 
@@ -295,3 +295,9 @@ PR 48 — Enrollment domain (backend) ✅
 - [x] CRUD-ish API at `/api/v1/enrollments` (GET/POST/DELETE); unique pair; capacity via `findByIdForUpdate`
 - [x] Error codes `DUPLICATE_ENROLLMENT`, `COURSE_FULL`, `ENROLLMENT_NOT_FOUND` (+ reuse student/course not-found)
 - [x] Concurrent capacity IT; OpenAPI + apiError/i18n; docs (orphan-ID limitation)
+
+PR 49 — Course Management UI ✅
+- [x] Courses SPA mirroring Students: list / create-edit drawer / delete; TanStack Query + RHF + Zod
+- [x] Thin Students|Courses local-state nav in App shell (no React Router); reusable `canManageStudents` for ADMIN gating
+- [x] `coursesApi` + client helpers + `useCourses`; en/de i18n
+- [x] Vitest for hooks, CoursesView auth gating, App sidebar switch; docs

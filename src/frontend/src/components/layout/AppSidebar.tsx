@@ -1,12 +1,18 @@
 import { useState } from 'react';
 import { Layout, Menu } from 'antd';
 import type { MenuProps } from 'antd';
-import { UserOutlined } from '@ant-design/icons';
+import { BookOutlined, UserOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
+import type { AppView } from '../../App';
 
 const { Sider } = Layout;
 
-function AppSidebar() {
+interface AppSidebarProps {
+  activeView: AppView;
+  onNavigate: (view: AppView) => void;
+}
+
+function AppSidebar({ activeView, onNavigate }: AppSidebarProps) {
   const { t } = useTranslation();
   const [collapsed, setCollapsed] = useState(false);
 
@@ -15,6 +21,11 @@ function AppSidebar() {
       key: 'students',
       icon: <UserOutlined />,
       label: t('layout.menu.students'),
+    },
+    {
+      key: 'courses',
+      icon: <BookOutlined />,
+      label: t('layout.menu.courses'),
     },
   ];
 
@@ -42,7 +53,17 @@ function AppSidebar() {
           }}
         />
       </div>
-      <Menu theme="dark" defaultSelectedKeys={['students']} mode="inline" items={menuItems} />
+      <Menu
+        theme="dark"
+        selectedKeys={[activeView]}
+        mode="inline"
+        items={menuItems}
+        onClick={({ key }) => {
+          if (key === 'students' || key === 'courses') {
+            onNavigate(key);
+          }
+        }}
+      />
     </Sider>
   );
 }

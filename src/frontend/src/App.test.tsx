@@ -5,6 +5,7 @@ import App from './App';
 import * as client from './client';
 import * as notify from './Notification';
 import i18n from './i18n';
+import type { Course } from './types/course';
 import type { Student } from './types/student';
 
 vi.mock('./client');
@@ -39,11 +40,22 @@ const students: Student[] = [
   },
 ];
 
+const courses: Course[] = [
+  {
+    id: 1,
+    title: 'Algebra',
+    description: 'Intro algebra',
+    capacity: 30,
+  },
+];
+
 describe('App', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     vi.mocked(client.getAllStudents).mockResolvedValue([]);
     vi.mocked(client.deleteStudent).mockResolvedValue(undefined);
+    vi.mocked(client.getAllCourses).mockResolvedValue([]);
+    vi.mocked(client.deleteCourse).mockResolvedValue(undefined);
   });
 
   it('shows empty state when there are no students', async () => {
@@ -159,5 +171,38 @@ describe('App', () => {
 
     expect(await screen.findByText('Edit student')).toBeInTheDocument();
     expect(screen.getByDisplayValue('Ada Lovelace')).toBeInTheDocument();
+  });
+
+  it('switches to Courses via the sidebar and shows the courses empty state', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+
+    await screen.findByText(/Add New Student/i);
+    await user.click(screen.getByRole('menuitem', { name: /Courses/i }));
+
+    expect(await screen.findByText(/Add New Course/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(i18n.t('courses.empty.description'), {
+        selector: '.ant-empty-description',
+      })
+    ).toBeInTheDocument();
+    expect(document.querySelector('.ant-breadcrumb')).toHaveTextContent(
+      i18n.t('layout.breadcrumbCourses')
+    );
+    expect(client.getAllCourses).toHaveBeenCalled();
+  });
+
+  it('renders course rows after switching to Courses', async () => {
+    const user = userEvent.setup();
+    vi.mocked(client.getAllCourses).mockResolvedValue(courses);
+
+    render(<App />);
+
+    await screen.findByText(/Add New Student/i);
+    await user.click(screen.getByRole('menuitem', { name: /Courses/i }));
+
+    expect(await screen.findByText('Algebra')).toBeInTheDocument();
+    expect(screen.getByText('Number of courses')).toBeInTheDocument();
+    expect(screen.getByText('30')).toBeInTheDocument();
   });
 });

@@ -5,19 +5,23 @@ import { AuthProvider, useAuth } from './auth/AuthContext';
 import AppLayout from './components/layout/AppLayout';
 import AppProviders from './components/layout/AppProviders';
 import LoginPage from './components/login/LoginPage';
+import CoursesView from './components/courses/CoursesView';
 import StudentsView from './components/students/StudentsView';
 import { createQueryClient } from './queryClient';
 
+export type AppView = 'students' | 'courses';
+
 function AuthenticatedShell() {
   const { isAuthenticated } = useAuth();
+  const [activeView, setActiveView] = useState<AppView>('students');
 
   if (!isAuthenticated) {
     return <LoginPage />;
   }
 
   return (
-    <AppLayout>
-      <StudentsView />
+    <AppLayout activeView={activeView} onNavigate={setActiveView}>
+      {activeView === 'courses' ? <CoursesView /> : <StudentsView />}
     </AppLayout>
   );
 }

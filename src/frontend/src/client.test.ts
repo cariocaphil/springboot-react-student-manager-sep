@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import fetch from 'unfetch';
-import { meApi, studentsApi } from './apiRoutes';
+import { coursesApi, meApi, studentsApi } from './apiRoutes';
 import {
   clearAuthCredentials,
   encodeBasicAuthorizationHeader,
@@ -8,13 +8,18 @@ import {
   setUnauthorizedHandler,
 } from './auth/authCredentials';
 import {
+  addNewCourse,
   addNewStudent,
+  deleteCourse,
   deleteStudent,
+  getAllCourses,
   getAllStudents,
   getCurrentUser,
+  updateCourse,
   updateStudent,
 } from './client';
 import type { ApiResponse } from './types/api';
+import type { Course } from './types/course';
 import type { Student } from './types/student';
 
 vi.mock('unfetch', () => ({
@@ -28,6 +33,13 @@ const ada: Student = {
   name: 'Ada',
   email: 'ada@example.com',
   gender: 'FEMALE',
+};
+
+const algebra: Course = {
+  id: 1,
+  title: 'Algebra',
+  description: 'Intro algebra',
+  capacity: 30,
 };
 
 describe('client', () => {
@@ -167,6 +179,73 @@ describe('client', () => {
       headers: { 'Content-Type': 'application/json' },
       method: 'PUT',
       body: JSON.stringify(student),
+    });
+  });
+
+  it('getAllCourses GETs the courses collection and returns parsed JSON', async () => {
+    const response = {
+      ok: true,
+      status: 200,
+      statusText: 'OK',
+      json: async () => [algebra],
+    } as ApiResponse;
+    mockedFetch.mockResolvedValue(response as never);
+
+    await expect(getAllCourses()).resolves.toEqual([algebra]);
+    expect(mockedFetch).toHaveBeenCalledWith(coursesApi.collection, {
+      headers: {},
+    });
+  });
+
+  it('deleteCourse DELETEs by id', async () => {
+    const response = {
+      ok: true,
+      status: 204,
+      statusText: 'No Content',
+      json: async () => undefined,
+    } as ApiResponse;
+    mockedFetch.mockResolvedValue(response as never);
+
+    await expect(deleteCourse(7)).resolves.toBeUndefined();
+    expect(mockedFetch).toHaveBeenCalledWith(coursesApi.byId(7), {
+      method: 'DELETE',
+      headers: {},
+    });
+  });
+
+  it('addNewCourse POSTs JSON body', async () => {
+    const response = {
+      ok: true,
+      status: 201,
+      statusText: 'Created',
+      json: async () => undefined,
+    } as ApiResponse;
+    const course = { title: 'Algebra', description: 'Intro algebra', capacity: 30 };
+    mockedFetch.mockResolvedValue(response as never);
+
+    await expect(addNewCourse(course)).resolves.toBeUndefined();
+    expect(mockedFetch).toHaveBeenCalledWith(coursesApi.collection, {
+      headers: { 'Content-Type': 'application/json' },
+      method: 'POST',
+      body: JSON.stringify(course),
+    });
+  });
+
+  it('updateCourse PUTs JSON body by id', async () => {
+    const response = {
+      ok: true,
+      status: 204,
+      statusText: 'No Content',
+      json: async () => undefined,
+    } as ApiResponse;
+    const course = { title: 'Algebra II', capacity: 25 };
+    mockedFetch.mockResolvedValue(response as never);
+
+    await expect(updateCourse(7, course)).resolves.toBeUndefined();
+    expect(mockedFetch).toHaveBeenCalledWith(coursesApi.byId(7), {
+      headers: { 'Content-Type': 'application/json' },
+      method: 'PUT',
+      body: JSON.stringify(course),
     });
   });
 });
