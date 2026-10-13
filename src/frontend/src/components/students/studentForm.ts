@@ -4,17 +4,17 @@ import i18n from '../../i18n';
 import { GENDERS, type NewStudent, type Student } from '../../types/student';
 import { EMAIL_PATTERN } from '../../validation/email';
 
-/** Build schema with messages for the active i18n language (pass `i18n.language` so callers rebuild on change). */
+/** Build schema with messages for the given language (pass `i18n.language` so callers rebuild on change). */
 export function createStudentFormSchema(language: string = i18n.language) {
-  void language;
+  const t = i18n.getFixedT(language);
   return z.object({
-    name: z.string().min(1, i18n.t('students.validation.nameRequired')),
+    name: z.string().min(1, t('students.validation.nameRequired')),
     email: z
       .string()
-      .min(1, i18n.t('students.validation.emailRequired'))
-      .regex(EMAIL_PATTERN, i18n.t('students.validation.emailInvalid')),
+      .min(1, t('students.validation.emailRequired'))
+      .regex(EMAIL_PATTERN, t('students.validation.emailInvalid')),
     gender: z.enum(GENDERS, {
-      message: i18n.t('students.validation.genderRequired'),
+      message: t('students.validation.genderRequired'),
     }),
   });
 }

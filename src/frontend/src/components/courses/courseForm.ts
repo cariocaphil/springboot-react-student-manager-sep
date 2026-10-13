@@ -3,16 +3,16 @@ import type { DefaultValues } from 'react-hook-form';
 import i18n from '../../i18n';
 import type { Course, NewCourse } from '../../types/course';
 
-/** Build schema with messages for the active i18n language (pass `i18n.language` so callers rebuild on change). */
+/** Build schema with messages for the given language (pass `i18n.language` so callers rebuild on change). */
 export function createCourseFormSchema(language: string = i18n.language) {
-  void language;
+  const t = i18n.getFixedT(language);
   return z.object({
-    title: z.string().trim().min(1, i18n.t('courses.validation.titleRequired')),
+    title: z.string().trim().min(1, t('courses.validation.titleRequired')),
     description: z.string(),
     capacity: z
-      .number({ message: i18n.t('courses.validation.capacityRequired') })
-      .int({ message: i18n.t('courses.validation.capacityInteger') })
-      .min(1, i18n.t('courses.validation.capacityMin')),
+      .number({ message: t('courses.validation.capacityRequired') })
+      .int({ message: t('courses.validation.capacityInteger') })
+      .min(1, t('courses.validation.capacityMin')),
   });
 }
 
