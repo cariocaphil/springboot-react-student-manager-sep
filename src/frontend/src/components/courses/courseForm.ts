@@ -9,7 +9,7 @@ export function createCourseFormSchema(language: string = i18n.language) {
   return z.object({
     title: z.string().trim().min(1, i18n.t('courses.validation.titleRequired')),
     description: z.string(),
-    capacity: z.coerce
+    capacity: z
       .number({ message: i18n.t('courses.validation.capacityRequired') })
       .int({ message: i18n.t('courses.validation.capacityInteger') })
       .min(1, i18n.t('courses.validation.capacityMin')),
