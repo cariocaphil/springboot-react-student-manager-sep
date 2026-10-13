@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import fetch from 'unfetch';
 import App from './App';
-import { meApi, studentsApi } from './apiRoutes';
+import { coursesApi, meApi, studentsApi } from './apiRoutes';
 import { clearAuthCredentials, hasAuthCredentials } from './auth/authCredentials';
 import i18n from './i18n';
 import type { ApiResponse } from './types/api';
@@ -41,7 +41,7 @@ function mockAuthedSession() {
     if (url === meApi.current) {
       return okMeAdmin as never;
     }
-    if (url === studentsApi.collection) {
+    if (url === studentsApi.collection || url === coursesApi.collection) {
       return okEmptyList as never;
     }
     return unauthorized as never;
@@ -116,5 +116,29 @@ describe('App auth flow', () => {
       expect(screen.getByRole('heading', { name: i18n.t('login.title') })).toBeInTheDocument();
     });
     expect(hasAuthCredentials()).toBe(false);
+  });
+
+  it('preserves the last selected view across logout and login', async () => {
+    // AuthenticatedShell stays mounted while showing LoginPage, so activeView is intentional.
+    const user = userEvent.setup();
+    mockAuthedSession();
+
+    render(<App />);
+    await signIn(user);
+    expect(await screen.findByText(/Add New Student/i)).toBeInTheDocument();
+
+    await user.click(screen.getByRole('menuitem', { name: /Courses/i }));
+    expect(await screen.findByText(/Add New Course/i)).toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: i18n.t('layout.logout') }));
+    expect(await screen.findByRole('heading', { name: i18n.t('login.title') })).toBeInTheDocument();
+
+    await signIn(user);
+
+    expect(await screen.findByText(/Add New Course/i)).toBeInTheDocument();
+    expect(screen.queryByText(/Add New Student/i)).not.toBeInTheDocument();
+    expect(document.querySelector('.ant-breadcrumb')).toHaveTextContent(
+      i18n.t('layout.breadcrumbCourses')
+    );
   });
 });
