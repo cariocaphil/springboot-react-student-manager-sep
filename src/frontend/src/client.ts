@@ -1,7 +1,8 @@
 import fetch from 'unfetch';
-import { meApi, studentsApi } from './apiRoutes';
+import { coursesApi, meApi, studentsApi } from './apiRoutes';
 import { getAuthorizationHeader, notifyUnauthorized } from './auth/authCredentials';
 import type { ApiResponse, HttpError } from './types/api';
+import type { Course, NewCourse } from './types/course';
 import type { NewStudent, Student } from './types/student';
 import type { CurrentUser } from './types/user';
 
@@ -65,4 +66,30 @@ export const updateStudent = (studentId: number, student: NewStudent): Promise<v
     },
     method: 'PUT',
     body: JSON.stringify(student),
+  }).then(() => undefined);
+
+export const getAllCourses = (): Promise<Course[]> =>
+  apiFetch(coursesApi.collection).then((response) => response.json<Course[]>());
+
+export const deleteCourse = (courseId: number): Promise<void> =>
+  apiFetch(coursesApi.byId(courseId), {
+    method: 'DELETE',
+  }).then(() => undefined);
+
+export const addNewCourse = (course: NewCourse): Promise<void> =>
+  apiFetch(coursesApi.collection, {
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    method: 'POST',
+    body: JSON.stringify(course),
+  }).then(() => undefined);
+
+export const updateCourse = (courseId: number, course: NewCourse): Promise<void> =>
+  apiFetch(coursesApi.byId(courseId), {
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    method: 'PUT',
+    body: JSON.stringify(course),
   }).then(() => undefined);

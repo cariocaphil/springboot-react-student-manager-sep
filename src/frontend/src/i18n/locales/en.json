@@ -6,8 +6,10 @@
   },
   "layout": {
     "breadcrumbStudents": "Students",
+    "breadcrumbCourses": "Courses",
     "menu": {
-      "students": "Students"
+      "students": "Students",
+      "courses": "Courses"
     },
     "tagline": "SEP - Student management made easy",
     "sourceLink": "View source on GitHub",
@@ -90,6 +92,67 @@
     "loadError": {
       "title": "Couldn't load students",
       "description": "Something went wrong while loading the student list. Please try again.",
+      "retry": "Retry"
+    }
+  },
+  "courses": {
+    "addNew": "Add New Course",
+    "countTag": "Number of courses",
+    "columns": {
+      "id": "Id",
+      "title": "Title",
+      "description": "Description",
+      "capacity": "Capacity",
+      "actions": "Actions"
+    },
+    "actions": {
+      "delete": "Delete",
+      "edit": "Edit",
+      "deleteConfirm": "Are you sure to delete {{title}}",
+      "yes": "Yes",
+      "no": "No"
+    },
+    "drawer": {
+      "title": "Create new course",
+      "editTitle": "Edit course",
+      "submit": "Submit",
+      "editSubmit": "Save changes",
+      "cancel": "Cancel"
+    },
+    "form": {
+      "title": {
+        "label": "Title",
+        "placeholder": "Please enter course title"
+      },
+      "description": {
+        "label": "Description",
+        "placeholder": "Optional course description"
+      },
+      "capacity": {
+        "label": "Capacity",
+        "placeholder": "Maximum seats"
+      }
+    },
+    "validation": {
+      "titleRequired": "Please enter a course title",
+      "capacityRequired": "Please enter capacity",
+      "capacityInteger": "Capacity must be a whole number",
+      "capacityMin": "Capacity must be at least 1"
+    },
+    "notifications": {
+      "addedTitle": "Course successfully added",
+      "addedDescription": "{{title}} was added to the system",
+      "updatedTitle": "Course updated",
+      "updatedDescription": "{{title}} was updated",
+      "deletedTitle": "Course deleted",
+      "deletedDescription": "Course with {{id}} was deleted"
+    },
+    "empty": {
+      "description": "No courses yet. Add one to get started."
+    },
+    "loadError": {
+      "title": "Couldn't load courses",
+      "description": "Something went wrong while loading the course list. Please try again.",
       "retry": "Retry"
     }
   },

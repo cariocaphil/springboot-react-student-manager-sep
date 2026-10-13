@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 import { Button, Breadcrumb, Layout } from 'antd';
 import { LogoutOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
+import type { AppView } from '../../App';
 import { useAuth } from '../../auth/AuthContext';
 import AppFooter from './AppFooter';
 import AppSidebar from './AppSidebar';
@@ -11,15 +12,20 @@ const { Header, Content } = Layout;
 
 interface AppLayoutProps {
   children: ReactNode;
+  activeView: AppView;
+  onNavigate: (view: AppView) => void;
 }
 
-function AppLayout({ children }: AppLayoutProps) {
+function AppLayout({ children, activeView, onNavigate }: AppLayoutProps) {
   const { t } = useTranslation();
   const { logout } = useAuth();
 
+  const breadcrumbTitle =
+    activeView === 'courses' ? t('layout.breadcrumbCourses') : t('layout.breadcrumbStudents');
+
   return (
     <Layout style={{ minHeight: '100vh' }}>
-      <AppSidebar />
+      <AppSidebar activeView={activeView} onNavigate={onNavigate} />
       <Layout className="site-layout">
         <Header
           className="site-layout-background"
@@ -37,10 +43,7 @@ function AppLayout({ children }: AppLayoutProps) {
           </Button>
         </Header>
         <Content style={{ margin: '16px' }}>
-          <Breadcrumb
-            style={{ marginBottom: 16 }}
-            items={[{ title: t('layout.breadcrumbStudents') }]}
-          />
+          <Breadcrumb style={{ marginBottom: 16 }} items={[{ title: breadcrumbTitle }]} />
           <div className="site-layout-background" style={{ padding: 24, minHeight: 360 }}>
             {children}
           </div>

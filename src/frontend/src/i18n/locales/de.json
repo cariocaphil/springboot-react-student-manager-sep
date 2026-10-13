@@ -6,8 +6,10 @@
   },
   "layout": {
     "breadcrumbStudents": "Studenten",
+    "breadcrumbCourses": "Kurse",
     "menu": {
-      "students": "Studenten"
+      "students": "Studenten",
+      "courses": "Kurse"
     },
     "tagline": "SEP - Student:innenverwaltung leicht gemacht",
     "sourceLink": "Quellcode auf GitHub ansehen",
@@ -90,6 +92,67 @@
     "loadError": {
       "title": "Studenten konnten nicht geladen werden",
       "description": "Beim Laden der Studentenliste ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.",
+      "retry": "Erneut versuchen"
+    }
+  },
+  "courses": {
+    "addNew": "Neuen Kurs hinzufügen",
+    "countTag": "Anzahl der Kurse",
+    "columns": {
+      "id": "Id",
+      "title": "Titel",
+      "description": "Beschreibung",
+      "capacity": "Kapazität",
+      "actions": "Aktionen"
+    },
+    "actions": {
+      "delete": "Löschen",
+      "edit": "Bearbeiten",
+      "deleteConfirm": "Möchten Sie {{title}} wirklich löschen?",
+      "yes": "Ja",
+      "no": "Nein"
+    },
+    "drawer": {
+      "title": "Neuen Kurs erstellen",
+      "editTitle": "Kurs bearbeiten",
+      "submit": "Absenden",
+      "editSubmit": "Änderungen speichern",
+      "cancel": "Abbrechen"
+    },
+    "form": {
+      "title": {
+        "label": "Titel",
+        "placeholder": "Bitte Kurstitel eingeben"
+      },
+      "description": {
+        "label": "Beschreibung",
+        "placeholder": "Optionale Kursbeschreibung"
+      },
+      "capacity": {
+        "label": "Kapazität",
+        "placeholder": "Maximale Plätze"
+      }
+    },
+    "validation": {
+      "titleRequired": "Bitte einen Kurstitel eingeben",
+      "capacityRequired": "Bitte Kapazität eingeben",
+      "capacityInteger": "Kapazität muss eine ganze Zahl sein",
+      "capacityMin": "Kapazität muss mindestens 1 betragen"
+    },
+    "notifications": {
+      "addedTitle": "Kurs erfolgreich hinzugefügt",
+      "addedDescription": "{{title}} wurde dem System hinzugefügt",
+      "updatedTitle": "Kurs aktualisiert",
+      "updatedDescription": "{{title}} wurde aktualisiert",
+      "deletedTitle": "Kurs gelöscht",
+      "deletedDescription": "Kurs mit {{id}} wurde gelöscht"
+    },
+    "empty": {
+      "description": "Noch keine Kurse. Fügen Sie einen hinzu, um zu starten."
+    },
+    "loadError": {
+      "title": "Kurse konnten nicht geladen werden",
+      "description": "Beim Laden der Kursliste ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.",
       "retry": "Erneut versuchen"
     }
   },
