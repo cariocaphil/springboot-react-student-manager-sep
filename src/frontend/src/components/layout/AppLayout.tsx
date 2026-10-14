@@ -21,7 +21,11 @@ function AppLayout({ children, activeView, onNavigate }: AppLayoutProps) {
   const { logout } = useAuth();
 
   const breadcrumbTitle =
-    activeView === 'courses' ? t('layout.breadcrumbCourses') : t('layout.breadcrumbStudents');
+    activeView === 'courses'
+      ? t('layout.breadcrumbCourses')
+      : activeView === 'enrollments'
+        ? t('layout.breadcrumbEnrollments')
+        : t('layout.breadcrumbStudents');
 
   return (
     <Layout style={{ minHeight: '100vh' }}>

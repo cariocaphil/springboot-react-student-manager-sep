@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Layout, Menu } from 'antd';
 import type { MenuProps } from 'antd';
-import { BookOutlined, UserOutlined } from '@ant-design/icons';
+import { BookOutlined, FormOutlined, UserOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import type { AppView } from '../../App';
 
@@ -26,6 +26,11 @@ function AppSidebar({ activeView, onNavigate }: AppSidebarProps) {
       key: 'courses',
       icon: <BookOutlined />,
       label: t('layout.menu.courses'),
+    },
+    {
+      key: 'enrollments',
+      icon: <FormOutlined />,
+      label: t('layout.menu.enrollments'),
     },
   ];
 
@@ -59,7 +64,7 @@ function AppSidebar({ activeView, onNavigate }: AppSidebarProps) {
         mode="inline"
         items={menuItems}
         onClick={({ key }) => {
-          if (key === 'students' || key === 'courses') {
+          if (key === 'students' || key === 'courses' || key === 'enrollments') {
             onNavigate(key);
           }
         }}

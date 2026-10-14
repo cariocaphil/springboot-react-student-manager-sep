@@ -56,6 +56,8 @@ describe('App', () => {
     vi.mocked(client.deleteStudent).mockResolvedValue(undefined);
     vi.mocked(client.getAllCourses).mockResolvedValue([]);
     vi.mocked(client.deleteCourse).mockResolvedValue(undefined);
+    vi.mocked(client.getAllEnrollments).mockResolvedValue([]);
+    vi.mocked(client.deleteEnrollment).mockResolvedValue(undefined);
   });
 
   it('shows empty state when there are no students', async () => {
@@ -204,5 +206,26 @@ describe('App', () => {
     expect(await screen.findByText('Algebra')).toBeInTheDocument();
     expect(screen.getByText('Number of courses')).toBeInTheDocument();
     expect(screen.getByText('30')).toBeInTheDocument();
+  });
+
+  it('switches to Enrollments via the sidebar and shows the enrollments empty state', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+
+    await screen.findByText(/Add New Student/i);
+    await user.click(screen.getByRole('menuitem', { name: /Enrollments/i }));
+
+    expect(await screen.findByText(/Enroll student/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(i18n.t('enrollments.empty.description'), {
+        selector: '.ant-empty-description',
+      })
+    ).toBeInTheDocument();
+    expect(document.querySelector('.ant-breadcrumb')).toHaveTextContent(
+      i18n.t('layout.breadcrumbEnrollments')
+    );
+    expect(client.getAllEnrollments).toHaveBeenCalled();
+    expect(client.getAllStudents).toHaveBeenCalled();
+    expect(client.getAllCourses).toHaveBeenCalled();
   });
 });

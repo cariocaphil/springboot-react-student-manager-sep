@@ -7,9 +7,11 @@
   "layout": {
     "breadcrumbStudents": "Students",
     "breadcrumbCourses": "Courses",
+    "breadcrumbEnrollments": "Enrollments",
     "menu": {
       "students": "Students",
-      "courses": "Courses"
+      "courses": "Courses",
+      "enrollments": "Enrollments"
     },
     "tagline": "SEP - Student management made easy",
     "sourceLink": "View source on GitHub",
@@ -153,6 +155,62 @@
     "loadError": {
       "title": "Couldn't load courses",
       "description": "Something went wrong while loading the course list. Please try again.",
+      "retry": "Retry"
+    }
+  },
+  "enrollments": {
+    "addNew": "Enroll student",
+    "countTag": "Number of enrollments",
+    "full": "Full",
+    "unknownStudent": "Unknown student (#{{id}})",
+    "unknownCourse": "Unknown course (#{{id}})",
+    "columns": {
+      "id": "Id",
+      "student": "Student",
+      "course": "Course",
+      "enrolledAt": "Enrolled at",
+      "seats": "Seats",
+      "actions": "Actions"
+    },
+    "actions": {
+      "cancel": "Cancel",
+      "cancelConfirm": "Cancel enrollment of {{student}} in {{course}}?",
+      "yes": "Yes",
+      "no": "No"
+    },
+    "drawer": {
+      "title": "Enroll student in course",
+      "submit": "Enroll",
+      "cancel": "Cancel"
+    },
+    "form": {
+      "student": {
+        "label": "Student",
+        "placeholder": "Select a student"
+      },
+      "course": {
+        "label": "Course",
+        "placeholder": "Select a course",
+        "seatsLabel": "{{title}} ({{count}}/{{capacity}})",
+        "fullLabel": "{{label}} — full"
+      }
+    },
+    "validation": {
+      "studentRequired": "Please select a student",
+      "courseRequired": "Please select a course"
+    },
+    "notifications": {
+      "addedTitle": "Enrollment created",
+      "addedDescription": "The student was enrolled in the course",
+      "cancelledTitle": "Enrollment cancelled",
+      "cancelledDescription": "Enrollment with {{id}} was cancelled"
+    },
+    "empty": {
+      "description": "No enrollments yet. Enroll a student to get started."
+    },
+    "loadError": {
+      "title": "Couldn't load enrollments",
+      "description": "Something went wrong while loading enrollment data. Please try again.",
       "retry": "Retry"
     }
   },
