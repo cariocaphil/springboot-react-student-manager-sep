@@ -167,4 +167,28 @@ describe('EnrollmentsView', () => {
       });
     });
   });
+
+  it('labels full courses as full and disables them in the create drawer', async () => {
+    const user = userEvent.setup();
+    enrollmentsHook.courses = [{ id: 10, title: 'Algebra', capacity: 1 }];
+    enrollmentsHook.enrollments = [
+      {
+        id: 100,
+        studentId: 2,
+        courseId: 10,
+        enrolledAt: '2026-01-15T10:30:00Z',
+      },
+    ];
+
+    render(<EnrollmentsView />);
+
+    await user.click(screen.getByRole('button', { name: /Enroll student/i }));
+    expect(await screen.findByText('Enroll student in course')).toBeInTheDocument();
+
+    await user.click(screen.getByText('Select a course'));
+    const fullOption = await screen.findByText('Algebra (1/1) — full', {
+      selector: '.ant-select-item-option-content',
+    });
+    expect(fullOption.closest('.ant-select-item-option-disabled')).not.toBeNull();
+  });
 });
