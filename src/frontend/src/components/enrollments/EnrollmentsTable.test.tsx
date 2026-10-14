@@ -52,12 +52,8 @@ describe('EnrollmentsTable', () => {
       />
     );
 
-    expect(
-      screen.getByText(i18n.t('enrollments.unknownStudent', { id: 99 }))
-    ).toBeInTheDocument();
-    expect(
-      screen.getByText(i18n.t('enrollments.unknownCourse', { id: 88 }))
-    ).toBeInTheDocument();
+    expect(screen.getByText(i18n.t('enrollments.unknownStudent', { id: 99 }))).toBeInTheDocument();
+    expect(screen.getByText(i18n.t('enrollments.unknownCourse', { id: 88 }))).toBeInTheDocument();
     expect(screen.getByText('—')).toBeInTheDocument();
     expect(screen.getByText('30/30')).toBeInTheDocument();
     expect(screen.getByText(i18n.t('enrollments.full'))).toBeInTheDocument();
