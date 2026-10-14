@@ -2,7 +2,7 @@
 
 Build history for the Student Manager modernization.
 
-PR numbers match merged GitHub pull requests. Future work continues from PR 49.
+PR numbers match merged GitHub pull requests. Future work continues from PR 50.
 
 The README keeps a short Status summary; this file holds the full checklist.
 
@@ -301,3 +301,9 @@ PR 49 — Course Management UI ✅
 - [x] Thin Students|Courses local-state nav in App shell (no React Router); reusable `canManageStudents` for ADMIN gating
 - [x] `coursesApi` + client helpers + `useCourses`; en/de i18n
 - [x] Vitest for hooks, CoursesView auth gating, App sidebar switch; docs
+
+PR 50 — Enrollment Management UI ✅
+- [x] Enrollments SPA: list (joined student/course names) / create drawer / cancel; TanStack Query + RHF + Zod
+- [x] Client join of enrollment IDs with student/course lists; lookup failures ≠ orphan fallbacks; capacity UX in course select
+- [x] Students|Courses|Enrollments local-state shell nav; ADMIN gating via `canManageStudents`
+- [x] Vitest for hooks, join helper, view gating, App nav; docs

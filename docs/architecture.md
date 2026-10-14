@@ -79,9 +79,9 @@ Feature packages under `com.example.demo`:
 
 **Shared API errors (PR 47):** `ApiErrorCode`, `ApiErrorResponse`, and `ApiExceptionHandler` live under `common.api` (no longer under `student.api`). Exception-to-status/code mappings and the JSON contract are unchanged.
 
-**Enrollment domain (PR 48):** `enrollment.*` stores plain `studentId` / `courseId` (no JPA association to Student/Course). `EnrollmentService.enroll` is the only insert path: verify student exists → `CourseRepository.findByIdForUpdate` → reject duplicate → reject when `countByCourseId >= capacity` → `saveAndFlush`. Unique `(student_id, course_id)` backstops races; constraint violations map to `DUPLICATE_ENROLLMENT`. Auth matches other collections (read for ADMIN/USER; create/delete ADMIN-only). No Enrollment SPA yet. Course capacity updates do **not** check current enrollment count (ADMIN can lower capacity below seats already taken; enroll still enforces capacity).
+**Enrollment domain (PR 48 + UI in PR 50):** `enrollment.*` stores plain `studentId` / `courseId` (no JPA association to Student/Course). `EnrollmentService.enroll` is the only insert path: verify student exists → `CourseRepository.findByIdForUpdate` → reject duplicate → reject when `countByCourseId >= capacity` → `saveAndFlush`. Unique `(student_id, course_id)` backstops races; constraint violations map to `DUPLICATE_ENROLLMENT`. Auth matches other collections (read for ADMIN/USER; create/delete ADMIN-only). SPA Enrollments view (PR 50) joins IDs with student/course lists client-side (lookup query failures show load error; true orphans use unknown labels); ADMIN create + cancel; no edit (no PUT). Course capacity updates do **not** check current enrollment count (ADMIN can lower capacity below seats already taken; enroll still enforces capacity).
 
-**Gaps vs a full CRUD product (recorded, not fixed):** no Enrollment SPA; no JWT/OAuth; no Flyway/Liquibase (DDL via Hibernate `update`); no DB foreign keys from enrollment to student/course (deleting a student or course can leave orphan enrollment rows); course capacity updates ignore existing enrollment counts; shell uses local-state Students|Courses nav (no React Router yet).
+**Gaps vs a full CRUD product (recorded, not fixed):** no JWT/OAuth; no Flyway/Liquibase (DDL via Hibernate `update`); no DB foreign keys from enrollment to student/course (deleting a student or course can leave orphan enrollment rows); course capacity updates ignore existing enrollment counts; shell uses local-state Students|Courses|Enrollments nav (no React Router yet); enrollment list has no enriched DTO (client join).
 
 ### 2.3 Frontend
 
@@ -117,16 +117,20 @@ Spring Boot DTOs ──springdoc──▶ /v3/api-docs ──export──▶ api
 ```text
 App (QueryClientProvider + AuthProvider)
 ├── LoginPage (unauthenticated)
-└── AuthenticatedShell (activeView: students | courses — local state, no React Router)
-    └── AppLayout (sidebar Students|Courses + breadcrumb)
+└── AuthenticatedShell (activeView: students | courses | enrollments — local state, no React Router)
+    └── AppLayout (sidebar Students|Courses|Enrollments + breadcrumb)
         ├── StudentsView (students/)
         │   ├── useStudents → TanStack Query + client / apiRoutes / apiError / Notification
         │   ├── EmptyStudents | StudentsLoadError | StudentsTable
         │   └── StudentDrawerForm (react-hook-form + Zod)
-        └── CoursesView (courses/)
-            ├── useCourses → TanStack Query + client / apiRoutes / apiError / Notification
-            ├── EmptyCourses | CoursesLoadError | CoursesTable
-            └── CourseDrawerForm (react-hook-form + Zod)
+        ├── CoursesView (courses/)
+        │   ├── useCourses → TanStack Query + client / apiRoutes / apiError / Notification
+        │   ├── EmptyCourses | CoursesLoadError | CoursesTable
+        │   └── CourseDrawerForm (react-hook-form + Zod)
+        └── EnrollmentsView (enrollments/)
+            ├── useEnrollments → enrollments + shared student/course queries; joinEnrollmentRows
+            ├── EmptyEnrollments | EnrollmentsLoadError | EnrollmentsTable (+ cancel)
+            └── EnrollmentDrawerForm (student/course Selects + capacity UX)
 ```
 
 Production: relative API URLs work because UI and API share origin. Dev: Vite `server.proxy` `/api` → `localhost:8080`.
@@ -313,7 +317,7 @@ Spring Boot / SEP container
 | Area | Present today |
 | --- | --- |
 | Backend | `DemoApplicationTests`; `StudentServiceTest` / `CourseServiceTest` / `EnrollmentServiceTest` (Mockito); repository `@DataJpaTest`s; `StudentIntegrationTest` / `CourseIntegrationTest` / `EnrollmentIntegrationTest` + `EnrollmentConcurrencyIntegrationTest` (capacity race); `SecurityIntegrationTest`; `AuthorizationIntegrationTest` (students + courses + enrollments); `MeIntegrationTest`; `OpenApiContractTest`; JaCoCo report on `test` |
-| Frontend | Vitest for `client`, `apiRoutes`, `apiError`, auth/`/me` login, role-aware students/courses UI, notifications, `useStudents` / `useCourses`, student/course/layout leaves, drawers, and App shell nav; ESLint + Prettier; Maven `build-frontend` runs `format:check`, `check:api-types`, `lint`, and `npm run test:coverage` before `vite build` |
+| Frontend | Vitest for `client`, `apiRoutes`, `apiError`, auth/`/me` login, role-aware students/courses/enrollments UI, notifications, `useStudents` / `useCourses` / `useEnrollments`, join helper, layout leaves, drawers, and App shell nav; ESLint + Prettier; Maven `build-frontend` runs `format:check`, `check:api-types`, `lint`, and `npm run test:coverage` before `vite build` |
 | OpenAPI | `OpenApiContractTest` asserts committed `api/openapi.json` matches `/v3/api-docs`; frontend `check:api-types` asserts generated TS matches that JSON |
 | Integration / repository / service tests | Present for student create/list/delete and email uniqueness (PR 14) |
 | Coverage | CI uploads JaCoCo XML + Vitest Cobertura to Codecov; `codecov.yml` enforces 80% project and patch (PR 38) |
@@ -352,7 +356,8 @@ These items are intentional backlog for modernization; this branch does not fix 
 ### Product / design
 
 - ~~Edit UI without backend update API~~ — PR 45 adds `PUT` + Edit drawer
-- ~~Course API without SPA screens~~ — PR 49 adds Courses UI; Enrollment API still without SPA
+- ~~Course API without SPA screens~~ — PR 49 adds Courses UI
+- ~~Enrollment API without SPA screens~~ — PR 50 adds Enrollments UI (create + cancel; no edit)
 - Enrollment uses plain IDs with no DB foreign keys — deleting a Student or Course can orphan enrollment rows
 - Course capacity updates do not check current enrollment count — ADMIN can set capacity below seats already taken (enroll still enforces capacity; fixing update is a follow-up)
 - Hibernate `ddl-auto=update` used for deployed `dev` profile (no migration history)
