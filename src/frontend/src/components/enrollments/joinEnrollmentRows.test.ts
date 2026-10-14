@@ -43,7 +43,7 @@ describe('joinEnrollmentRows', () => {
     ]);
   });
 
-  it('marks unknown names null for orphan ids and full courses', () => {
+  it('marks unknown names null for orphan student ids and full courses', () => {
     const orphan: Enrollment = {
       id: 101,
       studentId: 99,
@@ -63,6 +63,25 @@ describe('joinEnrollmentRows', () => {
     expect(rows[1]?.courseTitle).toBe('Algebra');
     expect(rows.every((row) => row.enrollmentCount === 3)).toBe(true);
     expect(rows.every((row) => row.isCourseFull)).toBe(true);
+  });
+
+  it('marks course fields null for orphan course ids without treating them as full', () => {
+    const orphanCourse: Enrollment = {
+      id: 103,
+      studentId: 1,
+      courseId: 99,
+      enrolledAt: '2026-01-18T10:30:00Z',
+    };
+
+    const [row] = joinEnrollmentRows([orphanCourse], [ada], [algebra]);
+
+    expect(row).toMatchObject({
+      studentName: 'Ada Lovelace',
+      courseTitle: null,
+      capacity: null,
+      enrollmentCount: 1,
+      isCourseFull: false,
+    });
   });
 });
 
