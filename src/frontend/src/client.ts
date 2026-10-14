@@ -1,8 +1,9 @@
 import fetch from 'unfetch';
-import { coursesApi, meApi, studentsApi } from './apiRoutes';
+import { coursesApi, enrollmentsApi, meApi, studentsApi } from './apiRoutes';
 import { getAuthorizationHeader, notifyUnauthorized } from './auth/authCredentials';
 import type { ApiResponse, HttpError } from './types/api';
 import type { Course, NewCourse } from './types/course';
+import type { Enrollment, NewEnrollment } from './types/enrollment';
 import type { NewStudent, Student } from './types/student';
 import type { CurrentUser } from './types/user';
 
@@ -92,4 +93,21 @@ export const updateCourse = (courseId: number, course: NewCourse): Promise<void>
     },
     method: 'PUT',
     body: JSON.stringify(course),
+  }).then(() => undefined);
+
+export const getAllEnrollments = (): Promise<Enrollment[]> =>
+  apiFetch(enrollmentsApi.collection).then((response) => response.json<Enrollment[]>());
+
+export const enrollStudent = (enrollment: NewEnrollment): Promise<void> =>
+  apiFetch(enrollmentsApi.collection, {
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    method: 'POST',
+    body: JSON.stringify(enrollment),
+  }).then(() => undefined);
+
+export const deleteEnrollment = (enrollmentId: number): Promise<void> =>
+  apiFetch(enrollmentsApi.byId(enrollmentId), {
+    method: 'DELETE',
   }).then(() => undefined);

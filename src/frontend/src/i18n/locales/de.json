@@ -7,9 +7,11 @@
   "layout": {
     "breadcrumbStudents": "Studenten",
     "breadcrumbCourses": "Kurse",
+    "breadcrumbEnrollments": "Einschreibungen",
     "menu": {
       "students": "Studenten",
-      "courses": "Kurse"
+      "courses": "Kurse",
+      "enrollments": "Einschreibungen"
     },
     "tagline": "SEP - Student:innenverwaltung leicht gemacht",
     "sourceLink": "Quellcode auf GitHub ansehen",
@@ -153,6 +155,62 @@
     "loadError": {
       "title": "Kurse konnten nicht geladen werden",
       "description": "Beim Laden der Kursliste ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.",
+      "retry": "Erneut versuchen"
+    }
+  },
+  "enrollments": {
+    "addNew": "Student einschreiben",
+    "countTag": "Anzahl der Einschreibungen",
+    "full": "Voll",
+    "unknownStudent": "Unbekannter Student (#{{id}})",
+    "unknownCourse": "Unbekannter Kurs (#{{id}})",
+    "columns": {
+      "id": "Id",
+      "student": "Student",
+      "course": "Kurs",
+      "enrolledAt": "Eingeschrieben am",
+      "seats": "Plätze",
+      "actions": "Aktionen"
+    },
+    "actions": {
+      "cancel": "Stornieren",
+      "cancelConfirm": "Einschreibung von {{student}} in {{course}} stornieren?",
+      "yes": "Ja",
+      "no": "Nein"
+    },
+    "drawer": {
+      "title": "Student in Kurs einschreiben",
+      "submit": "Einschreiben",
+      "cancel": "Abbrechen"
+    },
+    "form": {
+      "student": {
+        "label": "Student",
+        "placeholder": "Student auswählen"
+      },
+      "course": {
+        "label": "Kurs",
+        "placeholder": "Kurs auswählen",
+        "seatsLabel": "{{title}} ({{count}}/{{capacity}})",
+        "fullLabel": "{{label}} — voll"
+      }
+    },
+    "validation": {
+      "studentRequired": "Bitte einen Studenten auswählen",
+      "courseRequired": "Bitte einen Kurs auswählen"
+    },
+    "notifications": {
+      "addedTitle": "Einschreibung erstellt",
+      "addedDescription": "Der Student wurde in den Kurs eingeschrieben",
+      "cancelledTitle": "Einschreibung storniert",
+      "cancelledDescription": "Einschreibung mit {{id}} wurde storniert"
+    },
+    "empty": {
+      "description": "Noch keine Einschreibungen. Schreiben Sie einen Studenten ein, um zu starten."
+    },
+    "loadError": {
+      "title": "Einschreibungen konnten nicht geladen werden",
+      "description": "Beim Laden der Einschreibungsdaten ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.",
       "retry": "Erneut versuchen"
     }
   },

@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import fetch from 'unfetch';
 import App from './App';
-import { coursesApi, meApi, studentsApi } from './apiRoutes';
+import { coursesApi, enrollmentsApi, meApi, studentsApi } from './apiRoutes';
 import { clearAuthCredentials, hasAuthCredentials } from './auth/authCredentials';
 import i18n from './i18n';
 import type { ApiResponse } from './types/api';
@@ -41,7 +41,11 @@ function mockAuthedSession() {
     if (url === meApi.current) {
       return okMeAdmin as never;
     }
-    if (url === studentsApi.collection || url === coursesApi.collection) {
+    if (
+      url === studentsApi.collection ||
+      url === coursesApi.collection ||
+      url === enrollmentsApi.collection
+    ) {
       return okEmptyList as never;
     }
     return unauthorized as never;

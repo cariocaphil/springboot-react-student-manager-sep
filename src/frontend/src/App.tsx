@@ -6,10 +6,11 @@ import AppLayout from './components/layout/AppLayout';
 import AppProviders from './components/layout/AppProviders';
 import LoginPage from './components/login/LoginPage';
 import CoursesView from './components/courses/CoursesView';
+import EnrollmentsView from './components/enrollments/EnrollmentsView';
 import StudentsView from './components/students/StudentsView';
 import { createQueryClient } from './queryClient';
 
-export type AppView = 'students' | 'courses';
+export type AppView = 'students' | 'courses' | 'enrollments';
 
 function AuthenticatedShell() {
   const { isAuthenticated } = useAuth();
@@ -19,9 +20,18 @@ function AuthenticatedShell() {
     return <LoginPage />;
   }
 
+  let content;
+  if (activeView === 'courses') {
+    content = <CoursesView />;
+  } else if (activeView === 'enrollments') {
+    content = <EnrollmentsView />;
+  } else {
+    content = <StudentsView />;
+  }
+
   return (
     <AppLayout activeView={activeView} onNavigate={setActiveView}>
-      {activeView === 'courses' ? <CoursesView /> : <StudentsView />}
+      {content}
     </AppLayout>
   );
 }

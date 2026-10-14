@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import fetch from 'unfetch';
-import { coursesApi, meApi, studentsApi } from './apiRoutes';
+import { coursesApi, enrollmentsApi, meApi, studentsApi } from './apiRoutes';
 import {
   clearAuthCredentials,
   encodeBasicAuthorizationHeader,
@@ -11,8 +11,11 @@ import {
   addNewCourse,
   addNewStudent,
   deleteCourse,
+  deleteEnrollment,
   deleteStudent,
+  enrollStudent,
   getAllCourses,
+  getAllEnrollments,
   getAllStudents,
   getCurrentUser,
   updateCourse,
@@ -20,6 +23,7 @@ import {
 } from './client';
 import type { ApiResponse } from './types/api';
 import type { Course } from './types/course';
+import type { Enrollment } from './types/enrollment';
 import type { Student } from './types/student';
 
 vi.mock('unfetch', () => ({
@@ -40,6 +44,13 @@ const algebra: Course = {
   title: 'Algebra',
   description: 'Intro algebra',
   capacity: 30,
+};
+
+const enrollment: Enrollment = {
+  id: 9,
+  studentId: 1,
+  courseId: 1,
+  enrolledAt: '2026-01-15T10:30:00Z',
 };
 
 describe('client', () => {
@@ -246,6 +257,55 @@ describe('client', () => {
       headers: { 'Content-Type': 'application/json' },
       method: 'PUT',
       body: JSON.stringify(course),
+    });
+  });
+
+  it('getAllEnrollments GETs the enrollments collection and returns parsed JSON', async () => {
+    const response = {
+      ok: true,
+      status: 200,
+      statusText: 'OK',
+      json: async () => [enrollment],
+    } as ApiResponse;
+    mockedFetch.mockResolvedValue(response as never);
+
+    await expect(getAllEnrollments()).resolves.toEqual([enrollment]);
+    expect(mockedFetch).toHaveBeenCalledWith(enrollmentsApi.collection, {
+      headers: {},
+    });
+  });
+
+  it('enrollStudent POSTs JSON body', async () => {
+    const response = {
+      ok: true,
+      status: 201,
+      statusText: 'Created',
+      json: async () => undefined,
+    } as ApiResponse;
+    const body = { studentId: 1, courseId: 1 };
+    mockedFetch.mockResolvedValue(response as never);
+
+    await expect(enrollStudent(body)).resolves.toBeUndefined();
+    expect(mockedFetch).toHaveBeenCalledWith(enrollmentsApi.collection, {
+      headers: { 'Content-Type': 'application/json' },
+      method: 'POST',
+      body: JSON.stringify(body),
+    });
+  });
+
+  it('deleteEnrollment DELETEs by id', async () => {
+    const response = {
+      ok: true,
+      status: 204,
+      statusText: 'No Content',
+      json: async () => undefined,
+    } as ApiResponse;
+    mockedFetch.mockResolvedValue(response as never);
+
+    await expect(deleteEnrollment(9)).resolves.toBeUndefined();
+    expect(mockedFetch).toHaveBeenCalledWith(enrollmentsApi.byId(9), {
+      method: 'DELETE',
+      headers: {},
     });
   });
 });

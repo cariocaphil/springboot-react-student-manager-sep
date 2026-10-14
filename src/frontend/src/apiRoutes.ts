@@ -8,6 +8,11 @@ export const coursesApi = {
   byId: (courseId: number) => `api/v1/courses/${courseId}`,
 } as const;
 
+export const enrollmentsApi = {
+  collection: 'api/v1/enrollments',
+  byId: (enrollmentId: number) => `api/v1/enrollments/${enrollmentId}`,
+} as const;
+
 export const meApi = {
   current: 'api/v1/me',
 } as const;
