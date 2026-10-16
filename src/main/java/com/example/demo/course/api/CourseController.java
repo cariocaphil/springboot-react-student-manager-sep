@@ -85,6 +85,12 @@ public class CourseController {
                     description = "Course not found",
                     content = @Content(
                             mediaType = MediaType.APPLICATION_JSON_VALUE,
+                            schema = @Schema(implementation = ApiErrorResponse.class))),
+            @ApiResponse(
+                    responseCode = "409",
+                    description = "Capacity below existing enrollment count",
+                    content = @Content(
+                            mediaType = MediaType.APPLICATION_JSON_VALUE,
                             schema = @Schema(implementation = ApiErrorResponse.class)))
     })
     public void updateCourse(

@@ -1,8 +1,10 @@
 package com.example.demo.course.application;
 
 import com.example.demo.course.domain.Course;
+import com.example.demo.course.exception.CourseCapacityBelowEnrollmentCountException;
 import com.example.demo.course.exception.CourseNotFoundException;
 import com.example.demo.course.persistence.CourseRepository;
+import com.example.demo.enrollment.persistence.EnrollmentRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -26,11 +28,14 @@ class CourseServiceTest {
     @Mock
     private CourseRepository courseRepository;
 
+    @Mock
+    private EnrollmentRepository enrollmentRepository;
+
     private CourseService underTest;
 
     @BeforeEach
     void setUp() {
-        underTest = new CourseService(courseRepository);
+        underTest = new CourseService(courseRepository, enrollmentRepository);
     }
 
     @Test
@@ -62,26 +67,72 @@ class CourseServiceTest {
     void updateCourse_updatesWhenCourseExists() {
         long id = 42L;
         Course existing = new Course(id, "Old", "Desc", 10);
-        given(courseRepository.findById(id)).willReturn(Optional.of(existing));
+        given(courseRepository.findByIdForUpdate(id)).willReturn(Optional.of(existing));
+        given(enrollmentRepository.countByCourseId(id)).willReturn(0L);
 
         underTest.updateCourse(id, "New", "Updated", 20);
 
         assertThat(existing.getTitle()).isEqualTo("New");
         assertThat(existing.getDescription()).isEqualTo("Updated");
         assertThat(existing.getCapacity()).isEqualTo(20);
+        verify(courseRepository).findByIdForUpdate(id);
         verify(courseRepository).save(existing);
+    }
+
+    @Test
+    void updateCourse_allowsCapacityEqualToEnrollmentCount() {
+        long id = 42L;
+        Course existing = new Course(id, "Old", "Desc", 10);
+        given(courseRepository.findByIdForUpdate(id)).willReturn(Optional.of(existing));
+        given(enrollmentRepository.countByCourseId(id)).willReturn(5L);
+
+        underTest.updateCourse(id, "Old", "Desc", 5);
+
+        assertThat(existing.getCapacity()).isEqualTo(5);
+        verify(courseRepository).save(existing);
+    }
+
+    @Test
+    void updateCourse_allowsCapacityIncreaseWithEnrollments() {
+        long id = 42L;
+        Course existing = new Course(id, "Old", "Desc", 5);
+        given(courseRepository.findByIdForUpdate(id)).willReturn(Optional.of(existing));
+        given(enrollmentRepository.countByCourseId(id)).willReturn(5L);
+
+        underTest.updateCourse(id, "Old", "Desc", 10);
+
+        assertThat(existing.getCapacity()).isEqualTo(10);
+        verify(courseRepository).save(existing);
+    }
+
+    @Test
+    void updateCourse_rejectsCapacityBelowEnrollmentCount() {
+        long id = 42L;
+        Course existing = new Course(id, "Old", "Desc", 10);
+        given(courseRepository.findByIdForUpdate(id)).willReturn(Optional.of(existing));
+        given(enrollmentRepository.countByCourseId(id)).willReturn(5L);
+
+        assertThatThrownBy(() -> underTest.updateCourse(id, "Old", "Desc", 4))
+                .isInstanceOf(CourseCapacityBelowEnrollmentCountException.class)
+                .hasMessageContaining(String.valueOf(id))
+                .hasMessageContaining("4")
+                .hasMessageContaining("5");
+
+        assertThat(existing.getCapacity()).isEqualTo(10);
+        verify(courseRepository, never()).save(any());
     }
 
     @Test
     void updateCourse_throwsWhenCourseMissing() {
         long id = 99L;
-        given(courseRepository.findById(id)).willReturn(Optional.empty());
+        given(courseRepository.findByIdForUpdate(id)).willReturn(Optional.empty());
 
         assertThatThrownBy(() -> underTest.updateCourse(id, "A", "B", 5))
                 .isInstanceOf(CourseNotFoundException.class)
                 .hasMessageContaining(String.valueOf(id));
 
         verify(courseRepository, never()).save(any());
+        verify(enrollmentRepository, never()).countByCourseId(any());
     }
 
     @Test

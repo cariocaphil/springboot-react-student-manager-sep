@@ -224,6 +224,7 @@
       "enrollmentNotFound": "That enrollment could not be found.",
       "duplicateEnrollment": "That student is already enrolled in this course.",
       "courseFull": "That course is full.",
+      "courseCapacityBelowEnrollmentCount": "Capacity cannot be lower than the number of students already enrolled.",
       "validationFailed": "Please check the form and try again.",
       "badRequest": "The request could not be completed."
     }

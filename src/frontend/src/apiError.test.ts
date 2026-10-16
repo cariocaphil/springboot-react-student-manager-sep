@@ -63,6 +63,17 @@ describe('apiError', () => {
     ).toBe(i18n.t('errors.codes.enrollmentNotFound'));
   });
 
+  it('toUserFacingApiErrorMessage maps COURSE_CAPACITY_BELOW_ENROLLMENT_COUNT to i18n', () => {
+    expect(
+      toUserFacingApiErrorMessage({
+        code: 'COURSE_CAPACITY_BELOW_ENROLLMENT_COUNT',
+        message: 'Course 10 capacity 2 is below enrollment count 5',
+        status: 409,
+        error: 'Conflict',
+      })
+    ).toBe(i18n.t('errors.codes.courseCapacityBelowEnrollmentCount'));
+  });
+
   it('toUserFacingApiErrorMessage falls back for unknown codes', () => {
     const body = {
       code: 'SOME_FUTURE_CODE',

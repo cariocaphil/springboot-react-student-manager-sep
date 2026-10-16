@@ -7,7 +7,7 @@ Full-stack student CRUD demo: a Spring Boot API and a Vite React UI packaged int
 
 ## Status
 
-**Modernization:** PR 50 adds Enrollment Management UI (Students|Courses|Enrollments shell nav). Future work continues from PR 50.
+**Modernization:** PR 51 enforces course capacity ≥ enrollment count on update (shared course-row lock with enroll; 409 Conflict). Future work continues from PR 51.
 
 | | |
 | --- | --- |

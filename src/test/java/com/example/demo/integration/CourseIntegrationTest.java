@@ -4,7 +4,12 @@ import com.example.demo.course.api.CourseApiPaths;
 import com.example.demo.course.api.CourseRequest;
 import com.example.demo.course.domain.Course;
 import com.example.demo.course.persistence.CourseRepository;
+import com.example.demo.enrollment.domain.Enrollment;
+import com.example.demo.enrollment.persistence.EnrollmentRepository;
 import com.example.demo.security.TestAppUserFactory;
+import com.example.demo.student.domain.Gender;
+import com.example.demo.student.domain.Student;
+import com.example.demo.student.persistence.StudentRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -46,10 +51,18 @@ class CourseIntegrationTest {
     private CourseRepository courseRepository;
 
     @Autowired
+    private EnrollmentRepository enrollmentRepository;
+
+    @Autowired
+    private StudentRepository studentRepository;
+
+    @Autowired
     private TestAppUserFactory testAppUserFactory;
 
     @BeforeEach
     void setUp() {
+        enrollmentRepository.deleteAllInBatch();
+        studentRepository.deleteAllInBatch();
         courseRepository.deleteAllInBatch();
         testAppUserFactory.ensureTestUser();
     }
@@ -135,6 +148,49 @@ class CourseIntegrationTest {
                         .content(objectMapper.writeValueAsString(payload)))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.code").value("COURSE_NOT_FOUND"));
+    }
+
+    @Test
+    void updateCourse_rejectsCapacityBelowEnrollmentCountAndLeavesCourseUnchanged() throws Exception {
+        Course course = courseRepository.save(Course.createNew("Fullish", "Desc", 5));
+        Student studentA = studentRepository.save(
+                Student.createNew("Ada", "ada-capacity@example.com", Gender.FEMALE));
+        Student studentB = studentRepository.save(
+                Student.createNew("Bob", "bob-capacity@example.com", Gender.MALE));
+        enrollmentRepository.save(Enrollment.createNew(studentA.getId(), course.getId()));
+        enrollmentRepository.save(Enrollment.createNew(studentB.getId(), course.getId()));
+
+        CourseRequest payload = new CourseRequest("Fullish", "Desc", 1);
+
+        mockMvc.perform(put(COURSE_BY_ID_URI, course.getId())
+                        .with(BASIC_AUTH)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(payload)))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.code").value("COURSE_CAPACITY_BELOW_ENROLLMENT_COUNT"));
+
+        Course unchanged = courseRepository.findById(course.getId()).orElseThrow();
+        assertThat(unchanged.getTitle()).isEqualTo("Fullish");
+        assertThat(unchanged.getDescription()).isEqualTo("Desc");
+        assertThat(unchanged.getCapacity()).isEqualTo(5);
+    }
+
+    @Test
+    void updateCourse_allowsCapacityEqualToEnrollmentCount() throws Exception {
+        Course course = courseRepository.save(Course.createNew("Exact", null, 5));
+        Student student = studentRepository.save(
+                Student.createNew("Alan", "alan-capacity@example.com", Gender.MALE));
+        enrollmentRepository.save(Enrollment.createNew(student.getId(), course.getId()));
+
+        CourseRequest payload = new CourseRequest("Exact", null, 1);
+
+        mockMvc.perform(put(COURSE_BY_ID_URI, course.getId())
+                        .with(BASIC_AUTH)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(payload)))
+                .andExpect(status().isNoContent());
+
+        assertThat(courseRepository.findById(course.getId()).orElseThrow().getCapacity()).isEqualTo(1);
     }
 
     @Test

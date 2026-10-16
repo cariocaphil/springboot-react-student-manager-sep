@@ -1,5 +1,6 @@
 package com.example.demo.common.api;
 
+import com.example.demo.course.exception.CourseCapacityBelowEnrollmentCountException;
 import com.example.demo.course.exception.CourseNotFoundException;
 import com.example.demo.enrollment.exception.CourseFullException;
 import com.example.demo.enrollment.exception.DuplicateEnrollmentException;
@@ -52,6 +53,15 @@ public class ApiExceptionHandler {
     @ExceptionHandler(CourseFullException.class)
     public ResponseEntity<ApiErrorResponse> handleCourseFull(CourseFullException ex) {
         return error(HttpStatus.BAD_REQUEST, ApiErrorCode.COURSE_FULL, ex.getMessage());
+    }
+
+    @ExceptionHandler(CourseCapacityBelowEnrollmentCountException.class)
+    public ResponseEntity<ApiErrorResponse> handleCourseCapacityBelowEnrollmentCount(
+            CourseCapacityBelowEnrollmentCountException ex) {
+        return error(
+                HttpStatus.CONFLICT,
+                ApiErrorCode.COURSE_CAPACITY_BELOW_ENROLLMENT_COUNT,
+                ex.getMessage());
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
