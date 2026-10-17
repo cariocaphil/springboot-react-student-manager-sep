@@ -50,7 +50,7 @@ Feature packages under `com.example.demo`:
 | Domain | `course.domain` | `Course` (`@Entity`) | Persistence model; no dependency on `student.*` |
 | Application | `course.application` | `CourseService` | List, add, update, delete; update locks course row and rejects capacity below enrollment count (reads `EnrollmentRepository.countByCourseId`) |
 | Persistence | `course.persistence` | `CourseRepository` | `JpaRepository<Course, Long>` + `findByIdForUpdate` (pessimistic lock shared by enroll and capacity update) |
-| Exceptions | `course.exception` | `CourseNotFoundException`, `CourseCapacityBelowEnrollmentCountException` | Mapped to `COURSE_NOT_FOUND` (404) / `COURSE_CAPACITY_BELOW_ENROLLMENT_COUNT` (409) via shared handler |
+| Exceptions | `course.exception` | `CourseNotFoundException`, `CourseCapacityBelowEnrollmentCountException` | `CourseNotFoundException` → `COURSE_NOT_FOUND` (404); `CourseCapacityBelowEnrollmentCountException` → `COURSE_CAPACITY_BELOW_ENROLLMENT_COUNT` (409); both via shared handler |
 | API | `enrollment.api` | `EnrollmentController`, DTOs, `EnrollmentMapper`, `EnrollmentApiPaths` | Enrollment HTTP boundary (`/api/v1/enrollments`) |
 | Domain | `enrollment.domain` | `Enrollment` (`@Entity`) | Join of plain `studentId` + `courseId` + `enrolledAt` (no `@ManyToOne`) |
 | Application | `enrollment.application` | `EnrollmentService` | List / enroll / delete; locks course row before capacity check |
