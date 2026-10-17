@@ -43,8 +43,8 @@ public class AppUser {
     private String passwordHash;
 
     /**
-     * Application role. SQL default keeps {@code ddl-auto=update} safe for existing
-     * {@code app_user} rows that predate this column.
+     * Application role. SQL default ({@code ADMIN}) matches Flyway V1 and keeps older
+     * {@code app_user} rows valid if the column was added before role was required.
      */
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, columnDefinition = "varchar(16) not null default 'ADMIN'")

@@ -2,7 +2,7 @@
 
 Build history for the Student Manager modernization.
 
-PR numbers match merged GitHub pull requests. Future work continues from PR 51.
+PR numbers match merged GitHub pull requests. Future work continues from PR 52.
 
 The README keeps a short Status summary; this file holds the full checklist.
 
@@ -313,3 +313,9 @@ PR 51 — Course Capacity Invariants ✅
 - [x] `COURSE_CAPACITY_BELOW_ENROLLMENT_COUNT` → HTTP 409; OpenAPI + generated TS types
 - [x] Frontend `apiError` + en/de i18n for the new code
 - [x] Unit / IT / concurrency lock coordination tests; docs
+
+PR 52 — Flyway Database Migration Integration ✅
+- [x] Flyway deps + `V1__initial_schema.sql` (sequences/tables/uniques; no FKs); `ddl-auto=validate`
+- [x] Manual production baseline (not `baseline-on-migrate` at app startup); fail-fast on non-empty without history
+- [x] ITs: migration idempotency, sequences, unique constraints; `@DataJpaTest` imports Flyway
+- [x] Docs: how to add migrations, validate limits, cutover/rollback
