@@ -248,4 +248,77 @@ class EnrollmentConcurrencyIntegrationTest {
             pool.shutdownNow();
         }
     }
+
+    /**
+     * Reverse lock-ordering test: while one transaction holds {@code findByIdForUpdate} and
+     * lowers capacity to match seats already taken, a concurrent {@code enroll} blocks until
+     * that transaction commits — then fails with {@link CourseFullException}.
+     */
+    @Test
+    void enroll_blocksOnCourseLockWhileUpdateLowersCapacityThenFailsFull() throws Exception {
+        Course course = courseRepository.save(Course.createNew("LowerCapacity", null, 2));
+        Student seated = studentRepository.save(
+                Student.createNew("AlreadySeated", "already-seated@example.com", Gender.FEMALE));
+        Student waiter = studentRepository.save(
+                Student.createNew("CapWaiter", "cap-waiter@example.com", Gender.MALE));
+        enrollmentRepository.save(Enrollment.createNew(seated.getId(), course.getId()));
+
+        CountDownLatch lockHeld = new CountDownLatch(1);
+        CountDownLatch releaseLock = new CountDownLatch(1);
+        AtomicReference<Throwable> holderError = new AtomicReference<>();
+        TransactionTemplate tx = new TransactionTemplate(transactionManager);
+
+        ExecutorService pool = Executors.newFixedThreadPool(2);
+        try {
+            Future<?> holderFuture = pool.submit(() -> {
+                try {
+                    tx.executeWithoutResult(status -> {
+                        Course locked = courseRepository.findByIdForUpdate(course.getId()).orElseThrow();
+                        locked.setCapacity(1);
+                        courseRepository.saveAndFlush(locked);
+                        lockHeld.countDown();
+                        try {
+                            if (!releaseLock.await(10, TimeUnit.SECONDS)) {
+                                throw new IllegalStateException("timed out holding course lock");
+                            }
+                        } catch (InterruptedException ex) {
+                            Thread.currentThread().interrupt();
+                            throw new IllegalStateException(ex);
+                        }
+                    });
+                } catch (Throwable ex) {
+                    holderError.set(ex);
+                    lockHeld.countDown();
+                }
+            });
+
+            assertThat(lockHeld.await(10, TimeUnit.SECONDS))
+                    .as("holder should acquire course lock")
+                    .isTrue();
+            assertThat(holderError.get()).isNull();
+
+            Future<?> waiterFuture = pool.submit(() ->
+                    enrollmentService.enroll(waiter.getId(), course.getId()));
+
+            Thread.sleep(500);
+            assertThat(waiterFuture.isDone())
+                    .as("enroll should still be blocked while the course lock is held")
+                    .isFalse();
+
+            releaseLock.countDown();
+            holderFuture.get(10, TimeUnit.SECONDS);
+            assertThat(holderError.get()).isNull();
+
+            assertThatThrownBy(() -> waiterFuture.get(10, TimeUnit.SECONDS))
+                    .cause()
+                    .isInstanceOf(CourseFullException.class);
+
+            Course updated = courseRepository.findById(course.getId()).orElseThrow();
+            assertThat(updated.getCapacity()).isEqualTo(1);
+            assertThat(enrollmentRepository.countByCourseId(course.getId())).isEqualTo(1L);
+        } finally {
+            releaseLock.countDown();
+            pool.shutdownNow();
+        }
+    }
 }
