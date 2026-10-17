@@ -12,6 +12,7 @@ const ERROR_CODE_MESSAGE_KEYS = {
   ENROLLMENT_NOT_FOUND: 'errors.codes.enrollmentNotFound',
   DUPLICATE_ENROLLMENT: 'errors.codes.duplicateEnrollment',
   COURSE_FULL: 'errors.codes.courseFull',
+  COURSE_CAPACITY_BELOW_ENROLLMENT_COUNT: 'errors.codes.courseCapacityBelowEnrollmentCount',
   VALIDATION_FAILED: 'errors.codes.validationFailed',
   BAD_REQUEST: 'errors.codes.badRequest',
 } as const satisfies Record<ApiErrorCode, string>;

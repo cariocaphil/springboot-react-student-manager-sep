@@ -224,6 +224,7 @@
       "enrollmentNotFound": "Diese Einschreibung konnte nicht gefunden werden.",
       "duplicateEnrollment": "Dieser Student ist bereits für diesen Kurs eingeschrieben.",
       "courseFull": "Dieser Kurs ist voll.",
+      "courseCapacityBelowEnrollmentCount": "Die Kapazität darf nicht unter der Anzahl bereits eingeschriebener Studierender liegen.",
       "validationFailed": "Bitte prüfen Sie das Formular und versuchen Sie es erneut.",
       "badRequest": "Die Anfrage konnte nicht ausgeführt werden."
     }

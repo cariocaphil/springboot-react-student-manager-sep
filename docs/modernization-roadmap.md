@@ -2,7 +2,7 @@
 
 Build history for the Student Manager modernization.
 
-PR numbers match merged GitHub pull requests. Future work continues from PR 50.
+PR numbers match merged GitHub pull requests. Future work continues from PR 51.
 
 The README keeps a short Status summary; this file holds the full checklist.
 
@@ -307,3 +307,9 @@ PR 50 — Enrollment Management UI ✅
 - [x] Client join of enrollment IDs with student/course lists; lookup failures ≠ orphan fallbacks; capacity UX in course select
 - [x] Students|Courses|Enrollments local-state shell nav; ADMIN gating via `canManageStudents`
 - [x] Vitest for hooks, join helper, view gating, App nav; docs
+
+PR 51 — Course Capacity Invariants ✅
+- [x] `CourseService.updateCourse`: `findByIdForUpdate` + enrollment count check; reject capacity below count
+- [x] `COURSE_CAPACITY_BELOW_ENROLLMENT_COUNT` → HTTP 409; OpenAPI + generated TS types
+- [x] Frontend `apiError` + en/de i18n for the new code
+- [x] Unit / IT / concurrency lock coordination tests; docs

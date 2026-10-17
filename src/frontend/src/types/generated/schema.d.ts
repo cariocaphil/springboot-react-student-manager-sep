@@ -138,7 +138,7 @@ export interface components {
              * @description Stable error code for clients
              * @enum {string}
              */
-            code: "EMAIL_TAKEN" | "STUDENT_NOT_FOUND" | "COURSE_NOT_FOUND" | "ENROLLMENT_NOT_FOUND" | "DUPLICATE_ENROLLMENT" | "COURSE_FULL" | "VALIDATION_FAILED" | "BAD_REQUEST";
+            code: "EMAIL_TAKEN" | "STUDENT_NOT_FOUND" | "COURSE_NOT_FOUND" | "ENROLLMENT_NOT_FOUND" | "DUPLICATE_ENROLLMENT" | "COURSE_FULL" | "COURSE_CAPACITY_BELOW_ENROLLMENT_COUNT" | "VALIDATION_FAILED" | "BAD_REQUEST";
             /**
              * @description HTTP reason phrase
              * @example Bad Request
@@ -391,6 +391,15 @@ export interface operations {
             };
             /** @description Course not found */
             404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApiErrorResponse"];
+                };
+            };
+            /** @description Capacity below existing enrollment count */
+            409: {
                 headers: {
                     [name: string]: unknown;
                 };

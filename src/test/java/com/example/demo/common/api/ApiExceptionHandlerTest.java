@@ -1,5 +1,6 @@
 package com.example.demo.common.api;
 
+import com.example.demo.course.exception.CourseCapacityBelowEnrollmentCountException;
 import com.example.demo.course.exception.CourseNotFoundException;
 import com.example.demo.enrollment.exception.CourseFullException;
 import com.example.demo.enrollment.exception.DuplicateEnrollmentException;
@@ -109,6 +110,21 @@ class ApiExceptionHandlerTest {
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
         assertThat(response.getBody()).isEqualTo(
                 new ApiErrorResponse(ApiErrorCode.COURSE_FULL, "Course 10 is full", 400, "Bad Request"));
+    }
+
+    @Test
+    void handleCourseCapacityBelowEnrollmentCount_returnsConflict() {
+        ResponseEntity<ApiErrorResponse> response =
+                handler.handleCourseCapacityBelowEnrollmentCount(
+                        new CourseCapacityBelowEnrollmentCountException(10L, 2, 5L));
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CONFLICT);
+        assertThat(response.getBody()).isEqualTo(
+                new ApiErrorResponse(
+                        ApiErrorCode.COURSE_CAPACITY_BELOW_ENROLLMENT_COUNT,
+                        "Course 10 capacity 2 is below enrollment count 5",
+                        409,
+                        "Conflict"));
     }
 
     @Test
