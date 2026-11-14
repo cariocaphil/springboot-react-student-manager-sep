@@ -14,3 +14,8 @@ Both generators read the committed OpenAPI document at `../../api/openapi.json`
 
 No running backend is required for frontend generation — only an up-to-date
 `api/openapi.json` and `npm install`.
+
+`schemas.ts` includes every OpenAPI component schema. Forms currently import
+only the `*Request` schemas; `*Response`, `CurrentUserResponse`, and
+`ApiErrorResponse` are generated but unused (wire types still come from
+`schema.d.ts`).
