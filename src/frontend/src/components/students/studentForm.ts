@@ -27,7 +27,8 @@ export function createStudentFormErrorMap(language: string) {
           : t('students.validation.emailInvalid');
       }
     }
-    if (field === 'gender' && (issue.code === 'invalid_value' || issue.code === 'invalid_type')) {
+    // Zod enum failures are always invalid_value (missing / wrong / null), not invalid_type.
+    if (field === 'gender' && issue.code === 'invalid_value') {
       return t('students.validation.genderRequired');
     }
     return undefined;

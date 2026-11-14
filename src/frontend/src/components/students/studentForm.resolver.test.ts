@@ -52,6 +52,11 @@ describe('student form resolver messages', () => {
     expect(result.email).toBe(i18n.getFixedT('en')('students.validation.emailRequired'));
   });
 
+  it('reports an omitted gender as required', async () => {
+    const result = await validate('en', { name: 'Ada', email: 'ada@example.com' });
+    expect(result.gender).toBe(i18n.getFixedT('en')('students.validation.genderRequired'));
+  });
+
   it('reports a malformed email as invalid, not required', async () => {
     const result = await validate('en', { name: 'Ada', email: 'not-an-email', gender: 'FEMALE' });
     expect(result.email).toBe(i18n.getFixedT('en')('students.validation.emailInvalid'));
