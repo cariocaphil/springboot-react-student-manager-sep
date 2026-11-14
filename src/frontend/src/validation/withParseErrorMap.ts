@@ -5,6 +5,7 @@ export type ParseErrorIssue = {
   readonly code: string;
   readonly path?: PropertyKey[];
   readonly expected?: unknown;
+  readonly input?: unknown;
 };
 
 type ParseParams = {

@@ -3,25 +3,24 @@ import type { DefaultValues } from 'react-hook-form';
 import i18n from '../../i18n';
 import { StudentRequest } from '../../types/generated/schemas';
 import type { NewStudent, Student } from '../../types/student';
-import { EMAIL_PATTERN } from '../../validation/email';
 import { withParseErrorMap } from '../../validation/withParseErrorMap';
 
 /** Build schema with messages for the given language (pass `i18n.language` so callers rebuild on change). */
 export function createStudentFormSchema(language: string = i18n.language) {
   const t = i18n.getFixedT(language);
-  // Override email only: drop generated `z.email()` so form UX uses EMAIL_PATTERN + one i18n invalid message.
-  const base = StudentRequest.safeExtend({
-    email: z.string().min(1).regex(EMAIL_PATTERN),
-  });
-  return withParseErrorMap(base, (issue) => {
+  return withParseErrorMap(StudentRequest, (issue) => {
     const field = issue.path?.[0];
     if (field === 'name' && issue.code === 'too_small') {
       return t('students.validation.nameRequired');
     }
-    if (field === 'email' && issue.code === 'too_small') {
+    if (field === 'email' && (issue.code === 'too_small' || issue.code === 'invalid_type')) {
       return t('students.validation.emailRequired');
     }
     if (field === 'email' && issue.code === 'invalid_format') {
+      // z.email() rejects '' with invalid_format (often before too_small); keep required UX for empty.
+      if (issue.input === '') {
+        return t('students.validation.emailRequired');
+      }
       return t('students.validation.emailInvalid');
     }
     if (field === 'gender') {
