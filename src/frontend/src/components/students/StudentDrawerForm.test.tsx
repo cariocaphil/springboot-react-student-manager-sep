@@ -1,6 +1,6 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import i18n from '../../i18n';
 import StudentDrawerForm from './StudentDrawerForm';
 
@@ -25,6 +25,10 @@ describe('StudentDrawerForm', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     onSave.mockResolvedValue(true);
+  });
+
+  afterEach(async () => {
+    await i18n.changeLanguage('en');
   });
 
   it('renders create form when drawer is open', () => {
@@ -114,5 +118,28 @@ describe('StudentDrawerForm', () => {
       expect(onSave).toHaveBeenCalled();
     });
     expect(onClose).not.toHaveBeenCalled();
+  });
+
+  it('keeps shown errors until revalidation, then validates in the new language', async () => {
+    const user = userEvent.setup();
+    render(<StudentDrawerForm open onClose={onClose} onSave={onSave} />);
+
+    await user.click(screen.getByRole('button', { name: i18n.t('students.drawer.submit') }));
+    const enName = i18n.getFixedT('en')('students.validation.nameRequired');
+    const deName = i18n.getFixedT('de')('students.validation.nameRequired');
+    expect(await screen.findByText(enName)).toBeInTheDocument();
+
+    await act(async () => {
+      await i18n.changeLanguage('de');
+    });
+
+    // Existing behavior: RHF does not revalidate on language change, so the old message stays.
+    expect(screen.getByText(enName)).toBeInTheDocument();
+    expect(screen.queryByText(deName)).not.toBeInTheDocument();
+
+    // Revalidation uses the resolver rebuilt for the new language.
+    await user.click(screen.getByRole('button', { name: i18n.t('students.drawer.submit') }));
+    expect(await screen.findByText(deName)).toBeInTheDocument();
+    expect(screen.queryByText(enName)).not.toBeInTheDocument();
   });
 });

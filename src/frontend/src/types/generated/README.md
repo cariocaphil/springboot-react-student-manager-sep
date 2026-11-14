@@ -1,3 +1,24 @@
-# Generated API types — do not edit by hand.
-# Regenerate: from src/frontend, `npm run generate:api-types`
-# (requires up-to-date ../../api/openapi.json from the Spring Boot OpenAPI export).
+# Generated API artifacts — do not edit by hand.
+
+From `src/frontend`:
+
+| Script | Output | Tool |
+| --- | --- | --- |
+| `npm run generate:api-types` | `schema.d.ts` | `openapi-typescript` |
+| `npm run generate:zod` | `schemas.ts` | `typed-openapi` (Zod v4, schemas-only) |
+| `npm run check:api-types` | — | fails if `schema.d.ts` is stale |
+| `npm run check:zod` | — | fails if `schemas.ts` is stale |
+
+Both generators read the committed OpenAPI document at `../../api/openapi.json`
+(export from Spring Boot via `OpenApiContractTest` / `-Dopenapi.export=true`).
+They are independent artifacts from the same spec; `schemas.test.ts`
+assignability checks guard against Zod ↔ domain-type drift. A follow-up
+could infer TypeScript types from Zod and drop `openapi-typescript`.
+
+No running backend is required for frontend generation — only an up-to-date
+`api/openapi.json` and `npm install`.
+
+`schemas.ts` includes every OpenAPI component schema. Forms currently import
+only the `*Request` schemas; `*Response`, `CurrentUserResponse`, and
+`ApiErrorResponse` are generated but unused (wire types still come from
+`schema.d.ts`).

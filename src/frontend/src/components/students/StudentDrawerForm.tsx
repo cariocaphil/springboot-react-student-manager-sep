@@ -1,14 +1,15 @@
 import { Drawer, Col, Form, Row, Button, Spin } from 'antd';
 import { LoadingOutlined } from '@ant-design/icons';
-import { useEffect, useMemo } from 'react';
+import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useTranslation } from 'react-i18next';
 import type { NewStudent, Student } from '../../types/student';
 import {
   createNewStudentFromForm,
-  createStudentFormSchema,
+  createStudentFormErrorMap,
   defaultValues,
+  studentFormSchema,
   studentToFormValues,
   type StudentFormValues,
 } from './studentForm';
@@ -34,7 +35,6 @@ function StudentDrawerForm({
   onSave,
 }: StudentDrawerFormProps) {
   const { t, i18n } = useTranslation();
-  const schema = useMemo(() => createStudentFormSchema(i18n.language), [i18n.language]);
   const isEditing = editingStudent !== null;
 
   const {
@@ -43,7 +43,7 @@ function StudentDrawerForm({
     reset,
     formState: { errors, isSubmitting },
   } = useForm<StudentFormValues>({
-    resolver: zodResolver(schema),
+    resolver: zodResolver(studentFormSchema, { error: createStudentFormErrorMap(i18n.language) }),
     defaultValues,
   });
 

@@ -1,22 +1,40 @@
 import { z } from 'zod';
 import type { DefaultValues } from 'react-hook-form';
 import i18n from '../../i18n';
+import { CourseRequest } from '../../types/generated/schemas';
 import type { Course, NewCourse } from '../../types/course';
+import type { FormIssue } from '../../validation/formIssue';
 
-/** Build schema with messages for the given language (pass `i18n.language` so callers rebuild on change). */
-export function createCourseFormSchema(language: string = i18n.language) {
+/** Generated capacity constraints; title is trimmed and description is always a string in the form. */
+export const courseFormSchema = CourseRequest.safeExtend({
+  title: z.string().trim().min(1),
+  description: z.string(),
+});
+
+/** Localized messages for the resolver `error` option (pass `i18n.language`). */
+export function createCourseFormErrorMap(language: string) {
   const t = i18n.getFixedT(language);
-  return z.object({
-    title: z.string().trim().min(1, t('courses.validation.titleRequired')),
-    description: z.string(),
-    capacity: z
-      .number({ message: t('courses.validation.capacityRequired') })
-      .int({ message: t('courses.validation.capacityInteger') })
-      .min(1, t('courses.validation.capacityMin')),
-  });
+  return (issue: FormIssue) => {
+    const field = issue.path?.[0];
+    if (field === 'title' && issue.code === 'too_small') {
+      return t('courses.validation.titleRequired');
+    }
+    if (field === 'capacity') {
+      if (issue.code === 'too_small') {
+        return t('courses.validation.capacityMin');
+      }
+      if (issue.code === 'invalid_type' && issue.expected === 'int') {
+        return t('courses.validation.capacityInteger');
+      }
+      if (issue.code === 'invalid_type') {
+        return t('courses.validation.capacityRequired');
+      }
+    }
+    return undefined;
+  };
 }
 
-export type CourseFormValues = z.infer<ReturnType<typeof createCourseFormSchema>>;
+export type CourseFormValues = z.infer<typeof courseFormSchema>;
 
 export const defaultValues: DefaultValues<CourseFormValues> = {
   title: '',

@@ -1,12 +1,13 @@
 import { Drawer, Col, Form, Row, Button, Spin } from 'antd';
 import { LoadingOutlined } from '@ant-design/icons';
-import { useEffect, useMemo } from 'react';
+import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useTranslation } from 'react-i18next';
 import type { Course, NewCourse } from '../../types/course';
 import {
-  createCourseFormSchema,
+  courseFormSchema,
+  createCourseFormErrorMap,
   createNewCourseFromForm,
   defaultValues,
   courseToFormValues,
@@ -29,7 +30,6 @@ interface CourseDrawerFormProps {
 
 function CourseDrawerForm({ open, editingCourse = null, onClose, onSave }: CourseDrawerFormProps) {
   const { t, i18n } = useTranslation();
-  const schema = useMemo(() => createCourseFormSchema(i18n.language), [i18n.language]);
   const isEditing = editingCourse !== null;
 
   const {
@@ -38,7 +38,7 @@ function CourseDrawerForm({ open, editingCourse = null, onClose, onSave }: Cours
     reset,
     formState: { errors, isSubmitting },
   } = useForm<CourseFormValues>({
-    resolver: zodResolver(schema),
+    resolver: zodResolver(courseFormSchema, { error: createCourseFormErrorMap(i18n.language) }),
     defaultValues,
   });
 

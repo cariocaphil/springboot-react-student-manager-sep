@@ -7,7 +7,7 @@ Full-stack student CRUD demo: a Spring Boot API and a Vite React UI packaged int
 
 ## Status
 
-**Modernization:** PR 52 introduces Flyway as the schema authority (`validate` instead of Hibernate `ddl-auto=update`). Future work continues from PR 52.
+**Modernization:** PR 53 generates Zod request schemas from OpenAPI (`typed-openapi`) while keeping localized form messages (resolver error maps) and the existing `openapi-typescript` types/client. Future work continues from PR 53.
 
 | | |
 | --- | --- |
@@ -22,7 +22,7 @@ Full-stack student CRUD demo: a Spring Boot API and a Vite React UI packaged int
 | --- | --- |
 | Backend | Java **17**, Spring Boot **3.4.5**, Spring Web, Spring Security (HTTP Basic + `ADMIN`/`USER` roles), Spring Data JPA, **Flyway**, Bean Validation, Lombok, **springdoc-openapi** |
 | Database | PostgreSQL (local `localhost:5432`; AWS RDS via `dev` profile); schema via Flyway |
-| Frontend | React **19.3** + **TypeScript**, **Vite 5**, Ant Design **5.29**, **i18next** / **react-i18next** (en/de), **TanStack Query 5**, **React Hook Form 7**, **Zod**, `unfetch`, **openapi-typescript** (generated wire types), Vitest, **ESLint 9**, **Prettier** |
+| Frontend | React **19.3** + **TypeScript**, **Vite 5**, Ant Design **5.29**, **i18next** / **react-i18next** (en/de), **TanStack Query 5**, **React Hook Form 7**, **Zod** (generated from OpenAPI via **typed-openapi**; localized via resolver error maps), `unfetch`, **openapi-typescript** (generated wire types), Vitest, **ESLint 9**, **Prettier** |
 | Build | Maven Wrapper, `frontend-maven-plugin` (Node **20** / npm **10**), Jib **3.5.2** |
 | Container | Eclipse Temurin **17** JRE base (`eclipse-temurin:17-jre`); image name `cariocaphil/spring-react-fullstack` |
 | CI/CD | GitHub Actions (`.github/workflows/build.yml`, `deploy.yml`) |
@@ -174,20 +174,21 @@ Requires Docker. Pushes tags `cariocaphil/spring-react-fullstack:local` and `:la
 
 Runs `StudentServiceTest` (no DB), plus Postgres-backed `StudentRepositoryTest`, `StudentIntegrationTest`, `SecurityIntegrationTest`, `OpenApiContractTest`, and `DemoApplicationTests`. Start local Postgres first (see [Database](#database)). CI starts Postgres 13.1 before `./mvnw clean package`.
 
-Frontend Vitest / lint / format / OpenAPI typecheck (also run by Maven’s `build-frontend` profile before `vite build`):
+Frontend Vitest / lint / format / OpenAPI type + Zod checks (also run by Maven’s `build-frontend` profile before `vite build`):
 
 ```bash
 cd src/frontend && npm test
 cd src/frontend && npm run lint
 cd src/frontend && npm run format:check
 cd src/frontend && npm run check:api-types
+cd src/frontend && npm run check:zod
 ```
 
 Covers API client helpers, notification wrappers, create-student drawer (validation / success / error), and App list/delete/empty/load-error+retry flows. Use `npm run format` to apply Prettier.
 
 ### OpenAPI contract and generated types
 
-Spring Boot owns the HTTP contract (DTOs + springdoc). The committed snapshot is `api/openapi.json`. The React app generates TypeScript types from that file — **do not edit** `src/frontend/src/types/generated/` by hand.
+Spring Boot owns the HTTP contract (DTOs + springdoc). The committed snapshot is `api/openapi.json`. The React app generates TypeScript types and Zod schemas from that file — **do not edit** `src/frontend/src/types/generated/` by hand.
 
 After changing API DTOs or controller annotations:
 
@@ -195,9 +196,10 @@ After changing API DTOs or controller annotations:
 # Requires local Postgres (same as other @SpringBootTest suites)
 ./mvnw -Dopenapi.export=true test -Dtest=OpenApiContractTest -P'!build-frontend'
 cd src/frontend && npm run generate:api-types
+cd src/frontend && npm run generate:zod
 ```
 
-CI fails if the committed OpenAPI JSON drifts from the running app (`OpenApiContractTest`) or if generated TS drifts from `api/openapi.json` (`npm run check:api-types`).
+CI fails if the committed OpenAPI JSON drifts from the running app (`OpenApiContractTest`), or if generated TS / Zod drifts from `api/openapi.json` (`npm run check:api-types`, `npm run check:zod`).
 
 ## API surface (current)
 

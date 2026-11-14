@@ -2,7 +2,7 @@
 
 Build history for the Student Manager modernization.
 
-PR numbers match merged GitHub pull requests. Future work continues from PR 52.
+PR numbers match merged GitHub pull requests. Future work continues from PR 53.
 
 The README keeps a short Status summary; this file holds the full checklist.
 
@@ -319,3 +319,10 @@ PR 52 — Flyway Database Migration Integration ✅
 - [x] Manual production baseline (not `baseline-on-migrate` at app startup); fail-fast on non-empty without history
 - [x] ITs: migration idempotency, sequences, unique constraints; `@DataJpaTest` imports Flyway
 - [x] Docs: how to add migrations, validate limits, cutover/rollback
+
+PR 53 — OpenAPI-Driven Zod Schema Generation ✅
+- [x] Pin `typed-openapi`; generate Zod from `api/openapi.json` into `types/generated/schemas.ts` (schemas-only; leave `openapi-typescript` / client unchanged)
+- [x] `npm run generate:zod` / `check:zod`; Maven `build-frontend` runs `check:zod` after `check:api-types`
+- [x] Student / course / enrollment form schemas reuse generated `*Request` (course title trim / form description overlay only; no i18n in schemas); localized messages via per-form error maps passed to `zodResolver`; login stays handwritten
+- [x] Focused generated-schema tests (required fields, capacity, enrollment int64 as number); existing form/drawer tests stay green
+- [x] Docs: roadmap, architecture OpenAPI→Zod note, generated README

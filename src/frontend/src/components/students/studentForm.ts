@@ -1,25 +1,41 @@
-import { z } from 'zod';
+import type { z } from 'zod';
 import type { DefaultValues } from 'react-hook-form';
 import i18n from '../../i18n';
-import { GENDERS, type NewStudent, type Student } from '../../types/student';
-import { EMAIL_PATTERN } from '../../validation/email';
+import { StudentRequest } from '../../types/generated/schemas';
+import type { NewStudent, Student } from '../../types/student';
+import type { FormIssue } from '../../validation/formIssue';
 
-/** Build schema with messages for the given language (pass `i18n.language` so callers rebuild on change). */
-export function createStudentFormSchema(language: string = i18n.language) {
+/** Contract constraints only (generated); messages come from `createStudentFormErrorMap`. */
+export const studentFormSchema = StudentRequest;
+
+/** Localized messages for the resolver `error` option (pass `i18n.language`). */
+export function createStudentFormErrorMap(language: string) {
   const t = i18n.getFixedT(language);
-  return z.object({
-    name: z.string().min(1, t('students.validation.nameRequired')),
-    email: z
-      .string()
-      .min(1, t('students.validation.emailRequired'))
-      .regex(EMAIL_PATTERN, t('students.validation.emailInvalid')),
-    gender: z.enum(GENDERS, {
-      message: t('students.validation.genderRequired'),
-    }),
-  });
+  return (issue: FormIssue) => {
+    const field = issue.path?.[0];
+    if (field === 'name' && issue.code === 'too_small') {
+      return t('students.validation.nameRequired');
+    }
+    if (field === 'email') {
+      if (issue.code === 'too_small' || issue.code === 'invalid_type') {
+        return t('students.validation.emailRequired');
+      }
+      if (issue.code === 'invalid_format') {
+        // z.email() reports '' as invalid_format (before too_small); keep "required" for empty.
+        return issue.input === ''
+          ? t('students.validation.emailRequired')
+          : t('students.validation.emailInvalid');
+      }
+    }
+    // Zod enum failures are always invalid_value (missing / wrong / null), not invalid_type.
+    if (field === 'gender' && issue.code === 'invalid_value') {
+      return t('students.validation.genderRequired');
+    }
+    return undefined;
+  };
 }
 
-export type StudentFormValues = z.infer<ReturnType<typeof createStudentFormSchema>>;
+export type StudentFormValues = z.infer<typeof studentFormSchema>;
 
 export const defaultValues: DefaultValues<StudentFormValues> = {
   name: '',
