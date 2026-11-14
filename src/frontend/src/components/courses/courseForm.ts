@@ -3,17 +3,18 @@ import type { DefaultValues } from 'react-hook-form';
 import i18n from '../../i18n';
 import { CourseRequest } from '../../types/generated/schemas';
 import type { Course, NewCourse } from '../../types/course';
-import { withParseErrorMap } from '../../validation/withParseErrorMap';
+import type { FormIssue } from '../../validation/formIssue';
 
-/** Build schema with messages for the given language (pass `i18n.language` so callers rebuild on change). */
-export function createCourseFormSchema(language: string = i18n.language) {
+/** Generated capacity constraints; title is trimmed and description is always a string in the form. */
+export const courseFormSchema = CourseRequest.safeExtend({
+  title: z.string().trim().min(1),
+  description: z.string(),
+});
+
+/** Localized messages for the resolver `error` option (pass `i18n.language`). */
+export function createCourseFormErrorMap(language: string) {
   const t = i18n.getFixedT(language);
-  // Keep generated capacity constraints; override title (trim) and description (always string in the form).
-  const base = CourseRequest.safeExtend({
-    title: z.string().trim().min(1),
-    description: z.string(),
-  });
-  return withParseErrorMap(base, (issue) => {
+  return (issue: FormIssue) => {
     const field = issue.path?.[0];
     if (field === 'title' && issue.code === 'too_small') {
       return t('courses.validation.titleRequired');
@@ -22,19 +23,18 @@ export function createCourseFormSchema(language: string = i18n.language) {
       if (issue.code === 'too_small') {
         return t('courses.validation.capacityMin');
       }
+      if (issue.code === 'invalid_type' && issue.expected === 'int') {
+        return t('courses.validation.capacityInteger');
+      }
       if (issue.code === 'invalid_type') {
-        const expected = 'expected' in issue ? issue.expected : undefined;
-        if (expected === 'int') {
-          return t('courses.validation.capacityInteger');
-        }
         return t('courses.validation.capacityRequired');
       }
     }
     return undefined;
-  });
+  };
 }
 
-export type CourseFormValues = z.infer<ReturnType<typeof createCourseFormSchema>>;
+export type CourseFormValues = z.infer<typeof courseFormSchema>;
 
 export const defaultValues: DefaultValues<CourseFormValues> = {
   title: '',

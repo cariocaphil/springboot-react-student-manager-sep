@@ -1,10 +1,13 @@
 import { describe, expect, it } from 'vitest';
-import i18n from '../../i18n';
-import { createNewStudentFromForm, createStudentFormSchema } from './studentForm';
+import { createNewStudentFromForm, studentFormSchema } from './studentForm';
 
-const studentFormSchema = createStudentFormSchema();
+function failures(input: unknown) {
+  const result = studentFormSchema.safeParse(input);
+  expect(result.success).toBe(false);
+  return result.success ? [] : result.error.issues.map((i) => `${String(i.path[0])}:${i.code}`);
+}
 
-describe('studentFormSchema', () => {
+describe('studentFormSchema (constraints)', () => {
   it('accepts a complete valid student', () => {
     const result = studentFormSchema.safeParse({
       name: 'Ada',
@@ -15,32 +18,20 @@ describe('studentFormSchema', () => {
   });
 
   it('requires name, email, and gender', () => {
-    const result = studentFormSchema.safeParse({
-      name: '',
-      email: '',
-      gender: undefined,
-    });
-    expect(result.success).toBe(false);
-    if (!result.success) {
-      const messages = result.error.issues.map((issue) => issue.message);
-      expect(messages).toContain(i18n.t('students.validation.nameRequired'));
-      expect(messages).toContain(i18n.t('students.validation.emailRequired'));
-      expect(messages).toContain(i18n.t('students.validation.genderRequired'));
-    }
+    const found = failures({ name: '', email: '', gender: undefined });
+    expect(found).toEqual(
+      expect.arrayContaining(['name:too_small', 'email:too_small', 'gender:invalid_value'])
+    );
   });
 
-  it('rejects an invalid email', () => {
-    const result = studentFormSchema.safeParse({
-      name: 'Ada',
-      email: 'not-an-email',
-      gender: 'FEMALE',
-    });
-    expect(result.success).toBe(false);
-    if (!result.success) {
-      expect(result.error.issues.map((issue) => issue.message)).toContain(
-        i18n.t('students.validation.emailInvalid')
-      );
-    }
+  it('rejects a missing email as invalid_type', () => {
+    expect(failures({ name: 'Ada', gender: 'FEMALE' })).toContain('email:invalid_type');
+  });
+
+  it('rejects an invalid email format', () => {
+    expect(failures({ name: 'Ada', email: 'not-an-email', gender: 'FEMALE' })).toEqual([
+      'email:invalid_format',
+    ]);
   });
 });
 

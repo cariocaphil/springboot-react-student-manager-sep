@@ -1,6 +1,6 @@
 import { Drawer, Col, Form, Row, Button, Select, Spin } from 'antd';
 import { LoadingOutlined } from '@ant-design/icons';
-import { useEffect, useMemo } from 'react';
+import { useEffect } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useTranslation } from 'react-i18next';
@@ -10,9 +10,10 @@ import type { Enrollment, NewEnrollment } from '../../types/enrollment';
 import type { Student } from '../../types/student';
 import { countEnrollmentsByCourseId } from './joinEnrollmentRows';
 import {
-  createEnrollmentFormSchema,
+  createEnrollmentFormErrorMap,
   createNewEnrollmentFromForm,
   defaultValues,
+  enrollmentFormSchema,
   type EnrollmentFormValues,
 } from './enrollmentForm';
 import EnrollmentDrawerFooter from './EnrollmentDrawerFooter';
@@ -38,7 +39,6 @@ function EnrollmentDrawerForm({
   onSave,
 }: EnrollmentDrawerFormProps) {
   const { t, i18n } = useTranslation();
-  const schema = useMemo(() => createEnrollmentFormSchema(i18n.language), [i18n.language]);
   const enrollmentCounts = countEnrollmentsByCourseId(enrollments);
 
   const {
@@ -47,7 +47,9 @@ function EnrollmentDrawerForm({
     reset,
     formState: { errors, isSubmitting },
   } = useForm<EnrollmentFormValues>({
-    resolver: zodResolver(schema),
+    resolver: zodResolver(enrollmentFormSchema, {
+      error: createEnrollmentFormErrorMap(i18n.language),
+    }),
     defaultValues,
   });
 

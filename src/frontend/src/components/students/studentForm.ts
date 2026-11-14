@@ -1,36 +1,40 @@
-import { z } from 'zod';
+import type { z } from 'zod';
 import type { DefaultValues } from 'react-hook-form';
 import i18n from '../../i18n';
 import { StudentRequest } from '../../types/generated/schemas';
 import type { NewStudent, Student } from '../../types/student';
-import { withParseErrorMap } from '../../validation/withParseErrorMap';
+import type { FormIssue } from '../../validation/formIssue';
 
-/** Build schema with messages for the given language (pass `i18n.language` so callers rebuild on change). */
-export function createStudentFormSchema(language: string = i18n.language) {
+/** Contract constraints only (generated); messages come from `createStudentFormErrorMap`. */
+export const studentFormSchema = StudentRequest;
+
+/** Localized messages for the resolver `error` option (pass `i18n.language`). */
+export function createStudentFormErrorMap(language: string) {
   const t = i18n.getFixedT(language);
-  return withParseErrorMap(StudentRequest, (issue) => {
+  return (issue: FormIssue) => {
     const field = issue.path?.[0];
     if (field === 'name' && issue.code === 'too_small') {
       return t('students.validation.nameRequired');
     }
-    if (field === 'email' && (issue.code === 'too_small' || issue.code === 'invalid_type')) {
-      return t('students.validation.emailRequired');
-    }
-    if (field === 'email' && issue.code === 'invalid_format') {
-      // z.email() rejects '' with invalid_format (often before too_small); keep required UX for empty.
-      if (issue.input === '') {
+    if (field === 'email') {
+      if (issue.code === 'too_small' || issue.code === 'invalid_type') {
         return t('students.validation.emailRequired');
       }
-      return t('students.validation.emailInvalid');
+      if (issue.code === 'invalid_format') {
+        // z.email() reports '' as invalid_format (before too_small); keep "required" for empty.
+        return issue.input === ''
+          ? t('students.validation.emailRequired')
+          : t('students.validation.emailInvalid');
+      }
     }
-    if (field === 'gender') {
+    if (field === 'gender' && (issue.code === 'invalid_value' || issue.code === 'invalid_type')) {
       return t('students.validation.genderRequired');
     }
     return undefined;
-  });
+  };
 }
 
-export type StudentFormValues = z.infer<ReturnType<typeof createStudentFormSchema>>;
+export type StudentFormValues = z.infer<typeof studentFormSchema>;
 
 export const defaultValues: DefaultValues<StudentFormValues> = {
   name: '',

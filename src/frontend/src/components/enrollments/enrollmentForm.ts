@@ -1,27 +1,31 @@
-import { z } from 'zod';
+import type { z } from 'zod';
 import type { DefaultValues } from 'react-hook-form';
 import i18n from '../../i18n';
 import { EnrollmentRequest } from '../../types/generated/schemas';
 import type { NewEnrollment } from '../../types/enrollment';
-import { withParseErrorMap } from '../../validation/withParseErrorMap';
+import type { FormIssue } from '../../validation/formIssue';
 
-/** Build schema with messages for the given language (pass `i18n.language` so callers rebuild on change). */
-export function createEnrollmentFormSchema(language: string = i18n.language) {
+/** Contract constraints only (generated); messages come from `createEnrollmentFormErrorMap`. */
+export const enrollmentFormSchema = EnrollmentRequest;
+
+/** Localized messages for the resolver `error` option (pass `i18n.language`). */
+export function createEnrollmentFormErrorMap(language: string) {
   const t = i18n.getFixedT(language);
-  // Generated EnrollmentRequest already matches the form shape; only localize messages.
-  return withParseErrorMap(EnrollmentRequest, (issue) => {
+  return (issue: FormIssue) => {
     const field = issue.path?.[0];
-    if (field === 'studentId') {
+    // Only "missing / not a number" means required; e.g. a fractional id (expected 'int') keeps Zod's message.
+    const isMissing = issue.code === 'invalid_type' && issue.expected === 'number';
+    if (field === 'studentId' && isMissing) {
       return t('enrollments.validation.studentRequired');
     }
-    if (field === 'courseId') {
+    if (field === 'courseId' && isMissing) {
       return t('enrollments.validation.courseRequired');
     }
     return undefined;
-  });
+  };
 }
 
-export type EnrollmentFormValues = z.infer<ReturnType<typeof createEnrollmentFormSchema>>;
+export type EnrollmentFormValues = z.infer<typeof enrollmentFormSchema>;
 
 export const defaultValues: DefaultValues<EnrollmentFormValues> = {
   studentId: undefined,

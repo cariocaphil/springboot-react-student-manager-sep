@@ -7,7 +7,7 @@ Full-stack student CRUD demo: a Spring Boot API and a Vite React UI packaged int
 
 ## Status
 
-**Modernization:** PR 53 generates Zod request schemas from OpenAPI (`typed-openapi`) while keeping form i18n overlays and the existing `openapi-typescript` types/client. Future work continues from PR 53.
+**Modernization:** PR 53 generates Zod request schemas from OpenAPI (`typed-openapi`) while keeping localized form messages (resolver error maps) and the existing `openapi-typescript` types/client. Future work continues from PR 53.
 
 | | |
 | --- | --- |
@@ -22,7 +22,7 @@ Full-stack student CRUD demo: a Spring Boot API and a Vite React UI packaged int
 | --- | --- |
 | Backend | Java **17**, Spring Boot **3.4.5**, Spring Web, Spring Security (HTTP Basic + `ADMIN`/`USER` roles), Spring Data JPA, **Flyway**, Bean Validation, Lombok, **springdoc-openapi** |
 | Database | PostgreSQL (local `localhost:5432`; AWS RDS via `dev` profile); schema via Flyway |
-| Frontend | React **19.3** + **TypeScript**, **Vite 5**, Ant Design **5.29**, **i18next** / **react-i18next** (en/de), **TanStack Query 5**, **React Hook Form 7**, **Zod** (generated from OpenAPI via **typed-openapi** + form overlays), `unfetch`, **openapi-typescript** (generated wire types), Vitest, **ESLint 9**, **Prettier** |
+| Frontend | React **19.3** + **TypeScript**, **Vite 5**, Ant Design **5.29**, **i18next** / **react-i18next** (en/de), **TanStack Query 5**, **React Hook Form 7**, **Zod** (generated from OpenAPI via **typed-openapi**; localized via resolver error maps), `unfetch`, **openapi-typescript** (generated wire types), Vitest, **ESLint 9**, **Prettier** |
 | Build | Maven Wrapper, `frontend-maven-plugin` (Node **20** / npm **10**), Jib **3.5.2** |
 | Container | Eclipse Temurin **17** JRE base (`eclipse-temurin:17-jre`); image name `cariocaphil/spring-react-fullstack` |
 | CI/CD | GitHub Actions (`.github/workflows/build.yml`, `deploy.yml`) |
