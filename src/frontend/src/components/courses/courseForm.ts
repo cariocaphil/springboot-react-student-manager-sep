@@ -1,18 +1,36 @@
 import { z } from 'zod';
 import type { DefaultValues } from 'react-hook-form';
 import i18n from '../../i18n';
+import { CourseRequest } from '../../types/generated/schemas';
 import type { Course, NewCourse } from '../../types/course';
+import { withParseErrorMap } from '../../validation/withParseErrorMap';
 
 /** Build schema with messages for the given language (pass `i18n.language` so callers rebuild on change). */
 export function createCourseFormSchema(language: string = i18n.language) {
   const t = i18n.getFixedT(language);
-  return z.object({
-    title: z.string().trim().min(1, t('courses.validation.titleRequired')),
+  // Keep generated capacity constraints; override title (trim) and description (always string in the form).
+  const base = CourseRequest.safeExtend({
+    title: z.string().trim().min(1),
     description: z.string(),
-    capacity: z
-      .number({ message: t('courses.validation.capacityRequired') })
-      .int({ message: t('courses.validation.capacityInteger') })
-      .min(1, t('courses.validation.capacityMin')),
+  });
+  return withParseErrorMap(base, (issue) => {
+    const field = issue.path?.[0];
+    if (field === 'title' && issue.code === 'too_small') {
+      return t('courses.validation.titleRequired');
+    }
+    if (field === 'capacity') {
+      if (issue.code === 'too_small') {
+        return t('courses.validation.capacityMin');
+      }
+      if (issue.code === 'invalid_type') {
+        const expected = 'expected' in issue ? issue.expected : undefined;
+        if (expected === 'int') {
+          return t('courses.validation.capacityInteger');
+        }
+        return t('courses.validation.capacityRequired');
+      }
+    }
+    return undefined;
   });
 }
 
