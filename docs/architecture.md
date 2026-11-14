@@ -75,7 +75,7 @@ Feature packages under `com.example.demo`:
 
 **Student update (PR 45):** `PUT /api/v1/students/{studentId}` accepts `@Valid StudentRequest` (full replacement), returns **204**, and is ADMIN-only. Email uniqueness ignores the current row (`existsByEmailAndIdNot`). The SPA reuses `StudentDrawerForm` for create and edit; Edit opens the drawer prefilled and saves via `updateStudent` / TanStack mutation.
 
-**Course domain (PR 46 + UI in PR 49):** Independent `course.*` packages (no imports from `student.*` domain types). `CourseController` exposes list/create/update/delete at `/api/v1/courses` with the same status and auth matrix as students. Missing ids map to `COURSE_NOT_FOUND` via the shared `ApiExceptionHandler`. Titles may duplicate (no natural unique key). Hibernate `ddl-auto` creates the `course` table. The SPA Courses view (PR 49) mirrors Students: TanStack Query + shared create/edit drawer + ADMIN write gating via `canManageStudents`.
+**Course domain (PR 46 + UI in PR 49):** Independent `course.*` packages (no imports from `student.*` domain types). `CourseController` exposes list/create/update/delete at `/api/v1/courses` with the same status and auth matrix as students. Missing ids map to `COURSE_NOT_FOUND` via the shared `ApiExceptionHandler`. Titles may duplicate (no natural unique key). The SPA Courses view (PR 49) mirrors Students: TanStack Query + shared create/edit drawer + ADMIN write gating via `canManageStudents`.
 
 **Shared API errors (PR 47):** `ApiErrorCode`, `ApiErrorResponse`, and `ApiExceptionHandler` live under `common.api` (no longer under `student.api`). Exception-to-status/code mappings and the JSON contract are unchanged.
 
@@ -83,7 +83,11 @@ Feature packages under `com.example.demo`:
 
 **Course capacity invariant (PR 51):** `capacity >= enrollmentCount` is enforced on both enroll (`COURSE_FULL` → **400**) and course update (`COURSE_CAPACITY_BELOW_ENROLLMENT_COUNT` → **409**). `CourseService.updateCourse` uses the same `findByIdForUpdate` course-row lock as enroll, then `EnrollmentRepository.countByCourseId`, and rejects when the new capacity is strictly below the count (equal and increases are allowed). Enroll and capacity-lowering updates therefore serialize on one lock; `CourseService` depends on `EnrollmentRepository` only for that read (no shared capacity service).
 
-**Gaps vs a full CRUD product (recorded, not fixed):** no JWT/OAuth; no Flyway/Liquibase (DDL via Hibernate `update`); no DB foreign keys from enrollment to student/course (deleting a student or course can leave orphan enrollment rows); shell uses local-state Students|Courses|Enrollments nav (no React Router yet); enrollment list has no enriched DTO (client join).
+**Schema migrations (PR 52):** Flyway owns DDL. Versioned SQL lives under `src/main/resources/db/migration/` (`V1__initial_schema.sql` creates sequences/tables/constraints matching the prior Hibernate schema — still **no FKs** on enrollment). Spring Boot runs Flyway **before** JPA starts; `spring.jpa.hibernate.ddl-auto=validate` then checks mappings against the migrated schema (does **not** create or alter tables). `validate` is not a full constraint/index audit — named uniques/checks are asserted in Flyway SQL and `FlywayMigrationIntegrationTest`.
+
+**Flyway vs existing databases:** On an **empty** database, migrate applies V1. On a **non-empty** database with **no** `flyway_schema_history`, Flyway **fails fast** (does not run V1). Existing RDS must be **manually baselined** at version `1` (CLI/ops, outside the app) after confirming the live schema matches V1 — do **not** enable `baseline-on-migrate` at application startup. Never edit an already-applied migration; add `V2__…` instead. Check status via `flyway_schema_history` or Flyway info.
+
+**Gaps vs a full CRUD product (recorded, not fixed):** no JWT/OAuth; no DB foreign keys from enrollment to student/course (deleting a student or course can leave orphan enrollment rows); shell uses local-state Students|Courses|Enrollments nav (no React Router yet); enrollment list has no enriched DTO (client join).
 
 ### 2.3 Frontend
 
@@ -141,7 +145,7 @@ Production: relative API URLs work because UI and API share origin. Dev: Vite `s
 
 | File | When used | Notable settings |
 | --- | --- | --- |
-| `application.properties` | Default / local / CI | Local Postgres JDBC defaults via `${SPRING_DATASOURCE_*:…}` placeholders; AppUser bootstrap via `${APP_ADMIN_*:…}` (defaults `dev`/`changeme`); `ddl-auto=update`; SQL logging on; error messages included in responses |
+| `application.properties` | Default / local / CI | Local Postgres JDBC defaults via `${SPRING_DATASOURCE_*:…}` placeholders; AppUser bootstrap via `${APP_ADMIN_*:…}` (defaults `dev`/`changeme`); Flyway + `ddl-auto=validate`; SQL logging on; error messages included in responses |
 | `application-dev.properties` | `SPRING_PROFILES_ACTIVE=dev` (EB compose) | Datasource and AppUser bootstrap **required** from env: `SPRING_DATASOURCE_*`, `APP_ADMIN_*` (no secrets in git) |
 
 Elastic Beanstalk compose sets `SPRING_PROFILES_ACTIVE: dev` and passes through `SPRING_DATASOURCE_*` and `APP_ADMIN_*` from the host/EB environment.
@@ -318,7 +322,7 @@ Spring Boot / SEP container
 
 | Area | Present today |
 | --- | --- |
-| Backend | `DemoApplicationTests`; `StudentServiceTest` / `CourseServiceTest` / `EnrollmentServiceTest` (Mockito); repository `@DataJpaTest`s; `StudentIntegrationTest` / `CourseIntegrationTest` / `EnrollmentIntegrationTest` + `EnrollmentConcurrencyIntegrationTest` (enroll capacity race + update vs enroll lock); `SecurityIntegrationTest`; `AuthorizationIntegrationTest` (students + courses + enrollments); `MeIntegrationTest`; `OpenApiContractTest`; JaCoCo report on `test` |
+| Backend | `DemoApplicationTests`; `StudentServiceTest` / `CourseServiceTest` / `EnrollmentServiceTest` (Mockito); repository `@DataJpaTest`s (import Flyway); `StudentIntegrationTest` / `CourseIntegrationTest` / `EnrollmentIntegrationTest` + `EnrollmentConcurrencyIntegrationTest` + `FlywayMigrationIntegrationTest` (idempotency / sequences / uniques); `SecurityIntegrationTest`; `AuthorizationIntegrationTest`; `MeIntegrationTest`; `OpenApiContractTest`; JaCoCo report on `test` |
 | Frontend | Vitest for `client`, `apiRoutes`, `apiError`, auth/`/me` login, role-aware students/courses/enrollments UI, notifications, `useStudents` / `useCourses` / `useEnrollments`, join helper, layout leaves, drawers, and App shell nav; ESLint + Prettier; Maven `build-frontend` runs `format:check`, `check:api-types`, `lint`, and `npm run test:coverage` before `vite build` |
 | OpenAPI | `OpenApiContractTest` asserts committed `api/openapi.json` matches `/v3/api-docs`; frontend `check:api-types` asserts generated TS matches that JSON |
 | Integration / repository / service tests | Present for student create/list/delete and email uniqueness (PR 14) |
@@ -362,7 +366,7 @@ These items are intentional backlog for modernization; this branch does not fix 
 - ~~Enrollment API without SPA screens~~ — PR 50 adds Enrollments UI (create + cancel; no edit)
 - Enrollment uses plain IDs with no DB foreign keys — deleting a Student or Course can orphan enrollment rows
 - ~~Course capacity updates do not check current enrollment count~~ — PR 51 enforces the invariant on update (shared course-row lock with enroll)
-- Hibernate `ddl-auto=update` used for deployed `dev` profile (no migration history)
+- ~~Hibernate `ddl-auto=update` used for deployed `dev` profile (no migration history)~~ — PR 52: Flyway + `validate`; existing RDS needs a one-time manual baseline
 - ~~Shared `ApiErrorCode` / `ApiExceptionHandler` still under `student.api`~~ — moved to `common.api` in PR 47
 
 ### Quality

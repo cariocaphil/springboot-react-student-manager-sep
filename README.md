@@ -7,12 +7,12 @@ Full-stack student CRUD demo: a Spring Boot API and a Vite React UI packaged int
 
 ## Status
 
-**Modernization:** PR 51 enforces course capacity ≥ enrollment count on update (shared course-row lock with enroll; 409 Conflict). Future work continues from PR 51.
+**Modernization:** PR 52 introduces Flyway as the schema authority (`validate` instead of Hibernate `ddl-auto=update`). Future work continues from PR 52.
 
 | | |
 | --- | --- |
-| Current | **Java 17** / Spring Boot **3.4.5** + **springdoc** + **Spring Security** (HTTP Basic + DB roles); Student + Course + Enrollment APIs; shared errors in `common.api`; Vite + TypeScript **React 19.3** with login + in-memory Basic auth + role-aware Students, Courses, **and Enrollments** UI; EB **LoadBalanced** with public **HTTPS** at `sep.learning-projects.dev`; POST **201** / PUT & DELETE **204** |
-| Next | Richer identity (JWT/OAuth or similar), optional Swagger UI / Flyway; further platform work per roadmap |
+| Current | **Java 17** / Spring Boot **3.4.5** + **springdoc** + **Spring Security** (HTTP Basic + DB roles); Student + Course + Enrollment APIs; shared errors in `common.api`; **Flyway** schema migrations + Hibernate `validate`; Vite + TypeScript **React 19.3** with login + in-memory Basic auth + role-aware Students, Courses, **and Enrollments** UI; EB **LoadBalanced** with public **HTTPS** at `sep.learning-projects.dev`; POST **201** / PUT & DELETE **204** |
+| Next | Richer identity (JWT/OAuth or similar), optional Swagger UI; further platform work per roadmap |
 | Full checklist | [docs/modernization-roadmap.md](docs/modernization-roadmap.md) |
 | Architecture | [docs/architecture.md](docs/architecture.md) |
 
@@ -20,8 +20,8 @@ Full-stack student CRUD demo: a Spring Boot API and a Vite React UI packaged int
 
 | Layer | Technology |
 | --- | --- |
-| Backend | Java **17**, Spring Boot **3.4.5**, Spring Web, Spring Security (HTTP Basic + `ADMIN`/`USER` roles), Spring Data JPA, Bean Validation, Lombok, **springdoc-openapi** |
-| Database | PostgreSQL (local `localhost:5432`; AWS RDS via `dev` profile) |
+| Backend | Java **17**, Spring Boot **3.4.5**, Spring Web, Spring Security (HTTP Basic + `ADMIN`/`USER` roles), Spring Data JPA, **Flyway**, Bean Validation, Lombok, **springdoc-openapi** |
+| Database | PostgreSQL (local `localhost:5432`; AWS RDS via `dev` profile); schema via Flyway |
 | Frontend | React **19.3** + **TypeScript**, **Vite 5**, Ant Design **5.29**, **i18next** / **react-i18next** (en/de), **TanStack Query 5**, **React Hook Form 7**, **Zod**, `unfetch`, **openapi-typescript** (generated wire types), Vitest, **ESLint 9**, **Prettier** |
 | Build | Maven Wrapper, `frontend-maven-plugin` (Node **20** / npm **10**), Jib **3.5.2** |
 | Container | Eclipse Temurin **17** JRE base (`eclipse-temurin:17-jre`); image name `cariocaphil/spring-react-fullstack` |
@@ -60,7 +60,7 @@ Create a local database matching the **defaults** in `application.properties` (o
 - User: `postgres`
 - Password: `password`
 
-Schema is managed by Hibernate (`spring.jpa.hibernate.ddl-auto=update` for the app; tests use `create-drop`).
+Schema is managed by **Flyway** (`src/main/resources/db/migration/`). Hibernate uses `ddl-auto=validate` (does not alter tables). On first empty DB boot, Flyway applies `V1__initial_schema.sql`. A non-empty DB without `flyway_schema_history` **fails fast** — existing environments need a **manual** Flyway baseline at version `1` after confirming the live schema matches V1 (do not use `baseline-on-migrate` on the app). Add new changes as `V2__…` / `V3__…`; never edit applied migrations. See [docs/architecture.md](docs/architecture.md).
 
 **Start Postgres with Podman** (preferred on this machine) or Docker — same settings as CI:
 
