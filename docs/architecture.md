@@ -170,7 +170,7 @@ Elastic Beanstalk compose sets `SPRING_PROFILES_ACTIVE: dev` and passes through 
 | `id` | Sequence-generated `Long` (`course_sequence`) |
 | `title` | Non-blank, non-null (not unique) |
 | `description` | Nullable / optional on create and update |
-| `capacity` | Non-null integer, minimum 1 |
+| `capacity` | Non-null integer, minimum 1; OpenAPI / generated Zod is `.int().min(1)` with **no maximum** (see §7) |
 
 **Enrollment** (join table; plain IDs, no JPA/`@ManyToOne` FKs)
 
@@ -378,6 +378,7 @@ These items are intentional backlog for modernization; this branch does not fix 
 - Unused imports in `StudentService` (HttpStatus / ResponseStatus)
 - `typed-openapi` emits Zod for all OpenAPI schemas into `schemas.ts`; only `*Request` schemas are imported by forms today — `*Response`, `CurrentUserResponse`, and `ApiErrorResponse` are harmless unused output until response-side parsing or similar adopts them
 - Two generators from one OpenAPI spec (`openapi-typescript` types + `typed-openapi` Zod) are independent artifacts; assignability tests guard drift for now — a follow-up could infer types from Zod and drop one generator
+- Course `capacity` Zod / OpenAPI has no upper bound (`.int().min(1)` only); Java `CourseRequest.capacity` is `Integer` (max `2_147_483_647`). A huge value can pass SPA validation and fail at Jackson JSON deserialization. Accepted for now; optional later `@Max` / OpenAPI `maximum` for parity
 
 ## 8. What “done” looks like for this baseline
 
