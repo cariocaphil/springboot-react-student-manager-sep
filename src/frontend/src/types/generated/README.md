@@ -11,6 +11,9 @@ From `src/frontend`:
 
 Both generators read the committed OpenAPI document at `../../api/openapi.json`
 (export from Spring Boot via `OpenApiContractTest` / `-Dopenapi.export=true`).
+They are independent artifacts from the same spec; `schemas.test.ts`
+assignability checks guard against Zod ↔ domain-type drift. A follow-up
+could infer TypeScript types from Zod and drop `openapi-typescript`.
 
 No running backend is required for frontend generation — only an up-to-date
 `api/openapi.json` and `npm install`.
