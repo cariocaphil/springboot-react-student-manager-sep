@@ -320,9 +320,9 @@ PR 52 — Flyway Database Migration Integration ✅
 - [x] ITs: migration idempotency, sequences, unique constraints; `@DataJpaTest` imports Flyway
 - [x] Docs: how to add migrations, validate limits, cutover/rollback
 
-PR 53 — OpenAPI-Driven Zod Schema Generation
-- [ ] Pin `typed-openapi`; generate Zod from `api/openapi.json` into `types/generated/schemas.ts` (schemas-only; leave `openapi-typescript` / client unchanged)
-- [ ] `npm run generate:zod` / `check:zod`; Maven `build-frontend` runs `check:zod` after `check:api-types`
-- [ ] Student / course / enrollment form schemas reuse generated `*Request` (course title trim / form description overlay only; no i18n in schemas); localized messages via per-form error maps passed to `zodResolver`; login stays handwritten
-- [ ] Focused generated-schema tests (required fields, capacity, enrollment int64 as number); existing form/drawer tests stay green
-- [ ] Docs: roadmap, architecture OpenAPI→Zod note, generated README
+PR 53 — OpenAPI-Driven Zod Schema Generation ✅
+- [x] Pin `typed-openapi`; generate Zod from `api/openapi.json` into `types/generated/schemas.ts` (schemas-only; leave `openapi-typescript` / client unchanged)
+- [x] `npm run generate:zod` / `check:zod`; Maven `build-frontend` runs `check:zod` after `check:api-types`
+- [x] Student / course / enrollment form schemas reuse generated `*Request` (course title trim / form description overlay only; no i18n in schemas); localized messages via per-form error maps passed to `zodResolver`; login stays handwritten
+- [x] Focused generated-schema tests (required fields, capacity, enrollment int64 as number); existing form/drawer tests stay green
+- [x] Docs: roadmap, architecture OpenAPI→Zod note, generated README
