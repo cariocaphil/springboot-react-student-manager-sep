@@ -8,9 +8,13 @@ import jakarta.validation.constraints.NotNull;
 
 @Schema(name = "CourseRequest", description = "Payload to create or update a course")
 public record CourseRequest(
+        // TODO(tech-debt): DB column is VARCHAR(255) but there is no @Size(max = 255), so OpenAPI /
+        // generated Zod have no maxLength and over-long input fails at the database instead of validation.
         @NotBlank
         @Schema(description = "Course title", example = "Intro to Algorithms", requiredMode = Schema.RequiredMode.REQUIRED)
         String title,
+        // TODO(tech-debt): DB column is VARCHAR(255) but there is no @Size(max = 255), so OpenAPI /
+        // generated Zod have no maxLength and over-long input fails at the database instead of validation.
         @Schema(description = "Optional course description", example = "Sorting, graphs, and complexity")
         String description,
         @NotNull
