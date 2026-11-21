@@ -2,7 +2,7 @@
 
 Build history for the Student Manager modernization.
 
-PR numbers match merged GitHub pull requests. Future work continues from PR 53.
+PR numbers match merged GitHub pull requests. Future work continues from PR 54.
 
 The README keeps a short Status summary; this file holds the full checklist.
 
@@ -326,3 +326,10 @@ PR 53 — OpenAPI-Driven Zod Schema Generation ✅
 - [x] Student / course / enrollment form schemas reuse generated `*Request` (course title trim / form description overlay only; no i18n in schemas); localized messages via per-form error maps passed to `zodResolver`; login stays handwritten
 - [x] Focused generated-schema tests (required fields, capacity, enrollment int64 as number); existing form/drawer tests stay green
 - [x] Docs: roadmap, architecture OpenAPI→Zod note, generated README
+
+PR 54 — Zod Runtime Validation for API Responses ✅
+- [x] Validate successful JSON in `client.ts` getters (`getCurrentUser`, `getAllStudents`, `getAllCourses`, `getAllEnrollments`) via generated `*Response` / `CurrentUserResponse` (+ `z.array`)
+- [x] Small `parseApiResponse` helper + `ApiResponseValidationError` (readonly issues); DEV logs path/code only; skip JSON parse on 201/204 void paths
+- [x] Minimal `apiError` mapping to `errors.invalidResponse`; leave LoadError / LoginPage / query UI unchanged
+- [x] Tests: client boundary, response schema assignability + runtime `safeParse`, Query-cache path via mocked `unfetch` (real `getAllStudents`, retries off)
+- [x] Docs: roadmap, architecture (compile-time vs runtime), generated README, README Status

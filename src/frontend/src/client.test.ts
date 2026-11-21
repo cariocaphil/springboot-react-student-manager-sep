@@ -21,6 +21,7 @@ import {
   updateCourse,
   updateStudent,
 } from './client';
+import { isApiResponseValidationError } from './parseApiResponse';
 import type { ApiResponse } from './types/api';
 import type { Course } from './types/course';
 import type { Enrollment } from './types/enrollment';
@@ -31,6 +32,8 @@ vi.mock('unfetch', () => ({
 }));
 
 const mockedFetch = vi.mocked(fetch);
+
+vi.spyOn(console, 'error').mockImplementation(() => undefined);
 
 const ada: Student = {
   id: 1,
@@ -307,5 +310,91 @@ describe('client', () => {
       method: 'DELETE',
       headers: {},
     });
+  });
+
+  it('getAllStudents accepts an empty collection', async () => {
+    const response = {
+      ok: true,
+      status: 200,
+      statusText: 'OK',
+      json: async () => [],
+    } as ApiResponse;
+    mockedFetch.mockResolvedValue(response as never);
+
+    await expect(getAllStudents()).resolves.toEqual([]);
+  });
+
+  it('getAllStudents rejects a malformed collection before returning', async () => {
+    const invalid = [{ id: 1, name: 'Ada' }];
+    const response = {
+      ok: true,
+      status: 200,
+      statusText: 'OK',
+      json: async () => invalid,
+    } as ApiResponse;
+    mockedFetch.mockResolvedValue(response as never);
+
+    await expect(getAllStudents()).rejects.toSatisfy(isApiResponseValidationError);
+  });
+
+  it('getCurrentUser rejects an invalid role enum', async () => {
+    const response = {
+      ok: true,
+      status: 200,
+      statusText: 'OK',
+      json: async () => ({ username: 'dev', role: 'SUPERUSER' }),
+    } as ApiResponse;
+    mockedFetch.mockResolvedValue(response as never);
+
+    await expect(getCurrentUser()).rejects.toSatisfy(isApiResponseValidationError);
+  });
+
+  it('getAllCourses rejects null description and wrong capacity type', async () => {
+    const response = {
+      ok: true,
+      status: 200,
+      statusText: 'OK',
+      json: async () => [
+        { id: 1, title: 'Algebra', capacity: 30, description: null },
+        { id: 2, title: 'Geometry', capacity: '30' },
+      ],
+    } as ApiResponse;
+    mockedFetch.mockResolvedValue(response as never);
+
+    await expect(getAllCourses()).rejects.toSatisfy(isApiResponseValidationError);
+  });
+
+  it('getAllEnrollments rejects an invalid enrolledAt value', async () => {
+    const response = {
+      ok: true,
+      status: 200,
+      statusText: 'OK',
+      json: async () => [
+        {
+          id: 9,
+          studentId: 1,
+          courseId: 1,
+          enrolledAt: 'yesterday',
+        },
+      ],
+    } as ApiResponse;
+    mockedFetch.mockResolvedValue(response as never);
+
+    await expect(getAllEnrollments()).rejects.toSatisfy(isApiResponseValidationError);
+  });
+
+  it('updateStudent with HTTP 204 still resolves without validating a JSON body', async () => {
+    const response = {
+      ok: true,
+      status: 204,
+      statusText: 'No Content',
+      json: async () => {
+        throw new Error('json() should not be called for void responses');
+      },
+    } as ApiResponse;
+    const student = { name: 'Ada', email: 'ada@example.com', gender: 'FEMALE' as const };
+    mockedFetch.mockResolvedValue(response as never);
+
+    await expect(updateStudent(42, student)).resolves.toBeUndefined();
   });
 });

@@ -7,11 +7,11 @@ Full-stack student CRUD demo: a Spring Boot API and a Vite React UI packaged int
 
 ## Status
 
-**Modernization:** PR 53 generates Zod request schemas from OpenAPI (`typed-openapi`) while keeping localized form messages (resolver error maps) and the existing `openapi-typescript` types/client. Future work continues from PR 53.
+**Modernization:** PR 54 validates successful API JSON in `client.ts` with generated Zod `*Response` schemas (from PR 53 `typed-openapi`), while form validation and `openapi-typescript` wire types stay as before. Future work continues from PR 54.
 
 | | |
 | --- | --- |
-| Current | **Java 17** / Spring Boot **3.4.5** + **springdoc** + **Spring Security** (HTTP Basic + DB roles); Student + Course + Enrollment APIs; shared errors in `common.api`; **Flyway** schema migrations + Hibernate `validate`; Vite + TypeScript **React 19.3** with login + in-memory Basic auth + role-aware Students, Courses, **and Enrollments** UI; EB **LoadBalanced** with public **HTTPS** at `sep.learning-projects.dev`; POST **201** / PUT & DELETE **204** |
+| Current | **Java 17** / Spring Boot **3.4.5** + **springdoc** + **Spring Security** (HTTP Basic + DB roles); Student + Course + Enrollment APIs; shared errors in `common.api`; **Flyway** schema migrations + Hibernate `validate`; Vite + TypeScript **React 19.3** with login + in-memory Basic auth + role-aware Students, Courses, **and Enrollments** UI; OpenAPI-generated Zod for forms **and** runtime response validation at the API client; EB **LoadBalanced** with public **HTTPS** at `sep.learning-projects.dev`; POST **201** / PUT & DELETE **204** |
 | Next | Richer identity (JWT/OAuth or similar), optional Swagger UI; further platform work per roadmap |
 | Full checklist | [docs/modernization-roadmap.md](docs/modernization-roadmap.md) |
 | Architecture | [docs/architecture.md](docs/architecture.md) |
@@ -22,7 +22,7 @@ Full-stack student CRUD demo: a Spring Boot API and a Vite React UI packaged int
 | --- | --- |
 | Backend | Java **17**, Spring Boot **3.4.5**, Spring Web, Spring Security (HTTP Basic + `ADMIN`/`USER` roles), Spring Data JPA, **Flyway**, Bean Validation, Lombok, **springdoc-openapi** |
 | Database | PostgreSQL (local `localhost:5432`; AWS RDS via `dev` profile); schema via Flyway |
-| Frontend | React **19.3** + **TypeScript**, **Vite 5**, Ant Design **5.29**, **i18next** / **react-i18next** (en/de), **TanStack Query 5**, **React Hook Form 7**, **Zod** (generated from OpenAPI via **typed-openapi**; localized via resolver error maps), `unfetch`, **openapi-typescript** (generated wire types), Vitest, **ESLint 9**, **Prettier** |
+| Frontend | React **19.3** + **TypeScript**, **Vite 5**, Ant Design **5.29**, **i18next** / **react-i18next** (en/de), **TanStack Query 5**, **React Hook Form 7**, **Zod** (generated from OpenAPI via **typed-openapi**; form overlays + runtime response validation in `client.ts`; localized via resolver error maps), `unfetch`, **openapi-typescript** (generated wire types), Vitest, **ESLint 9**, **Prettier** |
 | Build | Maven Wrapper, `frontend-maven-plugin` (Node **20** / npm **10**), Jib **3.5.2** |
 | Container | Eclipse Temurin **17** JRE base (`eclipse-temurin:17-jre`); image name `cariocaphil/spring-react-fullstack` |
 | CI/CD | GitHub Actions (`.github/workflows/build.yml`, `deploy.yml`) |
@@ -188,7 +188,7 @@ Covers API client helpers, notification wrappers, create-student drawer (validat
 
 ### OpenAPI contract and generated types
 
-Spring Boot owns the HTTP contract (DTOs + springdoc). The committed snapshot is `api/openapi.json`. The React app generates TypeScript types and Zod schemas from that file — **do not edit** `src/frontend/src/types/generated/` by hand.
+Spring Boot owns the HTTP contract (DTOs + springdoc). The committed snapshot is `api/openapi.json`. The React app generates TypeScript types (`schema.d.ts`, compile-time) and Zod schemas (`schemas.ts`, runtime forms + API response validation in `client.ts`) from that file — **do not edit** `src/frontend/src/types/generated/` by hand.
 
 After changing API DTOs or controller annotations:
 

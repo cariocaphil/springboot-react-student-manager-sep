@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { notifyHttpError, notifyUnexpectedError, toUserFacingApiErrorMessage } from './apiError';
 import i18n from './i18n';
 import * as notify from './Notification';
+import { ApiResponseValidationError } from './parseApiResponse';
 import type { ApiErrorBody, HttpError } from './types/api';
 
 vi.mock('./Notification');
@@ -93,11 +94,27 @@ describe('apiError', () => {
     );
   });
 
+  it('notifyUnexpectedError maps response validation failures to invalidResponse', () => {
+    notifyUnexpectedError(new ApiResponseValidationError([]));
+    expect(notify.errorNotification).toHaveBeenCalledWith(
+      i18n.t('errors.issueTitle'),
+      i18n.t('errors.invalidResponse')
+    );
+  });
+
   it('notifyHttpError falls back to notifyUnexpectedError for non-HTTP errors', async () => {
     await notifyHttpError(new Error('boom'));
     expect(notify.errorNotification).toHaveBeenCalledWith(
       i18n.t('errors.issueTitle'),
       i18n.t('errors.unexpected')
+    );
+  });
+
+  it('notifyHttpError maps response validation failures to invalidResponse', async () => {
+    await notifyHttpError(new ApiResponseValidationError([]));
+    expect(notify.errorNotification).toHaveBeenCalledWith(
+      i18n.t('errors.issueTitle'),
+      i18n.t('errors.invalidResponse')
     );
   });
 
