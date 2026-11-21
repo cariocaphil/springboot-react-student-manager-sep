@@ -1,11 +1,13 @@
 package com.example.demo.course.api;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 @Schema(name = "CourseResponse", description = "Course as returned by the API")
 public record CourseResponse(
         @NotNull
