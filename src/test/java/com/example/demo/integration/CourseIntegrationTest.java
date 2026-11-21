@@ -96,6 +96,27 @@ class CourseIntegrationTest {
     }
 
     @Test
+    void getAllCourses_omitsDescriptionKeyWhenAbsent() throws Exception {
+        // OpenAPI + frontend Zod treat description as optional but never null — omit the key.
+        String payloadWithoutDescription = """
+                {"title":"NoDesc","capacity":10}
+                """;
+
+        mockMvc.perform(post(COURSES_URI)
+                        .with(BASIC_AUTH)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(payloadWithoutDescription))
+                .andExpect(status().isCreated());
+
+        mockMvc.perform(get(COURSES_URI).with(BASIC_AUTH))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(1)))
+                .andExpect(jsonPath("$[0].title").value("NoDesc"))
+                .andExpect(jsonPath("$[0].capacity").value(10))
+                .andExpect(jsonPath("$[0].description").doesNotExist());
+    }
+
+    @Test
     void addCourse_rejectsBlankTitle() throws Exception {
         String invalidJson = """
                 {"title":"","description":"Intro","capacity":30}
