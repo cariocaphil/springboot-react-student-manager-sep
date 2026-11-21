@@ -1,5 +1,6 @@
 import { errorNotification } from './Notification';
 import i18n from './i18n';
+import { isApiResponseValidationError } from './parseApiResponse';
 import type { ApiErrorBody, ApiErrorCode } from './types/api';
 import { isHttpError } from './types/api';
 import type { NotificationPlacement } from './types/notification';
@@ -47,7 +48,10 @@ export function notifyUnexpectedError(
   error: unknown,
   options: { placement?: NotificationPlacement } = {}
 ): void {
-  void error;
+  if (isApiResponseValidationError(error)) {
+    notifyIssue(i18n.t('errors.invalidResponse'), options.placement);
+    return;
+  }
   notifyIssue(i18n.t('errors.unexpected'), options.placement);
 }
 
